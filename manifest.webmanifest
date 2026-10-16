@@ -1,0 +1,15 @@
+{
+  "name": "Road to 10%",
+  "short_name": "Road to 10%",
+  "description": "Daily log for sleep, food, lifting, cardio and measurements, phase by phase.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ECEFED",
+  "theme_color": "#131A17",
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
