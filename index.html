@@ -25,6 +25,7 @@
   --ok:#1A6E4A; --ok-bg:#DFF0E7; --warn:#8A5A00; --warn-bg:#FAEFD3; --bad:#A92A22; --bad-bg:#F7E1DF; --info:#2350B5; --info-bg:#E3EAF8;
   --btn:#131A17; --on-btn:#FFFFFF;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --morn1:#FFF1D6; --morn2:#FFE2AE; --morn-ink:#3A2A08; --morn-mut:#7A5A1E;
   --display:"Saira Condensed","Arial Narrow","Roboto Condensed",sans-serif;
   --body:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;
   color-scheme:light;
@@ -35,13 +36,13 @@
   --red:#E8625A; --blue:#7298EE; --yellow:#E9BC34; --green:#46B786; --steel:#A0ACA7; --day:#E6ECE9;
   --on-red:#0D1210; --on-blue:#0D1210; --on-yellow:#0D1210; --on-green:#0D1210; --on-steel:#0D1210; --on-day:#0D1210;
   --ok:#6BD3A2; --ok-bg:#14291F; --warn:#EDC14A; --warn-bg:#2B2410; --bad:#F38A82; --bad-bg:#301816; --info:#9BB7F4; --info-bg:#172138;
-  --btn:#E6ECE9; --on-btn:#0D1210; --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; color-scheme:dark; } }
+  --btn:#E6ECE9; --on-btn:#0D1210; --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --morn1:#3A2C12; --morn2:#271D0D; --morn-ink:#FBE7C2; --morn-mut:#D9BC80; color-scheme:dark; } }
 :root[data-theme="dark"]{
   --bg:#0D1210; --surface:#151C19; --sunk:#111714; --ink:#E6ECE9; --ink2:#C3CDC8; --muted:#90A099; --line:#2B3632; --line2:#212B27;
   --red:#E8625A; --blue:#7298EE; --yellow:#E9BC34; --green:#46B786; --steel:#A0ACA7; --day:#E6ECE9;
   --on-red:#0D1210; --on-blue:#0D1210; --on-yellow:#0D1210; --on-green:#0D1210; --on-steel:#0D1210; --on-day:#0D1210;
   --ok:#6BD3A2; --ok-bg:#14291F; --warn:#EDC14A; --warn-bg:#2B2410; --bad:#F38A82; --bad-bg:#301816; --info:#9BB7F4; --info-bg:#172138;
-  --btn:#E6ECE9; --on-btn:#0D1210; --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; color-scheme:dark; }
+  --btn:#E6ECE9; --on-btn:#0D1210; --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --morn1:#3A2C12; --morn2:#271D0D; --morn-ink:#FBE7C2; --morn-mut:#D9BC80; color-scheme:dark; }
 
 *{box-sizing:border-box}
 html,body{background:var(--bg)}
@@ -295,6 +296,96 @@ body.resting main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
 .dleg i{width:10px;height:10px;border-radius:2px}
 .dleg b{font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
 .dleg .muted{font-variant-numeric:tabular-nums;text-align:right;min-width:34px}
+/* food */
+.fuel{padding:16px;display:flex;flex-direction:column;gap:12px;--sec:var(--green)}
+.fuelrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fuelnum{display:flex;flex-direction:column}
+.fuelnum small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fuelnum strong{font-family:var(--display);font-size:42px;font-weight:700;line-height:1.05}
+.fuelnum span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.leftline{font-size:14.5px}
+.leftline b{font-weight:600}
+.pips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.pip{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.pip b{font-family:var(--display);font-size:21px;color:var(--ink);font-weight:600;line-height:1.1}
+.pip.part{border-color:color-mix(in srgb,var(--yellow) 70%,var(--line))}
+.pip.ok{background:color-mix(in srgb,var(--green) 15%,var(--surface));border-color:color-mix(in srgb,var(--green) 55%,var(--line))}
+.pip.sel{box-shadow:0 0 0 2px var(--ink)}
+.foodcat{display:flex;flex-direction:column;gap:6px}
+.foodcat .chip{min-height:34px;font-size:13.5px;padding:0 11px}
+.platelist{display:flex;flex-direction:column;gap:6px}
+.plate-it{display:grid;grid-template-columns:minmax(0,1fr) 128px 32px;gap:8px;align-items:center;padding:6px 6px 6px 10px;border-radius:10px;background:var(--sunk)}
+.plate-it .nm{font-size:14px;min-width:0;font-weight:500}
+.plate-it .nm small{display:block;color:var(--muted);font-size:12px;font-weight:400;font-variant-numeric:tabular-nums}
+.plate-it .stepper{height:42px}
+.plate-it .stepper span{font-family:var(--display);font-size:16px;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rmx{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--muted);font-size:15px;padding:0}
+.plate-tot{display:flex;flex-direction:column;gap:2px;font-size:14px;font-variant-numeric:tabular-nums;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--green) 10%,var(--surface))}
+.plate-tot strong{font-family:var(--display);font-size:24px;font-weight:700}
+.suggs{display:grid;gap:8px}
+.sugg-card{border:1px solid color-mix(in srgb,var(--green) 40%,var(--line));border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.sugg-card b{font-weight:600}
+.favrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:10px 0;border-top:1px solid var(--line2);align-items:center}
+.favrow:first-child{border-top:0}
+.favrow .t{font-weight:600;font-size:14px}
+.favrow .d{font-size:12.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.favrow .acts{display:flex;gap:6px;align-items:center;grid-row:1/3;grid-column:2}
+.shop{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:2px 14px}
+.shop h4{grid-column:1/-1;margin:8px 0 0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.shop .ck.done{color:var(--muted);text-decoration:line-through}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:12;background:var(--btn);color:var(--on-btn);padding:10px 16px;border-radius:12px;font-size:14px;width:max-content;max-width:min(92vw,520px);box-shadow:0 8px 24px rgb(0 0 0 / .25)}
+/* sleep */
+.nightcard{border:0;padding:18px 16px;display:flex;flex-direction:column;gap:10px;color:#E8EDFF;background:radial-gradient(1.6px 1.6px at 16% 20%,#ffffffb0 50%,transparent 52%),radial-gradient(1.1px 1.1px at 70% 13%,#ffffffa0 50%,transparent 52%),radial-gradient(1.3px 1.3px at 88% 42%,#ffffff90 50%,transparent 52%),radial-gradient(1px 1px at 42% 9%,#ffffff80 50%,transparent 52%),radial-gradient(1px 1px at 58% 30%,#ffffff70 50%,transparent 52%),linear-gradient(160deg,#1B2C5C 0%,#0D1631 100%)}
+.nightcard .eyebrow,.morncard .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.nightcard .eyebrow{color:#AFC0F5}
+.nightcard h2{font-size:30px;color:#fff}
+.nightcard .big,.morncard .big{font-family:var(--display);font-size:56px;font-weight:700;line-height:1}
+.nightcard .big{color:#fff}
+.nightcard .soft{color:#BFCBEF;font-size:14px}
+.nightcard .btn{background:#E8EDFF;color:#0D1631}
+.nightcard .btn.ghost{background:transparent;color:#E8EDFF;border:1px solid #ffffff45}
+.nightcard input[type=time],.morncard input[type=time]{border-radius:8px;padding:8px 10px;font-size:16px;min-height:40px}
+.nightcard input[type=time]{background:#ffffff14;border:1px solid #ffffff35;color:#fff;color-scheme:dark}
+.nightcard .f>span{color:#C9D4F5}
+.morncard{border:0;padding:18px 16px;display:flex;flex-direction:column;gap:10px;color:var(--morn-ink);background:linear-gradient(160deg,var(--morn1),var(--morn2));--sec:var(--morn-ink);--on-sec:var(--morn1)}
+.morncard .eyebrow,.morncard .soft,.morncard .scale-note{color:var(--morn-mut)}
+.morncard .soft{font-size:14px}
+.morncard .f>span{color:var(--morn-ink)}
+.morncard .chip{background:transparent;border-color:color-mix(in srgb,var(--morn-ink) 30%,transparent);color:var(--morn-ink)}
+.morncard .chip[aria-pressed="true"]{background:var(--morn-ink);color:var(--morn1)}
+.morncard .btn{background:var(--morn-ink);color:var(--morn1)}
+.morncard input[type=time]{background:color-mix(in srgb,var(--morn1) 60%,transparent);border:1px solid color-mix(in srgb,var(--morn-ink) 25%,transparent);color:var(--morn-ink)}
+.morncard .ck input{accent-color:var(--morn-ink)}
+.verdict{display:inline-block;font-size:12.5px;font-weight:600;border-radius:999px;padding:2px 10px;background:color-mix(in srgb,currentColor 14%,transparent)}
+.tl{display:flex;flex-direction:column;margin-top:4px}
+.tl-i{display:grid;grid-template-columns:76px 18px minmax(0,1fr);gap:0 10px}
+.tl-t{font-family:var(--display);font-size:17px;font-weight:600;text-align:right;line-height:1.3;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tl-d{position:relative;display:flex;justify-content:center}
+.tl-d::before{content:"";position:absolute;top:0;bottom:0;width:2px;background:var(--line)}
+.tl-i:first-child .tl-d::before{top:10px}
+.tl-i:last-child .tl-d::before{bottom:auto;height:10px}
+.tl-d i{position:relative;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--blue);margin-top:5px;flex:none}
+.tl-b{padding-bottom:14px;min-width:0}
+.tl-b b{font-weight:600}
+.tl-b div{font-size:13px;color:var(--muted)}
+.tl-i.past{opacity:.45}
+.tl-i.past .tl-d i{background:var(--blue)}
+.tl-i.next .tl-d i{background:var(--blue);box-shadow:0 0 0 4px color-mix(in srgb,var(--blue) 25%,transparent)}
+.tl-i.next .tl-b b::after{content:" · next";color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line2);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.stats div{background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;min-width:0}
+.stats small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stats strong{font-family:var(--display);font-size:26px;font-weight:600;line-height:1.15}
+.stats span{font-size:12px;color:var(--muted)}
+.coach{display:flex;flex-direction:column;gap:8px}
+.coach .steps{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:20px;font-weight:600;flex-wrap:wrap}
+.coach .steps em{font-style:normal;color:var(--muted);font-family:var(--body);font-size:13px;font-weight:500}
+.coach .steps .arrow{color:var(--muted)}
+/* more */
+.morelink{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;text-align:left;cursor:pointer;width:100%;font:inherit;color:inherit}
+.morelink b{display:block;font-family:var(--display);font-size:22px;font-weight:600}
+.morelink small{display:block;color:var(--muted);font-size:13.5px}
+.chev2{font-size:26px;color:var(--muted);line-height:1}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
@@ -317,18 +408,22 @@ body.resting main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
   <section class="view" id="v-today"></section>
   <section class="view" id="v-workout" hidden></section>
   <section class="view" id="v-charts" hidden></section>
+  <section class="view" id="v-food" hidden></section>
+  <section class="view" id="v-sleep" hidden></section>
+  <section class="view" id="v-more" hidden></section>
   <section class="view" id="v-history" hidden></section>
   <section class="view" id="v-cheat" hidden></section>
   <section class="view share" id="v-share" hidden></section>
 </main>
 <div class="restbar" id="restBar" hidden><div class="in"><strong id="restTime">0:00</strong><span id="restLab">Rest</span><button type="button" data-rest="add">+15 s</button><button type="button" data-rest="skip">Skip</button></div></div>
+<div class="toast" id="toast" role="status" hidden></div>
 <nav class="bottomnav" role="tablist" aria-label="Sections">
   <button role="tab" id="t-today" aria-selected="true" data-tab="today"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Today</button>
   <button role="tab" id="t-workout" aria-selected="false" data-tab="workout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 7.5v9M17.5 7.5v9M3.5 10v4M20.5 10v4M6.5 12h11"/></svg>Workout</button>
-  <button role="tab" id="t-charts" aria-selected="false" data-tab="charts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20.5h18M6 20.5v-7M11 20.5V5M16 20.5v-10M21 20.5"/></svg>Charts</button>
-  <button role="tab" id="t-history" aria-selected="false" data-tab="history"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6.5h11M9 12h11M9 17.5h11M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01" stroke-width="2.2"/></svg>History</button>
-  <button role="tab" id="t-cheat" aria-selected="false" data-tab="cheat"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 3h6v3.5H9zM8.5 11h7M8.5 15h5"/></svg>Cheat sheet</button>
-  <button role="tab" id="t-share" aria-selected="false" data-tab="share"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3.5M8 7.5l4-4 4 4M5.5 11v8a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-8"/></svg>Send</button>
+  <button role="tab" id="t-food" aria-selected="false" data-tab="food"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v7.5M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 10.5V21M17 21V3c-2.2 1.2-3.5 4-3.5 8h3.5"/></svg>Food</button>
+  <button role="tab" id="t-sleep" aria-selected="false" data-tab="sleep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/></svg>Sleep</button>
+  <button role="tab" id="t-charts" aria-selected="false" data-tab="charts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20.5h18M6 20.5v-7M11 20.5V5M16 20.5v-10"/></svg>Charts</button>
+  <button role="tab" id="t-more" aria-selected="false" data-tab="more"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/></svg>More</button>
 </nav>
 
 <script>
@@ -866,11 +961,11 @@ function bindView(el){
   }, true);
 }
 bindView($("#v-today")); bindView($("#v-workout"));
-function renderCurrent(){ if (tab === "workout") renderWorkout(); else renderToday(); }
+function renderCurrent(){ if (tab === "workout") renderWorkout(); else if (tab === "food") renderFood(); else renderToday(); }
 async function goDate(date){
   await flush();
   curDate = date; loadDraft();
-  if (tab !== "today" && tab !== "workout") showTab("today"); else renderCurrent();
+  if (!["today","workout","food"].includes(tab)) showTab("today"); else renderCurrent();
   window.scrollTo({top:0});
 }
 function dateBarHTML(){
@@ -1233,6 +1328,364 @@ function drawChart(){
   hit.addEventListener("blur", () => { xh.setAttribute("visibility","hidden"); tip.hidden = true; });
   hit.addEventListener("keydown", ev => { if (ev.key === "ArrowLeft"){ show(idx-1); ev.preventDefault(); } if (ev.key === "ArrowRight"){ show(idx+1); ev.preventDefault(); } });
 }
+
+/* ---------- shared helpers for Food & Sleep ---------- */
+let toastT = null;
+function showToast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2800); }
+async function patchDay(date, fn){
+  if (date === curDate){ fn(draft); dirty = true; await flush(); return; }
+  const e = clone(store.days[date] || { date }); e.date = date; if (!e.phase) e.phase = store.settings.phase;
+  fn(e); e.updatedAt = new Date().toISOString(); store.days[date] = e;
+  try { if (mode === "idb") await IDB.put("days", e); else ls.set("rt10-local", { days: store.days, settings: store.settings }); setStatus("saved"); }
+  catch(err){ setStatus("error", "Not saved"); }
+}
+const SLOTNAME = Object.fromEntries(MEALS.map(([id, l]) => [id, l === "Before bed & extras" ? "Extras" : l]));
+const MAIN_SLOTS = ["breakfast","lunch","snack","dinner"];
+
+/* ---------- FOOD ---------- */
+const FOODS = [
+  {id:"chicken", c:"p", chip:"Chicken thigh", sn:"chicken thigh (skinless, cooked)", unit:"g", step:25, def:150, min:75, max:350, k:1.85, p:0.25},
+  {id:"beef", c:"p", chip:"Ground beef", sn:"ground beef (cooked, drained)", unit:"g", step:25, def:150, min:75, max:250, k:2.72, p:0.26},
+  {id:"eggs", c:"p", chip:"Eggs", sn:"", unit:"egg", pl:"eggs", self:true, step:1, def:3, min:1, max:6, k:72, p:6.3},
+  {id:"tuna", c:"p", chip:"Tuna", sn:"tuna (in water, drained)", unit:"can", step:1, def:1, min:1, max:2, k:130, p:29},
+  {id:"whey", c:"p", chip:"Whey", sn:"whey protein", unit:"scoop", step:1, def:1, min:1, max:2, k:120, p:24},
+  {id:"greek", c:"p", chip:"Greek yogurt", sn:"0% Greek yogurt", unit:"g", step:25, def:175, min:25, max:400, k:0.59, p:0.10},
+  {id:"cottage", c:"p", chip:"Cottage cheese", sn:"2% cottage cheese", unit:"g", step:25, def:100, min:50, max:300, k:0.82, p:0.11},
+  {id:"lentils", c:"p", chip:"Lentils / beans", sn:"lentils or beans (canned, drained)", unit:"g", step:25, def:100, min:50, max:250, k:1.13, p:0.08},
+  {id:"milk", c:"p", chip:"1% milk", sn:"1% milk", unit:"ml", step:50, def:250, min:50, max:500, k:0.44, p:0.036},
+  {id:"rice", c:"c", chip:"Rice", sn:"rice (cooked)", unit:"g", step:25, def:150, min:50, max:300, k:1.30, p:0.027},
+  {id:"potato", c:"c", chip:"Potatoes", sn:"potatoes (boiled)", unit:"g", step:25, def:150, min:75, max:450, k:0.87, p:0.019},
+  {id:"oats", c:"c", chip:"Oats", sn:"oats (dry)", unit:"g", step:10, def:50, min:30, max:100, k:3.79, p:0.13},
+  {id:"bread", c:"c", chip:"Bread", sn:"whole wheat bread", unit:"slice", pl:"slices", step:1, def:2, min:1, max:3, k:90, p:4},
+  {id:"veg", c:"v", chip:"Mixed veg", sn:"frozen mixed veg", unit:"g", step:25, def:150, min:50, max:400, k:0.65, p:0.029},
+  {id:"peas", c:"v", chip:"Peas & carrots", sn:"peas and carrots", unit:"g", step:25, def:150, min:50, max:400, k:0.50, p:0.031},
+  {id:"berries", c:"v", chip:"Berries", sn:"frozen berries", unit:"g", step:25, def:100, min:25, max:300, k:0.50, p:0.007},
+  {id:"apple", c:"v", chip:"Apple", sn:"", unit:"apple", self:true, step:1, def:1, min:1, max:2, k:95, p:0.5},
+  {id:"banana", c:"v", chip:"Banana", sn:"", unit:"banana", self:true, step:1, def:1, min:1, max:2, k:105, p:1.3},
+  {id:"pb", c:"f", chip:"Peanut butter", sn:"peanut butter", unit:"tbsp", pl:"tbsp", step:1, def:1, min:1, max:3, k:95, p:3.5},
+  {id:"oil", c:"f", chip:"Olive oil", sn:"olive oil", unit:"tsp", pl:"tsp", step:1, def:1, min:1, max:3, k:40, p:0},
+  {id:"butter", c:"f", chip:"Butter", sn:"butter", unit:"tsp", pl:"tsp", step:1, def:1, min:1, max:3, k:34, p:0},
+  {id:"cheese", c:"f", chip:"Cheese", sn:"cheddar", unit:"g", step:10, def:30, min:10, max:60, k:4.0, p:0.25},
+  {id:"popcorn", c:"f", chip:"Popcorn", sn:"air-popped popcorn", unit:"cup", step:1, def:3, min:1, max:6, k:31, p:1},
+  {id:"jello", c:"f", chip:"SF jello", sn:"sugar-free jello", unit:"cup", step:1, def:1, min:1, max:3, k:10, p:0.2}
+];
+const FOOD_BY = Object.fromEntries(FOODS.map(f => [f.id, f]));
+const FOOD_CATS = [["p","Protein"],["c","Carbs"],["v","Veg & fruit"],["f","Fats & extras"]];
+const TEMPLATES = [
+  {n:"Protein oats", slots:["breakfast","snack"], items:[["oats",50],["milk",250],["whey",1],["berries",100],["pb",1]], scaleK:"oats"},
+  {n:"Eggs, toast and cottage cheese", slots:["breakfast"], items:[["eggs",3],["bread",2],["cottage",150],["apple",1]], scaleP:"cottage", scaleK:"bread"},
+  {n:"Greek yogurt bowl", slots:["breakfast","snack","extra"], items:[["greek",250],["berries",100],["oats",30]], scaleP:"greek", scaleK:"oats"},
+  {n:"Chicken, rice and veg", slots:["lunch","dinner"], items:[["chicken",175],["rice",175],["veg",150],["oil",1]], scaleP:"chicken", scaleK:"rice"},
+  {n:"Beef, potatoes and veg", slots:["lunch","dinner"], items:[["beef",150],["potato",150],["veg",150],["butter",1]], scaleP:"beef", scaleK:"potato"},
+  {n:"Chicken and lentil bowl", slots:["lunch","dinner"], items:[["chicken",125],["lentils",125],["rice",100],["veg",150]], scaleP:"chicken", scaleK:"rice"},
+  {n:"Tuna sandwich and fruit", slots:["snack","lunch"], items:[["tuna",1],["bread",2],["greek",25],["apple",1]], scaleK:"bread"},
+  {n:"Cottage cheese", slots:["extra","snack"], items:[["cottage",100]], scaleP:"cottage"},
+  {n:"Whey shake", slots:["extra","snack"], items:[["whey",1],["milk",250]], scaleK:"milk"}
+];
+const SHOP = [
+  ["Protein", ["Chicken thighs, bone-in family pack","Eggs, 30-count tray","Regular ground beef","0% Greek yogurt","2% cottage cheese","1% milk","Budget whey protein","Canned tuna","Canned beans or lentils"]],
+  ["Carbs", ["Potatoes, 10 lb bag","Rice, large bag","Oats, large bag","Whole wheat bread"]],
+  ["Veg & fruit", ["Frozen mixed vegetables","Frozen peas and carrots","Bananas","Apples","Frozen berries"]],
+  ["Fats & flavour", ["Peanut butter","Olive oil or butter","Cheese","Bouillon cubes","Spice rack basics","Popcorn kernels","Sugar-free jello"]],
+  ["Supplements", ["Creatine monohydrate","Vitamin D3"]]
+];
+const isMass = f => f.unit === "g" || f.unit === "ml";
+function amtLabel(f, amt){ const a = fmtW(amt); if (isMass(f)) return `${a} ${f.unit}`; return `${a} ${amt === 1 ? f.unit : (f.pl || f.unit + "s")}`; }
+function itemText(f, amt){ return f.self ? amtLabel(f, amt) : `${amtLabel(f, amt)} ${f.sn}`; }
+function plateTotals(items){ return items.reduce((a, it) => { const f = FOOD_BY[it.id]; if (f){ a.k += f.k * it.amt; a.p += f.p * it.amt; } return a; }, { k:0, p:0 }); }
+function plateText(items){ return items.map(it => itemText(FOOD_BY[it.id], it.amt)).join(", "); }
+function plateName(items){ const names = items.slice(0, 2).map(it => FOOD_BY[it.id].chip.toLowerCase()); return names.length ? names.join(" + ").replace(/^./, c => c.toUpperCase()) : "My plate"; }
+let plate = (() => { const p = ls.get("rt10-plate"); return p && Array.isArray(p.items) ? p : { slot:null, items:[] }; })();
+let lastSugg = null, lovedCache = [];
+function savePlate(){ ls.set("rt10-plate", plate); }
+function defaultSlot(){
+  const h = new Date().getHours() + new Date().getMinutes() / 60;
+  const byClock = h < 10.5 ? "breakfast" : h < 14 ? "lunch" : h < 17 ? "snack" : h < 21.5 ? "dinner" : "extra";
+  if (byClock === "extra") return "extra";
+  const meals = draft.meals || {}; const order = MAIN_SLOTS.slice(MAIN_SLOTS.indexOf(byClock)).concat(MAIN_SLOTS);
+  return order.find(id => !has((meals[id] || {}).kcal)) || byClock;
+}
+function dayFuel(){
+  const ph = phaseOf(draft), plan = dayPlan(ph, curDate, draft);
+  const K = targetKcal(ph, plan.reset), PT = toNum(PH[ph].p) || 170; const ft = foodTotals(draft);
+  return { ph, K, PT, k: ft.kcal || 0, p: ft.protein || 0 };
+}
+function slotTargets(slot){
+  const F = dayFuel(); const remK = F.K - F.k, remP = F.PT - F.p;
+  if (slot === "extra") return { k: Math.max(0, Math.min(remK, 250)), p: Math.max(0, Math.min(remP, 25)), remK, remP };
+  const open = MAIN_SLOTS.filter(id => !has(((draft.meals || {})[id] || {}).kcal));
+  const n = Math.max(1, open.includes(slot) ? open.length : open.length + 1);
+  return { k: Math.max(0, Math.min(1000, remK / n)), p: Math.max(0, Math.min(65, remP / n)), remK, remP };
+}
+function buildTemplate(t, tk, tp){
+  const items = t.items.map(([id, amt]) => ({ id, amt }));
+  const adj = (key, target, field) => {
+    if (!key) return; const it = items.find(z => z.id === key); const f = FOOD_BY[key];
+    const others = plateTotals(items.filter(z => z !== it)); const per = f[field]; if (!per) return;
+    let amt = Math.round(((target - others[field]) / per) / f.step) * f.step;
+    it.amt = Math.max(f.min, Math.min(f.max, amt));
+  };
+  adj(t.scaleP, Math.max(tp, 15), "p"); adj(t.scaleK, tk, "k");
+  const tt = plateTotals(items);
+  return { n: t.n, items, k: tt.k, p: tt.p, score: Math.abs(tt.k - tk) / Math.max(200, tk) + 1.5 * Math.abs(tt.p - tp) / Math.max(15, tp) };
+}
+function suggestions(slot){
+  const tg = slotTargets(slot);
+  if (tg.remK <= 80) return { tg, list: [] };
+  return { tg, list: TEMPLATES.filter(t => t.slots.includes(slot)).map(t => buildTemplate(t, tg.k, tg.p)).sort((a, b) => a.score - b.score).slice(0, 3) };
+}
+function logToSlot(slot, text, k, p){
+  const m = clone(getP(draft, `meals.${slot}`) || {});
+  m.text = has(m.text) ? `${m.text}; ${text}` : text;
+  m.kcal = String(Math.round((toNum(m.kcal) || 0) + k));
+  m.protein = String(Math.round((toNum(m.protein) || 0) + p));
+  setP(draft, `meals.${slot}`, m); markDirty();
+  showToast(`Added to ${SLOTNAME[slot]}: ${fmt(k)} kcal, ${fmt(p)} g protein. Rate it on the Today tab.`);
+}
+function renderFood(){
+  if (!plate.slot) plate.slot = defaultSlot();
+  $("#v-food").innerHTML = `${dateBarHTML()}
+    <div class="card fuel" id="fuelCard"></div>
+    <div class="card panel" id="builder" style="--sec:var(--green);--on-sec:var(--on-green)"></div>
+    <div class="card panel" id="favCard" style="--sec:var(--green);--on-sec:var(--on-green)"></div>
+    <div class="card panel" id="shopCard" style="--sec:var(--green);--on-sec:var(--on-green)"></div>
+    <div class="card panel"><h2>When you're hungry</h2><ul class="rules" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li>Eat the protein first, then the carbs. It fills you up more.</li>
+      <li>Potatoes, oats, cottage cheese and frozen veg give you the most food for the fewest calories.</li>
+      <li>For cravings: 3 cups of air-popped popcorn is about 95 kcal, and a sugar-free jello is about 10.</li>
+      <li>Have a big glass of water first. Thirst often feels like hunger.</li>
+      <li>Hungry and drained for more than a few days running? Tell Claude. It may be time for a reset week.</li></ul></div>`;
+  renderFuel(); renderBuilder(); renderFavs(); renderShop();
+}
+function renderFuel(){
+  const el = document.getElementById("fuelCard"); if (!el) return;
+  const F = dayFuel(); const meals = draft.meals || {};
+  const remK = F.K - F.k, remP = F.PT - F.p;
+  const open = MAIN_SLOTS.filter(id => !has((meals[id] || {}).kcal));
+  const bar = (v, t) => { const pct = t ? Math.min(100, v / t * 100) : 0; return `<div class="track"><div class="fill${v > t * 1.05 ? " over" : ""}" style="width:${pct}%"></div></div>`; };
+  let hint;
+  if (F.k >= F.K) hint = "You've hit today's calories. Still hungry? Popcorn, sugar-free jello or a bowl of frozen veg barely move the number.";
+  else if (F.p >= F.PT) hint = "Protein's done for today. Fill the rest with carbs and veg.";
+  else if (open.length) hint = `${open.length} meal${open.length > 1 ? "s" : ""} left: aim for about ${fmt(remP / open.length)} g protein and ${fmt(remK / open.length)} kcal each.`;
+  else hint = `All four meals are in. ${fmt(remP)} g protein to go: cottage cheese, Greek yogurt or a whey shake closes it.`;
+  el.innerHTML = `<div class="eyebrow" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600">Fuel · ${esc(fmtLong(curDate))}</div>
+    <div class="fuelrow">
+      <div class="fuelnum"><small>Calories</small><strong>${fmt(F.k)}</strong><span>of ${fmt(F.K)} kcal</span></div>
+      <div class="fuelnum"><small>Protein</small><strong>${fmt(F.p)}</strong><span>of ${F.PT} g</span></div>
+    </div>
+    <div class="bars"><div class="bar">${bar(F.k, F.K)}</div><div class="bar">${bar(F.p, F.PT)}</div></div>
+    <div class="leftline">Left today: <b>${fmt(Math.max(0, remK))} kcal</b> · <b>${fmt(Math.max(0, remP))} g protein</b></div>
+    <div class="pips" role="group" aria-label="Protein per meal">${MAIN_SLOTS.map(id => { const m = meals[id] || {}; const pv = toNum(m.protein); const logged = has(m.kcal) || pv !== null;
+      return `<button type="button" class="pip${pv !== null && pv >= 40 ? " ok" : logged ? " part" : ""}${plate.slot === id ? " sel" : ""}" data-fa="slot" data-slot="${id}"><span>${SLOTNAME[id]}</span><b>${pv !== null ? fmt(pv) + " g" : "–"}</b></button>`; }).join("")}</div>
+    <div class="small muted">${esc(hint)} Each box fills in green at 40 g protein.</div>`;
+}
+function renderBuilder(){
+  const el = document.getElementById("builder"); if (!el) return;
+  const slot = plate.slot || defaultSlot(); const tot = plateTotals(plate.items); const F = dayFuel();
+  const suggHTML = lastSugg ? (lastSugg.list.length ? `<div class="suggs">${lastSugg.list.map((z, i) => `<div class="sugg-card"><b>${esc(z.n)}</b><div class="small">${esc(plateText(z.items))}</div><div class="small muted">${fmt(z.k)} kcal · ${fmt(z.p)} g protein</div><div><button type="button" class="textbtn" data-fa="use" data-si="${i}">Use this plate</button></div></div>`).join("")}</div><div class="small muted">Sized to fit what's left today: about ${fmt(lastSugg.tg.k)} kcal and ${fmt(lastSugg.tg.p)} g protein for this meal.</div>`
+    : `<div class="notice">You're at or over today's calories, so there's nothing to suggest. If you're hungry, see the tips at the bottom.</div>`) : "";
+  el.innerHTML = `<h2>Build a plate</h2>
+    <div class="chips" role="group" aria-label="Meal">${MEALS.map(([id]) => `<button type="button" class="chip" data-fa="slot" data-slot="${id}" aria-pressed="${slot === id}">${SLOTNAME[id]}</button>`).join("")}</div>
+    <div class="row"><button type="button" class="btn" data-fa="suggest">Suggest a ${esc(SLOTNAME[slot].toLowerCase())}</button><span class="small muted">sized to what you have left</span></div>
+    ${suggHTML}
+    <div class="sub">Tap a food to add it</div>
+    ${FOOD_CATS.map(([c, l]) => `<div class="foodcat"><div class="small muted" style="font-weight:600">${l}</div><div class="chips">${FOODS.filter(f => f.c === c).map(f => `<button type="button" class="chip" data-fa="add" data-id="${f.id}" aria-pressed="${plate.items.some(it => it.id === f.id)}">${esc(f.chip)}</button>`).join("")}</div></div>`).join("")}
+    <div class="sub">Your plate</div>
+    ${plate.items.length ? `<div class="platelist">${plate.items.map((it, i) => { const f = FOOD_BY[it.id]; return `<div class="plate-it"><div class="nm">${esc(f.chip)}<small>${fmt(f.k * it.amt)} kcal · ${fmt(f.p * it.amt, 1).replace(/\.0$/, "")} g protein</small></div>
+      <div class="stepper"><button type="button" data-fa="dec" data-i="${i}" aria-label="Less ${esc(f.chip)}">−</button><span>${esc(amtLabel(f, it.amt))}</span><button type="button" data-fa="inc" data-i="${i}" aria-label="More ${esc(f.chip)}">+</button></div>
+      <button type="button" class="rmx" data-fa="rm" data-i="${i}" aria-label="Remove ${esc(f.chip)}">✕</button></div>`; }).join("")}</div>
+      <div class="plate-tot"><span>This plate</span><strong>${fmt(tot.k)} kcal · ${fmt(tot.p)} g protein</strong><span class="muted">After it: ${fmt(F.k + tot.k)} of ${fmt(F.K)} kcal · ${fmt(F.p + tot.p)} of ${F.PT} g protein</span></div>
+      <div class="row"><button type="button" class="btn" data-fa="log">Add to ${esc(SLOTNAME[slot])}</button><button type="button" class="btn ghost" data-fa="fav">★ Save as favorite</button><button type="button" class="textbtn" data-fa="clear">Clear</button></div>`
+      : `<p class="empty">Your plate is empty. Tap foods above, or ask for a suggestion.</p>`}
+    <p class="small muted" style="margin:0">Numbers are estimates for typical grocery-store versions. Your food app or the label is more exact.</p>`;
+}
+function lovedMeals(){
+  const seen = new Set(), out = [];
+  const ds = sortedDates().reverse().slice(0, 120);
+  for (const d of ds){ const e = entryFor(d) || {}; for (const [id] of MEALS){ const m = (e.meals || {})[id]; if (!m || m.liked !== "loved" || !has(m.text)) continue;
+    const key = String(m.text).trim().toLowerCase(); if (seen.has(key)) continue; seen.add(key);
+    out.push({ text: String(m.text).trim(), k: toNum(m.kcal) || 0, p: toNum(m.protein) || 0, slot: id, d }); if (out.length >= 8) return out; } }
+  return out;
+}
+function renderFavs(){
+  const el = document.getElementById("favCard"); if (!el) return;
+  const favs = store.settings.favs || []; lovedCache = lovedMeals(); const slot = plate.slot || defaultSlot();
+  el.innerHTML = `<h2>Favorites</h2>
+    ${favs.length ? `<div>${favs.map((f, i) => `<div class="favrow"><div class="t">${esc(f.name)}</div><div class="d">${esc(f.text)} · ${fmt(f.k)} kcal · ${fmt(f.p)} g</div><div class="acts"><button type="button" class="textbtn" data-fa="favlog" data-i="${i}">Log to ${esc(SLOTNAME[slot])}</button><button type="button" class="rmx" data-fa="favdel" data-i="${i}" aria-label="Delete favorite">✕</button></div></div>`).join("")}</div>` : `<p class="empty">Build a plate you like and tap ★ Save as favorite. It shows up here for one-tap logging.</p>`}
+    <h3 style="font-size:18px;margin-top:6px">Meals you loved</h3>
+    ${lovedCache.length ? `<div>${lovedCache.map((m, i) => `<div class="favrow"><div class="t">${esc(SLOTNAME[m.slot])} · ${fmtDate(m.d)}</div><div class="d">${esc(m.text)}${m.k ? ` · ${fmt(m.k)} kcal` : ""}${m.p ? ` · ${fmt(m.p)} g` : ""}</div><div class="acts"><button type="button" class="textbtn" data-fa="lovedlog" data-i="${i}">Log to ${esc(SLOTNAME[slot])}</button></div></div>`).join("")}</div>` : `<p class="empty">Meals you rate "Loved it" on the Today tab land here so you can eat them again with one tap.</p>`}`;
+}
+function renderShop(){
+  const el = document.getElementById("shopCard"); if (!el) return;
+  const got = store.settings.shop || {}; const n = Object.values(got).filter(Boolean).length;
+  el.innerHTML = `<div class="row" style="justify-content:space-between"><h2>Shopping list</h2>${n ? `<button type="button" class="textbtn" data-fa="shopclear">Uncheck all (${n})</button>` : ""}</div>
+    <div class="small muted">Superstore, No Frills, Walmart or Co-op. Buy shelf-stable and frozen in bulk every 3 weeks; use PC Optimum and Flipp for meat sales.</div>
+    <div class="shop">${SHOP.map(([cat, items]) => `<h4>${cat}</h4>${items.map(it => `<label class="ck${got[it] ? " done" : ""}"><input type="checkbox" data-shop="${esc(it)}" ${got[it] ? "checked" : ""}>${esc(it)}</label>`).join("")}`).join("")}</div>`;
+}
+function onFoodAction(b){
+  const a = b.dataset.fa; const i = Number(b.dataset.i);
+  if (a === "slot"){ plate.slot = b.dataset.slot; lastSugg = null; savePlate(); renderFuel(); renderBuilder(); renderFavs(); if (b.classList.contains("pip")) document.getElementById("builder").scrollIntoView({ behavior:"smooth", block:"start" }); return; }
+  if (a === "add"){ const f = FOOD_BY[b.dataset.id]; const ex = plate.items.find(z => z.id === f.id); if (ex) ex.amt = Math.min(f.max * 2, ex.amt + f.step); else plate.items.push({ id: f.id, amt: f.def }); }
+  else if (a === "inc" || a === "dec"){ const it = plate.items[i]; if (!it) return; const f = FOOD_BY[it.id]; it.amt = Math.round((it.amt + (a === "inc" ? f.step : -f.step)) * 100) / 100; if (it.amt <= 0) plate.items.splice(i, 1); }
+  else if (a === "rm") plate.items.splice(i, 1);
+  else if (a === "clear") plate.items = [];
+  else if (a === "suggest") lastSugg = suggestions(plate.slot || defaultSlot());
+  else if (a === "use"){ const z = lastSugg && lastSugg.list[Number(b.dataset.si)]; if (z) plate.items = z.items.map(it => ({ id: it.id, amt: it.amt })); lastSugg = null; }
+  else if (a === "log"){ if (!plate.items.length) return; const t = plateTotals(plate.items); logToSlot(plate.slot, plateText(plate.items), t.k, t.p); plate.items = []; lastSugg = null; savePlate(); renderFuel(); renderBuilder(); return; }
+  else if (a === "fav"){ if (!plate.items.length) return; const t = plateTotals(plate.items); store.settings.favs = (store.settings.favs || []).concat([{ name: plateName(plate.items), text: plateText(plate.items), k: Math.round(t.k), p: Math.round(t.p), items: plate.items.map(it => ({ id: it.id, amt: it.amt })) }]); saveSettings(); renderFavs(); showToast("Saved to favorites."); return; }
+  else if (a === "favlog"){ const f = (store.settings.favs || [])[i]; if (f){ logToSlot(plate.slot || defaultSlot(), f.text, f.k, f.p); renderFuel(); } return; }
+  else if (a === "favdel"){ store.settings.favs = (store.settings.favs || []).filter((_, k) => k !== i); saveSettings(); renderFavs(); return; }
+  else if (a === "lovedlog"){ const m = lovedCache[i]; if (m){ logToSlot(plate.slot || defaultSlot(), m.text, m.k, m.p); renderFuel(); } return; }
+  else if (a === "shopclear"){ store.settings.shop = {}; saveSettings(); renderShop(); return; }
+  savePlate(); renderBuilder();
+}
+bindView($("#v-food"));
+$("#v-food").addEventListener("click", e => { const b = e.target.closest("[data-fa]"); if (b) onFoodAction(b); });
+$("#v-food").addEventListener("change", e => { const t = e.target; if (t.dataset && "shop" in t.dataset){ store.settings.shop = Object.assign({}, store.settings.shop || {}, { [t.dataset.shop]: t.checked }); saveSettings(); t.closest(".ck").classList.toggle("done", t.checked); const n = Object.values(store.settings.shop).filter(Boolean).length; if (!n || n === 1) renderShop(); } });
+
+/* ---------- SLEEP ---------- */
+const hm = v => { const m = String(v || "").match(/^(\d{1,2}):(\d{2})/); return m ? Number(m[1]) * 60 + Number(m[2]) : null; };
+const normBed = v => v === null ? null : (v < 720 ? v + 1440 : v);
+const clock = mins => { const t = ((Math.round(mins) % 1440) + 1440) % 1440; const h = Math.floor(t / 60), m = t % 60; return `${h % 12 === 0 ? 12 : h % 12}:${pad(m)} ${h >= 12 ? "p.m." : "a.m."}`; };
+const endS = t => /\.$/.test(t) ? t : t + ".";
+const nowHM = () => { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const durTxt = mins => { mins = Math.max(0, Math.round(mins)); const h = Math.floor(mins / 60), m = mins % 60; return h ? `${h} h${m ? " " + m + " min" : ""}` : `${m} min`; };
+function bedCoach(){
+  const today = iso(new Date()); const goal = normBed(hm(store.settings.goalBed || "23:00")); const beds = [];
+  for (let i = 0; i < 7; i++){ const e = entryFor(addDays(today, -i)); const b = e && e.sleep ? hm(e.sleep.bed) : null; if (b !== null) beds.push(normBed(b)); }
+  if (beds.length < 3) return { stage:"start", target: goal, goal, n: beds.length };
+  const sorted = beds.slice().sort((a, b) => a - b); const med = sorted[Math.floor(sorted.length / 2)];
+  const spread = Math.round(Math.sqrt(beds.reduce((a, b) => a + (b - med) ** 2, 0) / beds.length));
+  if (med <= goal + 15) return { stage:"there", target: goal, goal, med, spread, n: beds.length };
+  return { stage:"shift", target: Math.max(goal, Math.round((med - 20) / 5) * 5), goal, med, spread, n: beds.length, steps: Math.ceil((med - goal) / 20) };
+}
+function sleepNights(n){
+  const today = iso(new Date()); const out = [];
+  for (let i = 0; i < n; i++){ const d = addDays(today, -i); const e = entryFor(d) || {}; const s = e.sleep || {}; out.push({ d, h: sleepHours(s.bed, s.wake), bed: hm(s.bed), snore: !!s.snore }); }
+  return out;
+}
+function sleepAlerts(){
+  const N = sleepNights(14), a = [];
+  const l3 = N.slice(0, 3);
+  if (l3.every(x => x.h !== null && x.h < 7)) a.push(["warn", "Under 7 hours three nights in a row.", "Swap your next hard session (intervals, circuit, sprints or jumps) for easy zone 2, or skip it. Keep your steps, don't cut calories and keep every protein feeding. Nights that are short only because you're moving your bedtime earlier, and still 6.5 h or more, don't count."]);
+  const wk = N.slice(0, 7).filter(x => x.h !== null);
+  if (wk.length >= 5 && wk.reduce((s, x) => s + x.h, 0) / wk.length < 6.5){ const ph = store.settings.phase; a.push(["bad", "Under 6.5 hours a night this week.", `Take your reset week early: about ${fmt(PH[ph].reset || 2800)} kcal, lighter lifting, and protect the ${clock(hm(store.settings.wake || "07:00"))} wake. Protein stays at 180 g.`]); }
+  if (N.filter(x => x.snore).length >= 2) a.push(["info", "You've flagged snoring, gasping or still being tired more than once.", "Ask a doctor about a sleep apnea check. It's more common at higher body weight, quietly hurts recovery, and often improves as you lose weight."]);
+  if (!a.length && N[0].h !== null && N[0].h < 6.5) a.push(["info", "One rough night.", "Nothing changes. Keep the wake time, get bright light and train as planned."]);
+  return a;
+}
+function sleepTimeline(T, wake, ph){
+  const ev = [
+    { t: 900, label: "Caffeine cutoff", sub: "Last coffee, tea, energy drink or pre-workout by 2–3 p.m." },
+    { t: T - 180, label: "Hard training finished", sub: "Intervals, circuits, sprints and jumps end 3+ hours before bed; lifting and zone 2, 2+ hours." },
+    { t: T - 150, label: "Last big meal", sub: "Finish your main meal 2–3 hours before bed." }
+  ];
+  if (ph === "p3" || ph === "p4") ev.push({ t: T - 105, label: "Cottage cheese", sub: "About 100 g, 1.5–2 hours before bed." });
+  ev.push({ t: T - 75, label: "Dim the lights", sub: "Lights low, phone on night mode and brightness down." },
+    { t: T - 35, label: "Wind down off-screen", sub: "Shower, pack your bag, read on paper, hip-flexor stretches." },
+    { t: T, label: "Lights out", sub: "Bed is for sleep. Awake for 20–25 minutes? Get up, sit in low light, come back when sleepy." },
+    { t: wake + 1440, label: "Wake up", sub: "Same time every day. Bright light within 30–60 minutes (it's dark at 7 until about March, so turn on your brightest lights)." });
+  return ev.sort((a, b) => a.t - b.t);
+}
+function sleepChips(date, key, label, lo, hi, cur){
+  return `<div class="f"><span>${label}</span><div class="chips">${["1","2","3","4","5"].map(v => `<button type="button" class="chip n" data-sa="rate" data-k="${key}" data-v="${v}" data-date="${date}" aria-pressed="${String(cur) === v}">${v}</button>`).join("")}</div><div class="scale-note">1 = ${lo} · 5 = ${hi}</div></div>`;
+}
+function renderSleep(){
+  const now = new Date(); const H = now.getHours(); const nowMin = H * 60 + now.getMinutes(); const today = iso(now);
+  const morning = H >= 4 && H < 12, nightMode = H >= 15 || H < 4;
+  const nowN = H < 4 ? nowMin + 1440 : nowMin;
+  const coach = bedCoach(); const wake = hm(store.settings.wake || "07:00"); const T = coach.target;
+  const ph = store.settings.phase; const ev = sleepTimeline(T, wake, ph);
+  const next = morning ? null : ev.find(x => x.t > nowN);
+  const bedDate = H < 12 ? today : addDays(today, 1);
+  const be = entryFor(bedDate) || {}; const bedLogged = hm((be.sleep || {}).bed);
+  const atTarget = wake + 1440 - T;
+  let html = "";
+  /* morning card */
+  const te = entryFor(today) || {}; const ts = te.sleep || {};
+  const lastH = sleepHours(ts.bed, ts.wake);
+  const morningCard = `<div class="card morncard">
+    <div class="eyebrow">${morning ? "Good morning" : "Last night"} · ${esc(fmtLong(today).replace(/, \d{4}$/, ""))}</div>
+    ${lastH !== null ? `<div class="big">${fmt(lastH, 1)} h</div><div>${clock(hm(ts.bed))} → ${clock(hm(ts.wake))} <span class="verdict">${lastH >= 7.5 ? "In the 7.5–9 h window" : lastH >= 7 ? "Just under 7.5 h" : lastH >= 6.5 ? "Short night" : "Under 6.5 h"}</span></div>`
+      : `<div class="row">${!ts.wake ? `<button type="button" class="btn" data-sa="upnow">I'm up</button><span class="soft">Logs ${clock(nowMin)} as your wake time</span>` : `<span class="soft">Woke at ${clock(hm(ts.wake))}. Add your bedtime below.</span>`}</div>`}
+    <div class="grid2"><label class="f"><span>Went to bed</span><input type="time" data-sfield="bed" data-date="${today}" value="${esc(ts.bed || "")}"></label><label class="f"><span>Woke up</span><input type="time" data-sfield="wake" data-date="${today}" value="${esc(ts.wake || "")}"></label></div>
+    ${sleepChips(today, "quality", "Sleep quality", "terrible", "great", ts.quality)}
+    ${sleepChips(today, "rested", "How rested you feel", "exhausted", "fully rested", ts.rested)}
+    <div class="checks"><label class="ck"><input type="checkbox" data-scheck="light" data-date="${today}" ${ts.light ? "checked" : ""}>Bright light within an hour</label><label class="ck"><input type="checkbox" data-scheck="snore" data-date="${today}" ${ts.snore ? "checked" : ""}>Snoring, gasping or still tired</label></div>
+  </div>`;
+  /* night card */
+  const nb = (be.sleep || {}).bed;
+  const nightCard = `<div class="card nightcard">
+    <div class="eyebrow">Tonight · ${esc(DOWL[parseISO(H < 4 ? addDays(today, -1) : today).getDay()])}${morning ? " (coming up)" : ""}</div>
+    ${bedLogged !== null && !morning ? `<h2>Sleep well.</h2><div class="soft">In bed since ${endS(clock(bedLogged))} With your ${clock(wake)} alarm that's ${durTxt(wake + 1440 - normBed(bedLogged))} in bed.</div>
+        <div class="row"><label class="f" style="max-width:160px"><span>Fix the time</span><input type="time" data-sfield="bed" data-date="${bedDate}" value="${esc(nb || "")}"></label><button type="button" class="btn ghost" data-sa="bedundo" data-date="${bedDate}">Undo</button></div>`
+      : `<div class="soft">Target bedtime</div><div class="big">${clock(T)}</div>
+        <div class="soft">${durTxt(atTarget)} in bed with your ${clock(wake)} alarm.${next && nightMode ? ` <b style="color:#fff">${esc(next.label)}</b> in ${durTxt(next.t - nowN)}.` : ""}</div>
+        ${nightMode ? `<div class="row"><button type="button" class="btn" data-sa="bednow" data-date="${bedDate}">I'm going to bed now</button></div>` : ""}`}
+  </div>`;
+  html += morning ? morningCard + nightCard : nightCard + (H >= 4 && !(ts.bed && ts.wake && ts.quality) ? morningCard : "");
+  /* timeline */
+  html += `<div class="card panel" style="--sec:var(--blue)"><h2>Tonight's schedule</h2><div class="small muted">Built backward from your ${clock(T)} target bedtime.</div>
+    <div class="tl">${ev.map(x => { const cls = morning ? "" : (x.t <= nowN ? " past" : (next && x === next ? " next" : "")); return `<div class="tl-i${cls}"><div class="tl-t">${clock(x.t)}</div><div class="tl-d"><i></i></div><div class="tl-b"><b>${esc(x.label)}</b><div>${esc(x.sub)}</div></div></div>`; }).join("")}</div></div>`;
+  /* coach */
+  const shortWake = atTarget < 390;
+  html += `<div class="card panel coach" style="--sec:var(--blue)"><h2>Bedtime coach</h2>
+    ${coach.stage === "start" ? `<p style="margin:0">Log your bedtime for 3 nights (tap <b>I'm going to bed now</b>) and I'll set a step-by-step target. Until then, aim for ${endS(clock(coach.goal))}</p>`
+      : coach.stage === "there" ? `<div class="steps">${clock(coach.med)} <em>your usual bedtime</em></div><p style="margin:0">You're at your goal. Keep the ${clock(wake)} wake time steady, weekends included.</p>`
+      : `<div class="steps">${clock(coach.med)} <span class="arrow">→</span> ${clock(coach.target)} <span class="arrow">→</span> ${clock(coach.goal)}</div>
+         <div class="small muted">Usual lately → this week's target → goal</div>
+         <p style="margin:0">Go to bed at <b>${clock(coach.target)}</b> for the next 4–7 nights. When falling asleep then feels easy, the target moves 20 minutes earlier. About ${coach.steps} more step${coach.steps > 1 ? "s" : ""} to your goal.</p>`}
+    ${shortWake ? `<div class="notice warn">At this bedtime you'd get under 6.5 hours. Wake at 7:30 instead of 7:00 until your bedtime catches up.</div>` : ""}
+    ${coach.spread > 30 ? `<div class="notice">Your bedtime has varied by about ±${coach.spread} min this week. Steadier is better: try to stay within 30 minutes.</div>` : ""}
+    <div class="grid2"><label class="f"><span>Wake-up time</span><input type="time" data-sset="wake" value="${esc(store.settings.wake || "07:00")}"></label><label class="f"><span>Goal bedtime</span><input type="time" data-sset="goalBed" value="${esc(store.settings.goalBed || "23:00")}"></label></div>
+  </div>`;
+  /* last nights */
+  const N7 = sleepNights(7); const hrs = N7.filter(x => x.h !== null);
+  const avgH = hrs.length ? hrs.reduce((a, x) => a + x.h, 0) / hrs.length : null;
+  let streak = 0; for (const x of sleepNights(60)){ if (x.h !== null && x.h >= 7) streak++; else break; }
+  const alerts = sleepAlerts();
+  html += `<div class="card panel" style="--sec:var(--blue)"><h2>Last 7 nights</h2>
+    <div class="stats">
+      <div><small>Average in bed</small><strong>${avgH !== null ? fmt(avgH, 1) + " h" : "–"}</strong><span>target 7.5–9 h</span></div>
+      <div><small>Nights at 7.5 h+</small><strong>${hrs.filter(x => x.h >= 7.5).length} of ${hrs.length}</strong><span>logged this week</span></div>
+      <div><small>Usual bedtime</small><strong>${coach.med ? clock(coach.med) : "–"}</strong><span>goal ${clock(coach.goal)}</span></div>
+      <div><small>Streak at 7 h+</small><strong>${streak} night${streak === 1 ? "" : "s"}</strong><span>in a row</span></div>
+    </div>
+    ${alerts.map(([k, t, d]) => `<div class="notice${k === "warn" || k === "bad" ? " warn" : ""}"><b>${esc(t)}</b> ${esc(d)}</div>`).join("")}
+    <div class="ch" id="ch-sleep14"></div>
+  </div>
+  <div class="card panel"><h2>Your room</h2><ul class="rules" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+    <li><b>Cool:</b> about 18–20°C.</li><li><b>Dark:</b> curtains or a sleep mask.</li><li><b>Quiet:</b> or steady noise like a fan or brown noise.</li>
+    <li><b>Naps:</b> only if needed, under 20–30 minutes, and not late in the afternoon.</li>
+    <li><b>Exam weeks:</b> protect the wake time and your steps, keep the protein feedings, and don't add extra cardio.</li></ul></div>`;
+  $("#v-sleep").innerHTML = html;
+  const sp = { from: addDays(today, -13), to: today };
+  const pts = []; for (let i = 13; i >= 0; i--){ const d = addDays(today, -i); const e = entryFor(d) || {}; const h = sleepHours((e.sleep || {}).bed, (e.sleep || {}).wake); if (h !== null) pts.push({ d, v: h }); }
+  drawTime(document.getElementById("ch-sleep14"), Object.assign({}, sp, { kind:"bar", series:[{ name:"Hours in bed", pts, color:"var(--s1)" }], band:[7.5, 9, "7.5–9 h"], vFmt: v => fmt(v, 1) + " h", empty:"Your last two weeks of sleep show up here.", aria:"Hours in bed, last 14 nights" }));
+}
+async function onSleepAction(b){
+  const a = b.dataset.sa, date = b.dataset.date;
+  if (a === "bednow"){ const t = nowHM(); await patchDay(date, e => setP(e, "sleep.bed", t)); showToast(`Good night. Bedtime logged: ${endS(clock(hm(t)))}`); }
+  else if (a === "bedundo") await patchDay(date, e => setP(e, "sleep.bed", ""));
+  else if (a === "upnow"){ const t = nowHM(); await patchDay(date || iso(new Date()), e => setP(e, "sleep.wake", t)); showToast(`Morning. Wake time logged: ${endS(clock(hm(t)))}`); }
+  else if (a === "rate"){ const k = b.dataset.k, v = b.dataset.v; await patchDay(date, e => { const cur = String(getP(e, "sleep." + k) || ""); setP(e, "sleep." + k, cur === v ? "" : v); }); }
+  renderSleep();
+}
+$("#v-sleep").addEventListener("click", e => { const b = e.target.closest("[data-sa]"); if (b) onSleepAction(b); });
+$("#v-sleep").addEventListener("change", async e => {
+  const t = e.target; const d = t.dataset || {};
+  if (d.sfield){ await patchDay(d.date, x => setP(x, "sleep." + d.sfield, t.value)); renderSleep(); }
+  else if (d.scheck){ await patchDay(d.date, x => setP(x, "sleep." + d.scheck, t.checked)); }
+  else if (d.sset){ store.settings[d.sset] = t.value; await saveSettings(); renderSleep(); }
+});
+setInterval(() => { if (tab === "sleep" && document.visibilityState === "visible" && !formFocused()) renderSleep(); }, 60000);
+
+/* ---------- MORE ---------- */
+function renderMore(){
+  $("#v-more").innerHTML = `<h2 style="font-size:28px">More</h2>
+    ${[["history","History","Weekly averages, strength floor and every day you've logged"],["cheat","Cheat sheet","Targets, your week and the rules for each phase"],["share","Send to Claude","Share a summary, back up or restore your log"]].map(([t, n, d]) => `<button type="button" class="card morelink" data-go="${t}"><span><b>${n}</b><small>${d}</small></span><span class="chev2" aria-hidden="true">›</span></button>`).join("")}`;
+}
+$("#v-more").addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) goTab(b.dataset.go); });
 
 /* ---------- CHARTS ---------- */
 let chartRange2 = "8w";
@@ -1723,14 +2176,19 @@ $("#v-share").addEventListener("click", e => {
 $("#v-share").addEventListener("change", e => { if (e.target.id === "restoreIn" && e.target.files && e.target.files[0]){ restoreFrom(e.target.files[0]); e.target.value = ""; } });
 
 /* ---------- tabs, phase picker, mode ---------- */
-const TABS = ["today","workout","charts","history","cheat","share"];
+const TABS = ["today","workout","food","sleep","charts","more","history","cheat","share"];
+const NAVTABS = ["today","workout","food","sleep","charts","more"];
 function showTab(t){
-  const prev = tab; tab = t;
-  TABS.forEach(x => { $("#v-" + x).hidden = x !== t; $("#t-" + x).setAttribute("aria-selected", String(x === t)); });
-  if (prev !== t && (prev === "today" || prev === "workout")) $("#v-" + prev).innerHTML = "";
+  const prev = tab; tab = t; const navKey = ["history","cheat","share"].includes(t) ? "more" : t;
+  TABS.forEach(x => { $("#v-" + x).hidden = x !== t; });
+  NAVTABS.forEach(x => $("#t-" + x).setAttribute("aria-selected", String(x === navKey)));
+  if (prev !== t && ["today","workout","food","sleep"].includes(prev)) $("#v-" + prev).innerHTML = "";
   if (t === "today") renderToday();
   if (t === "workout") renderWorkout();
+  if (t === "food") renderFood();
+  if (t === "sleep") renderSleep();
   if (t === "charts") renderCharts();
+  if (t === "more") renderMore();
   if (t === "history") renderHistory();
   if (t === "cheat") renderCheat();
   if (t === "share") renderShare();
@@ -1777,23 +2235,25 @@ function rerenderAll(force){
   if (tab === "today"){ if (force || !formFocused()) renderToday(); else updateDerived(); }
   if (tab === "workout"){ if (force || !formFocused()) renderWorkout(); else updateDerived(); }
   if (tab === "charts") renderCharts();
+  if (tab === "food"){ if (force || !formFocused()) renderFood(); }
+  if (tab === "sleep"){ if (force || !formFocused()) renderSleep(); }
   if (tab === "history") renderHistory();
   if (tab === "cheat") renderCheat();
   if (tab === "share") renderShare();
 }
-function formFocused(){ const a = document.activeElement; return !!(a && ($("#v-today").contains(a) || $("#v-workout").contains(a)) && a.matches("input,textarea,select")); }
+function formFocused(){ const a = document.activeElement; return !!(a && ["#v-today","#v-workout","#v-food","#v-sleep"].some(v => $(v).contains(a)) && a.matches("input,textarea,select")); }
 
 /* ---------- boot ---------- */
 renderPhaseSel();
 renderToday();
 const startTab = (location.hash || "").replace("#","");
-if (["workout","charts","history","cheat","share"].includes(startTab)) showTab(startTab);
+if (["workout","food","sleep","charts","more","history","cheat","share"].includes(startTab)) showTab(startTab);
 
 let bootToday = iso(new Date());
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState !== "visible") return;
   const t = iso(new Date());
-  if (t !== bootToday){ const wasOnToday = curDate === bootToday; bootToday = t; renderModeNote(); if (wasOnToday && (tab === "today" || tab === "workout") && !dirty) goDate(t); else rerenderAll(); }
+  if (t !== bootToday){ const wasOnToday = curDate === bootToday; bootToday = t; renderModeNote(); if (wasOnToday && ["today","workout","food"].includes(tab) && !dirty) goDate(t); else if (tab === "sleep") renderSleep(); else rerenderAll(); }
 });
 (async () => {
   try {
