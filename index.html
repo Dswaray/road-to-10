@@ -353,6 +353,15 @@ body.resting main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
 .healthbox{display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:12px}
 .healthbox ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
 .codeline{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px 10px;word-break:break-all}
+/* cloud */
+.cloudline{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:500}
+.cloudline i{width:12px;height:12px;border-radius:50%;flex:none;background:var(--steel)}
+.cloudline.ok i{background:var(--ok)}
+.cloudline.busy i,.cloudline.pending i{background:var(--yellow)}
+.cloudline.bad i{background:var(--bad)}
+.cloudsteps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.cloudsteps a{color:var(--blue)}
+.f input[type=password]{width:100%;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:16px;min-height:42px}
 /* sleep */
 .nightcard{border:0;padding:18px 16px;display:flex;flex-direction:column;gap:10px;color:#E8EDFF;background:radial-gradient(1.6px 1.6px at 16% 20%,#ffffffb0 50%,transparent 52%),radial-gradient(1.1px 1.1px at 70% 13%,#ffffffa0 50%,transparent 52%),radial-gradient(1.3px 1.3px at 88% 42%,#ffffff90 50%,transparent 52%),radial-gradient(1px 1px at 42% 9%,#ffffff80 50%,transparent 52%),radial-gradient(1px 1px at 58% 30%,#ffffff70 50%,transparent 52%),linear-gradient(160deg,#1B2C5C 0%,#0D1631 100%)}
 .nightcard .eyebrow,.morncard .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
@@ -655,7 +664,8 @@ function loadDraft(){ draft = clone(store.days[curDate] || { date: curDate }); d
 /* ---------- saving ---------- */
 function setStatus(s, msg){
   const el = $("#status"); el.dataset.s = s;
-  const t = { connecting:"Loading…", saved: mode === "local" ? "Saved in this browser" : "Saved on this iPhone", saving:"Saving…", unsaved:"Editing…", error: msg || "Not saved" }[s] || s;
+  const savedTxt = mode === "local" ? "Saved in this browser" : !cloud ? "Saved on this iPhone" : cloudState.kind === "ok" ? "Saved + backed up" : (cloudState.kind === "pending" || cloudState.kind === "busy") ? "Saved · backing up…" : "Saved on this iPhone";
+  const t = { connecting:"Loading…", saved: savedTxt, saving:"Saving…", unsaved:"Editing…", error: msg || "Not saved" }[s] || s;
   el.querySelector("span").textContent = t;
 }
 function markDirty(){ dirty = true; stuck = false; retried = false; if (mode !== "readonly") setStatus("unsaved"); clearTimeout(saveTimer); saveTimer = setTimeout(flush, 700); }
@@ -674,7 +684,7 @@ async function flush(){
   try {
     if (mode === "idb") await IDB.put("days", body);
     else ls.set("rt10-local", { days: store.days, settings: store.settings });
-    retried = false; stuck = false;
+    retried = false; stuck = false; cloudMark(date);
     setStatus(dirty ? "unsaved" : "saved");
   } catch(e){
     dirty = true;
@@ -685,12 +695,15 @@ async function flush(){
   if (dirty && !stuck) saveTimer = setTimeout(flush, 700);
 }
 async function saveSettings(){
+  store.settings.updatedAt = new Date().toISOString();
   try {
     if (mode === "idb") await IDB.put("kv", clone(store.settings), "settings");
     else ls.set("rt10-local", { days: store.days, settings: store.settings });
+    cloudMarkSettings();
   } catch(e){ setStatus("error", "Settings not saved"); }
 }
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flush(); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flush().then(() => cloudPush()); });
+window.addEventListener("online", () => cloudPush());
 
 /* ---------- field builders ---------- */
 const val = p => { const v = getP(draft, p); return v === undefined || v === null ? "" : v; };
@@ -1357,7 +1370,7 @@ async function patchDay(date, fn){
   if (date === curDate){ fn(draft); dirty = true; await flush(); return; }
   const e = clone(store.days[date] || { date }); e.date = date; if (!e.phase) e.phase = store.settings.phase;
   fn(e); e.updatedAt = new Date().toISOString(); store.days[date] = e;
-  try { if (mode === "idb") await IDB.put("days", e); else ls.set("rt10-local", { days: store.days, settings: store.settings }); setStatus("saved"); }
+  try { if (mode === "idb") await IDB.put("days", e); else ls.set("rt10-local", { days: store.days, settings: store.settings }); cloudMark(date); setStatus("saved"); }
   catch(err){ setStatus("error", "Not saved"); }
 }
 const SLOTNAME = Object.fromEntries(MEALS.map(([id, l]) => [id, l === "Before bed & extras" ? "Extras" : l]));
@@ -2262,11 +2275,199 @@ async function restoreFrom(file){
       const c = clone(d); store.days[d.date] = c; toPut.push(c);
     });
     if (mode === "idb"){ if (toPut.length) await IDB.putMany("days", toPut); } else ls.set("rt10-local", { days: store.days, settings: store.settings });
+    toPut.forEach(d => cloudMark(d.date));
     if (wasEmpty && data.settings && PH[data.settings.phase]){ store.settings = Object.assign(clone(DEFAULT_SETTINGS), data.settings); delete store.settings.lastBackup; await saveSettings(); renderPhaseSel(); }
     loadDraft(); renderModeNote(); renderShare();
     $("#bkMsg").textContent = `Restored ${added} new day${added === 1 ? "" : "s"}${updated ? ` and updated ${updated}` : ""}.`;
   } catch(e){ msg("That file isn't a Road to 10% backup. Pick the .json file from a backup or the one Claude sent you."); }
 }
+/* ---------- CLOUD BACKUP (a private GitHub repository) ---------- */
+let cloud = null, cloudDirty = { months: {}, settings: 0, seq: 0 }, cloudBusy = false, cloudTimer = null, cloudState = { kind: "off" };
+const ymOf = d => String(d).slice(0, 7);
+const b64enc = str => { const bytes = new TextEncoder().encode(str); let bin = ""; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(bin); };
+const b64dec = b64 => { const bin = atob(String(b64 || "").replace(/\s/g, "")); const bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); return new TextDecoder().decode(bytes); };
+function cloudSaveCfg(){ if (mode === "idb") IDB.put("kv", cloud ? clone(cloud) : null, "cloud").catch(() => {}); }
+function cloudSaveDirty(){ if (mode === "idb") IDB.put("kv", clone(cloudDirty), "cloudDirty").catch(() => {}); }
+function cloudPending(){ return Object.keys(cloudDirty.months).length > 0 || cloudDirty.settings > 0; }
+function cloudMark(date){ if (!cloud || !date) return; cloudDirty.months[ymOf(date)] = ++cloudDirty.seq; cloudSaveDirty(); cloudSchedule(); }
+function cloudMarkSettings(){ if (!cloud) return; cloudDirty.settings = ++cloudDirty.seq; cloudSaveDirty(); cloudSchedule(); }
+function cloudSchedule(ms){ if (!cloud) return; clearTimeout(cloudTimer); cloudTimer = setTimeout(cloudPush, ms || 12000); if (!cloudBusy && !["token","forbidden","missing"].includes(cloudState.kind)) setCloudState("pending"); }
+function cloudMsg(kind){
+  const repo = cloud ? `${cloud.owner}/${cloud.repo}` : "the repository";
+  return { ok: "", pending: "", busy: "", offline: "You're offline. It backs up as soon as you're connected again.",
+    token: cloud ? "GitHub didn't accept the key. It may have expired. Make a new key on GitHub (same settings as before), then tap Change key and paste it." : "GitHub didn't accept the key. Check that you copied all of it, or make a new one (step 2).",
+    forbidden: `The key can't save to ${repo}. When you make the key, set Contents to Read and write.`,
+    missing: `Couldn't find ${repo}. Check the spelling, and that the key includes this repository.`,
+    other: "GitHub had a problem. It will try again shortly." }[kind] || "";
+}
+function cloudLineHTML(){
+  const k = cloudState.kind; const cls = k === "ok" ? "ok" : (k === "busy" || k === "pending") ? "busy" : (k === "off" ? "" : "bad");
+  const when = cloud && cloud.lastPush ? `${fmtDate(cloud.lastPush.slice(0, 10))} at ${clock(hm(new Date(cloud.lastPush).toTimeString().slice(0, 5)))}` : "not yet";
+  const text = k === "ok" ? `Backed up · last saved ${when}` : k === "busy" ? "Backing up…" : k === "pending" ? "New changes will back up in a few seconds" : k === "offline" ? "Waiting for a connection" : k === "off" ? "Off" : "Not backing up";
+  return `<div class="cloudline ${cls}"><i aria-hidden="true"></i><span>${esc(text)}</span></div>${cloudMsg(k) ? `<div class="small" style="color:var(--bad)">${esc(cloudMsg(k))}</div>` : ""}`;
+}
+function setCloudState(kind){
+  cloudState = { kind };
+  const st = $("#status"); if (st && st.dataset.s === "saved") setStatus("saved");
+  const el = document.getElementById("cloudLine"); if (el) el.innerHTML = cloudLineHTML();
+  if (["token","forbidden","missing","ok"].includes(kind)) renderModeNote();
+}
+function ghError(r){ const e = new Error("GitHub " + r.status); e.kind = r.status === 401 ? "token" : r.status === 403 ? "forbidden" : r.status === 404 ? "missing" : "other"; return e; }
+async function gh(method, path, body){
+  const url = `https://api.github.com/repos/${encodeURIComponent(cloud.owner)}/${encodeURIComponent(cloud.repo)}${path}`;
+  let res;
+  try {
+    res = await fetch(url, { method, cache: "no-store", headers: Object.assign({ Authorization: `Bearer ${cloud.token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }, body ? { "Content-Type": "application/json" } : {}), body: body ? JSON.stringify(body) : undefined });
+  } catch(err){ const e = new Error("offline"); e.kind = "offline"; throw e; }
+  let json = null; try { json = await res.json(); } catch(err){}
+  return { ok: res.ok, status: res.status, json };
+}
+async function mergeRemoteDays(daysObj, stamps){
+  const changed = [];
+  Object.values(daysObj || {}).forEach(r => {
+    if (!r || typeof r !== "object" || !/^\d{4}-\d{2}-\d{2}$/.test(String(r.date || ""))) return;
+    if (stamps) stamps[r.date] = String(r.updatedAt || "");
+    const l = store.days[r.date];
+    if ((!l || String(r.updatedAt || "") > String(l.updatedAt || "")) && !(r.date === curDate && dirty)){ store.days[r.date] = r; changed.push(r); }
+  });
+  if (changed.length){
+    if (mode === "idb") await IDB.putMany("days", changed); else ls.set("rt10-local", { days: store.days, settings: store.settings });
+    if (changed.some(r => r.date === curDate) && !dirty) loadDraft();
+  }
+  return changed.length;
+}
+async function mergeRemoteSettings(rs){
+  if (rs && String(rs.updatedAt || "") > String(store.settings.updatedAt || "")){
+    store.settings = Object.assign(clone(DEFAULT_SETTINGS), rs);
+    if (mode === "idb") await IDB.put("kv", clone(store.settings), "settings"); renderPhaseSel(); return true;
+  }
+  return false;
+}
+async function cloudPull(){
+  let changed = 0; const stamps = {};
+  const L = await gh("GET", "/contents/log");
+  const files = L.ok && Array.isArray(L.json) ? L.json.filter(f => /^\d{4}-\d{2}\.json$/.test(f.name)) : [];
+  if (!L.ok && L.status !== 404) throw ghError(L);
+  for (const f of files){
+    const key = "log/" + f.name;
+    if (cloud.shas[key] === f.sha) continue;
+    const g = await gh("GET", "/contents/" + key); if (!g.ok) throw ghError(g);
+    const data = JSON.parse(b64dec(g.json.content));
+    changed += await mergeRemoteDays(data.days, stamps);
+    sortedDates().filter(d => d.startsWith(f.name.slice(0, 7))).forEach(d => { if (!(d in stamps) || String(store.days[d].updatedAt || "") > stamps[d]) cloudDirty.months[ymOf(d)] = ++cloudDirty.seq; });
+    cloud.shas[key] = f.sha;
+  }
+  const remoteMonths = new Set(files.map(f => f.name.slice(0, 7)));
+  sortedDates().forEach(d => { if (!remoteMonths.has(ymOf(d))) cloudDirty.months[ymOf(d)] = cloudDirty.months[ymOf(d)] || ++cloudDirty.seq; });
+  const S = await gh("GET", "/contents/settings.json");
+  if (S.ok && S.json && S.json.content){ const rs = JSON.parse(b64dec(S.json.content)); if (await mergeRemoteSettings(rs)) changed++; else if (String(rs.updatedAt || "") < String(store.settings.updatedAt || "")) cloudDirty.settings = ++cloudDirty.seq; }
+  else if (S.status === 404) cloudDirty.settings = ++cloudDirty.seq;
+  else if (!S.ok) throw ghError(S);
+  cloudSaveCfg(); cloudSaveDirty();
+  return changed;
+}
+async function pushFile(path, build, mergeRemote){
+  for (let attempt = 0; attempt < 3; attempt++){
+    const g = await gh("GET", "/contents/" + path); let sha = null;
+    if (g.ok && g.json){ sha = g.json.sha; if (g.json.content){ try { await mergeRemote(JSON.parse(b64dec(g.json.content))); } catch(err){} } }
+    else if (g.status !== 404) throw ghError(g);
+    const p = await gh("PUT", "/contents/" + path, Object.assign({ message: `Road to 10%: update ${path}`, content: b64enc(JSON.stringify(build())) }, sha ? { sha } : {}));
+    if (p.ok){ cloud.shas[path] = p.json && p.json.content ? p.json.content.sha : null; return; }
+    if (p.status !== 409 && p.status !== 422) throw ghError(p);
+  }
+  const e = new Error("conflict"); e.kind = "other"; throw e;
+}
+async function cloudPush(){
+  if (!cloud || cloudBusy || mode !== "idb") return;
+  clearTimeout(cloudTimer);
+  if (dirty){ await flush(); }
+  if (!cloudPending()){ setCloudState("ok"); return; }
+  if (navigator.onLine === false){ setCloudState("offline"); return; }
+  cloudBusy = true; setCloudState("busy");
+  let pulledChange = false;
+  try {
+    for (const ym of Object.keys(cloudDirty.months).sort()){
+      const seq = cloudDirty.months[ym];
+      await pushFile(`log/${ym}.json`, () => { const days = {}; sortedDates().filter(d => d.startsWith(ym)).forEach(d => { days[d] = store.days[d]; }); return { app:"road-to-10", month: ym, days }; },
+        async remote => { if (await mergeRemoteDays(remote.days)) pulledChange = true; });
+      if (cloudDirty.months[ym] === seq) delete cloudDirty.months[ym];
+      cloudSaveDirty();
+    }
+    if (cloudDirty.settings){
+      const seq = cloudDirty.settings;
+      await pushFile("settings.json", () => clone(store.settings), async rs => { if (await mergeRemoteSettings(rs)) pulledChange = true; });
+      if (cloudDirty.settings === seq) cloudDirty.settings = 0;
+      cloudSaveDirty();
+    }
+    cloud.lastPush = new Date().toISOString(); cloudSaveCfg();
+    cloudBusy = false; setCloudState(cloudPending() ? "pending" : "ok");
+  } catch(e){ cloudBusy = false; setCloudState(e.kind || "other"); if (e.kind === "offline" || e.kind === "other") { clearTimeout(cloudTimer); cloudTimer = setTimeout(cloudPush, 60000); } }
+  if (pulledChange) rerenderAll();
+  if (cloudPending() && cloudState.kind === "pending") cloudSchedule();
+}
+async function cloudSync(){
+  if (!cloud || mode !== "idb") return;
+  try { setCloudState("busy"); const n = await cloudPull(); if (n){ rerenderAll(); renderModeNote(); } cloudBusy = false; await cloudPush(); }
+  catch(e){ setCloudState(e.kind || "other"); }
+}
+async function cloudConnect(owner, repo, token){
+  const msg = t => { const m = document.getElementById("cloudMsg"); if (m) m.textContent = t; };
+  if (!owner || !repo || !token){ msg("Fill in all three boxes."); return; }
+  if (mode !== "idb"){ msg("Open the app from its Home Screen icon to turn on cloud backup."); return; }
+  const prev = cloud;
+  cloud = { owner: owner.trim().replace(/^@/, ""), repo: repo.trim(), token: token.trim(), shas: {} };
+  msg("Connecting…");
+  try {
+    const r = await gh("GET", "");
+    if (!r.ok) throw ghError(r);
+    if (!r.json || r.json.private !== true){ cloud = prev; msg("That repository is public, so anyone could read your log. On GitHub, open the repository's Settings, scroll to the bottom and change its visibility to Private, then connect again."); return; }
+    cloudSaveCfg(); cloudDirty = { months: {}, settings: 0, seq: cloudDirty.seq || 0 };
+    const n = await cloudPull();
+    await cloudPush();
+    rerenderAll(); renderModeNote();
+    if (tab === "share") renderShare();
+    const m = document.getElementById("cloudMsg"); if (m) m.textContent = n ? `Connected. Your log is back: ${sortedDates().length} day${sortedDates().length === 1 ? "" : "s"} restored from the cloud.` : "Connected. Everything on this iPhone is now backed up.";
+  } catch(e){ cloud = prev; cloudSaveCfg(); msg(e.kind === "offline" ? "You're offline. Connect to the internet and try again." : cloudMsg(e.kind)); setCloudState(prev ? cloudState.kind : "off"); }
+}
+function cloudCardHTML(){
+  const ownerGuess = /\.github\.io$/i.test(location.hostname) ? location.hostname.split(".")[0] : "";
+  if (!cloud) return `<div class="card panel" id="cloudCard">
+    <h2>Cloud backup</h2>
+    <p style="margin:0">Saves a copy of everything to a <b>private</b> GitHub repository, automatically, every time you log. If the app gets deleted or you change phones, reconnect here and it all comes back. Setup takes about 3 minutes, once.</p>
+    <ol class="cloudsteps">
+      <li>On GitHub, tap <b>+</b> then <b>New repository</b>. Name it <b>road-to-10-data</b>, choose <b>Private</b>, check <b>Add a README file</b>, and tap <b>Create repository</b>. This is separate from the app's repository.</li>
+      <li>Make a key for the app at <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.
+        Token name: <b>Road to 10% app</b>. Expiration: the longest option it offers. Repository access: <b>Only select repositories</b>, then pick <b>road-to-10-data</b>. Under Permissions, set <b>Contents</b> to <b>Read and write</b>. Tap <b>Generate token</b> and copy it (it starts with github_pat_).</li>
+      <li>Fill in the boxes below and tap <b>Connect</b>.</li>
+    </ol>
+    <div class="grid2"><label class="f"><span>GitHub username</span><input type="text" id="cloudOwner" value="${esc(ownerGuess)}" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></label>
+      <label class="f"><span>Data repository</span><input type="text" id="cloudRepo" value="road-to-10-data" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></label></div>
+    <label class="f"><span>Key (token)</span><input type="password" id="cloudToken" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></label>
+    <div class="row"><button type="button" class="btn" data-cloud="connect">Connect</button></div>
+    <div id="cloudMsg" class="small" role="status"></div>
+    <p class="small muted" style="margin:0">The key only works on that one private repository, and it stays on this iPhone. It's never included in files you share. The app's public repository never sees your log.</p>
+  </div>`;
+  const t = cloud.token || ""; const mask = t.length > 10 ? `${t.slice(0, 11)}…${t.slice(-4)}` : "saved";
+  return `<div class="card panel" id="cloudCard">
+    <h2>Cloud backup</h2>
+    <div id="cloudLine">${cloudLineHTML()}</div>
+    <div class="small muted">Saving to <b>${esc(cloud.owner)}/${esc(cloud.repo)}</b> (private) · key ${esc(mask)}. Every change backs up within a few seconds, and again when you leave the app.</div>
+    <div class="row"><button type="button" class="btn" data-cloud="push">Back up now</button><button type="button" class="btn ghost" data-cloud="pull">Get latest from cloud</button><button type="button" class="textbtn" data-cloud="newkey">Change key</button><button type="button" class="textbtn" data-cloud="disconnect">Turn off</button></div>
+    <div id="cloudKeyBox" hidden><label class="f"><span>New key (token)</span><input type="password" id="cloudToken2" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></label><div class="row"><button type="button" class="btn" data-cloud="savekey">Save key</button></div></div>
+    <div id="cloudMsg" class="small" role="status"></div>
+  </div>`;
+}
+$("#v-share").addEventListener("click", async e => {
+  const b = e.target.closest("[data-cloud]"); if (!b) return;
+  const a = b.dataset.cloud; const msg = t => { const m = document.getElementById("cloudMsg"); if (m) m.textContent = t; };
+  if (a === "connect") cloudConnect($("#cloudOwner").value, $("#cloudRepo").value, $("#cloudToken").value);
+  if (a === "push"){ Object.keys(store.days).forEach(d => { if (cloud && !(ymOf(d) in cloudDirty.months) && cloud.lastPush && String(store.days[d].updatedAt || "") > cloud.lastPush) cloudDirty.months[ymOf(d)] = ++cloudDirty.seq; }); await cloudPush(); msg(cloudState.kind === "ok" ? "All backed up." : cloudMsg(cloudState.kind)); }
+  if (a === "pull"){ try { setCloudState("busy"); cloud.shas = {}; const n = await cloudPull(); await cloudPush(); rerenderAll(); msg(n ? `Brought in ${n} newer item${n === 1 ? "" : "s"} from the cloud.` : "This iPhone already has the latest."); } catch(err){ setCloudState(err.kind || "other"); msg(cloudMsg(err.kind)); } }
+  if (a === "newkey"){ const box = $("#cloudKeyBox"); box.hidden = !box.hidden; }
+  if (a === "savekey"){ const v = ($("#cloudToken2").value || "").trim(); if (!v) return; cloud.token = v; cloudSaveCfg(); await cloudSync(); renderShare(); }
+  if (a === "disconnect"){ if (b.dataset.confirm !== "1"){ b.dataset.confirm = "1"; b.textContent = "Tap again to turn off"; return; } cloud = null; cloudSaveCfg(); cloudDirty = { months: {}, settings: 0, seq: 0 }; cloudSaveDirty(); setCloudState("off"); renderShare(); renderModeNote(); }
+});
+
 function renderShare(){
   const lb = store.settings.lastBackup, n = sortedDates().length;
   $("#v-share").innerHTML = `
@@ -2285,11 +2486,12 @@ function renderShare(){
       <div class="row"><button class="btn" id="shareSum">Share summary</button><button class="btn ghost" id="copyBtn">Copy</button><button class="btn ghost" id="shareJson">Share log file</button></div>
       <span class="small muted" id="copyMsg" role="status"></span>
     </div>
+    ${cloudCardHTML()}
     <div class="card panel">
-      <h2>Backup</h2>
-      <div class="notice warn"><b>Deleting the app's icon deletes its data.</b> Back up once a week: tap Back up now, then Save to Files and pick iCloud Drive.</div>
+      <h2>Backup file</h2>
+      ${cloud ? `<div class="small muted">Cloud backup is on, so this is optional. A file is still handy to send to Claude or keep in iCloud Drive.</div>` : `<div class="notice warn"><b>Deleting the app's icon deletes its data.</b> Turn on cloud backup above, or back up once a week: tap Back up now, then Save to Files and pick iCloud Drive.</div>`}
       <div class="calc"><span>Last backup</span><strong>${lb ? fmtDate(lb) : "Never"}</strong><span class="muted small">${n} day${n === 1 ? "" : "s"} logged</span></div>
-      <div class="row"><button class="btn" id="backupBtn">Back up now</button><button class="btn ghost" id="restoreBtn">Restore from a backup</button><button class="btn ghost" id="csvBtn">Export spreadsheet</button></div>
+      <div class="row"><button class="btn" id="backupBtn">Save a backup file</button><button class="btn ghost" id="restoreBtn">Restore from a backup</button><button class="btn ghost" id="csvBtn">Export spreadsheet</button></div>
       <input type="file" id="restoreIn" class="vh" accept=".json,application/json" tabindex="-1" aria-hidden="true">
       <span class="small muted" id="bkMsg" role="status"></span>
       <p class="small muted" style="margin:0">Restoring adds the days from the file. If a day is in both, the most recently edited version is kept. It also accepts the file downloaded from the online tracker.</p>
@@ -2372,8 +2574,10 @@ function renderModeNote(){
   let h = "";
   if (!isStandalone) h += `<div class="notice" style="margin-bottom:14px"><b>Install it first.</b> Tap the Share button, then <b>Add to Home Screen</b>, and open Road to 10% from its icon. Anything you log here in Safari stays in Safari and won't show up in the app.</div>`;
   if (mode === "local") h += `<div class="notice warn" style="margin-bottom:14px"><b>Limited storage.</b> This browser blocked the app's database, so your log is kept in a smaller backup store. Back up often.</div>`;
-  if (count === 0) h += `<div class="notice" style="margin-bottom:14px"><b>Starting fresh?</b> If Claude sent you a baseline file or you have a backup, restore it first. <button class="textbtn" data-go="share" style="margin-left:4px">Restore</button></div>`;
-  else if (count >= 3 && (!lb || daysBetween(lb, today) >= 7)) h += `<div class="notice warn" style="margin-bottom:14px"><b>${lb ? `Last backup was ${daysBetween(lb, today)} days ago.` : "You haven't backed up yet."}</b> Your log lives only on this iPhone. <button class="textbtn" id="backupNow" style="margin-left:4px">Back up now</button></div>`;
+  if (count === 0) h += `<div class="notice" style="margin-bottom:14px"><b>Starting fresh?</b> If you've used cloud backup before, reconnect it to get everything back. Or restore a backup file, or the baseline file Claude sent. <button class="textbtn" data-go="share" style="margin-left:4px">Restore</button></div>`;
+  else if (cloud && ["token","forbidden","missing"].includes(cloudState.kind)) h += `<div class="notice warn" style="margin-bottom:14px"><b>Cloud backup stopped.</b> ${esc(cloudMsg(cloudState.kind))} <button class="textbtn" data-go="share" style="margin-left:4px">Fix it</button></div>`;
+  else if (!cloud && count >= 1 && mode === "idb" && !(lb && daysBetween(lb, today) < 7)) h += `<div class="notice warn" style="margin-bottom:14px"><b>Your log lives only on this iPhone.</b> If the app is deleted, it's gone. Turn on cloud backup and it's saved automatically. <button class="textbtn" data-go="share" style="margin-left:4px">Set it up</button></div>`;
+  else if (!cloud && count >= 3 && (!lb || daysBetween(lb, today) >= 7)) h += `<div class="notice warn" style="margin-bottom:14px"><b>${lb ? `Last backup was ${daysBetween(lb, today)} days ago.` : "You haven't backed up yet."}</b> Your log lives only on this iPhone. <button class="textbtn" id="backupNow" style="margin-left:4px">Back up now</button></div>`;
   n.innerHTML = h;
 }
 $("#modeNote").addEventListener("click", e => { if (e.target.id === "backupNow"){ showTab("share"); doBackup(); return; } const g = e.target.closest("[data-go]"); if (g) goTab(g.dataset.go); });
@@ -2406,6 +2610,8 @@ document.addEventListener("visibilitychange", () => {
     await IDB.open();
     const days = await IDB.all("days"); (days || []).forEach(d => { if (d && d.date) store.days[d.date] = d; });
     const st = await IDB.get("kv", "settings"); if (st) store.settings = Object.assign(clone(DEFAULT_SETTINGS), st);
+    const cc = await IDB.get("kv", "cloud"); if (cc && cc.owner && cc.repo && cc.token){ cloud = Object.assign({ shas: {} }, cc); cloudState = { kind: "pending" }; }
+    const cd = await IDB.get("kv", "cloudDirty"); if (cd && cd.months && !Array.isArray(cd.months)) cloudDirty = Object.assign({ months: {}, settings: 0, seq: 0 }, cd);
     mode = "idb";
   } catch(e){
     mode = "local";
@@ -2416,6 +2622,7 @@ document.addEventListener("visibilitychange", () => {
   const typed = dirty;
   if (typed){ draft = mergeDeep(store.days[curDate] || {}, draft); draft.date = curDate; } else loadDraft();
   setStatus(typed ? "unsaved" : "saved"); renderPhaseSel(); renderModeNote(); rerenderAll(true);
+  if (cloud){ if (cloud.lastPush) Object.keys(store.days).forEach(d => { if (String(store.days[d].updatedAt || "") > cloud.lastPush) cloudDirty.months[ymOf(d)] = cloudDirty.months[ymOf(d)] || ++cloudDirty.seq; }); setTimeout(cloudSync, 400); }
   if (typed) flush();
 })();
 if ("serviceWorker" in navigator && location.protocol !== "file:"){ window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); }); }
