@@ -222,7 +222,7 @@ td.num,th.num{text-align:right}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .confirm{padding:14px 16px;display:flex;flex-direction:column;gap:10px;border-color:var(--ink)}
 /* bottom tab bar */
-.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:9;background:color-mix(in srgb,var(--surface) 92%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:repeat(6,minmax(0,1fr))}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:9;background:color-mix(in srgb,var(--surface) 92%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
 .bottomnav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:3px 0 2px;color:var(--muted);font-size:10.5px;font-weight:600;cursor:pointer;min-width:0;white-space:nowrap}
 .bottomnav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .bottomnav button[aria-selected="true"]{color:var(--ink)}
@@ -353,6 +353,88 @@ body.resting main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
 .healthbox{display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:12px}
 .healthbox ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
 .codeline{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px 10px;word-break:break-all}
+/* measure + overview */
+.eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+button.pill{cursor:pointer}
+#v-measure{--sec:var(--steel);--on-sec:var(--on-steel)}
+.mstep>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 16px}
+.mstep>summary::-webkit-details-marker{display:none}
+.mstep .num{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:17px;background:var(--surface);border:1.5px solid var(--line);color:var(--muted)}
+.mstep.due .num{background:var(--sec);border-color:var(--sec);color:var(--on-sec)}
+.mstep.done .num{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.mstep>summary .pill{flex:none}
+.how{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px;font-size:14px;line-height:1.45}
+.how b{font-weight:600}
+.site{border:1px solid var(--line2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.site h4{margin:0;font-family:var(--display);font-size:18px;font-weight:600}
+.site p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.45}
+.sites{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.rd{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rd:empty{display:none}
+.rd.warn{color:var(--warn);font-weight:600}
+.rounds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.calgrid{display:grid;grid-template-columns:minmax(58px,auto) repeat(3,minmax(0,1fr));gap:8px;align-items:center}
+.calgrid b{font-weight:600;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);text-align:center}
+.calgrid span{color:var(--ink2);font-size:12.5px;line-height:1.2}
+.calgrid input,.rounds input{width:100%;min-width:0;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px 6px;font-size:16px;min-height:42px;text-align:center}
+.rounds label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink2);min-width:0}
+.calgrid output{text-align:center;font-family:var(--display);font-size:21px;font-weight:600;font-variant-numeric:tabular-nums}
+.tapegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 10px}
+.tapegrid .f>span{display:flex;flex-direction:column;gap:1px}
+.tapegrid .f>span em{font-size:12px;line-height:1.35}
+.sched{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px 12px;font-size:14px;align-items:baseline;line-height:1.45}
+.sched b{font-weight:600;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.sched em{font-style:normal;color:var(--muted)}
+.order{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;font-size:13px;font-weight:600}
+.order span{background:var(--sunk);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.order i{font-style:normal;color:var(--muted)}
+.cl{display:grid;grid-template-columns:26px minmax(0,1fr);gap:2px 10px;padding:10px 0;border-top:1px solid var(--line2);align-items:start}
+.cl:first-child{border-top:0}
+.cl i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:700;margin-top:1px}
+.cl.yes i{background:var(--ok-bg);color:var(--ok)}
+.cl.no i{background:var(--warn-bg);color:var(--warn)}
+.cl.na i{background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+.cl b{font-weight:600;font-size:14.5px;line-height:1.35}
+.cl span{grid-column:2;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.4}
+.rverdict{border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.45;background:var(--sunk);color:var(--ink2)}
+.rverdict.yes{background:var(--ok-bg);color:var(--ok)}
+.rverdict.warn{background:var(--warn-bg);color:var(--warn)}
+.rverdict b{font-weight:600}
+.goals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line2);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.goals div{background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.goals small,.targets small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.goals strong{font-family:var(--display);font-size:24px;font-weight:600;line-height:1.1}
+.goals span,.targets span{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.35}
+.jump{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px}
+.jump::-webkit-scrollbar{display:none}
+.jump button{flex:none;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;background:var(--surface);cursor:pointer}
+.ovsec{scroll-margin-top:84px}
+.road .st{display:grid;grid-template-columns:22px minmax(0,1fr);gap:3px 12px;padding:12px 0;border-top:1px solid var(--line2)}
+.road .st:first-child{border-top:0}
+.road .st>i{width:14px;height:14px;border-radius:50%;border:2px solid var(--steel);margin:5px 0 0 4px;background:var(--surface)}
+.road .st.done>i{background:var(--steel)}
+.road .st.now>i{background:var(--ink);border-color:var(--ink);box-shadow:0 0 0 4px color-mix(in srgb,var(--ink) 16%,transparent)}
+.road .st b{font-family:var(--display);font-size:20px;font-weight:600}
+.road .st .meta{grid-column:2;font-size:13.5px;color:var(--ink2);line-height:1.45}
+.road .st .meta em{font-style:normal;font-weight:600;color:var(--ink)}
+.wks{display:flex;flex-direction:column;gap:8px}
+.wk{border:1px solid var(--line2);border-radius:10px}
+.wk>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:4px 10px;padding:12px 14px;flex-wrap:wrap}
+.wk>summary::-webkit-details-marker{display:none}
+.wk>summary b{font-family:var(--display);font-size:19px;font-weight:600}
+.wk>summary span{font-size:13px;color:var(--muted)}
+.wk>summary .chev{margin-left:auto}
+.cs .wk ol{margin:0;padding:0 14px 12px 34px;gap:7px;font-size:14px}
+.wk li span{display:block;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+.wk .pre{margin:0 14px 12px;font-size:12.5px;color:var(--muted)}
+.cs td.wrap{white-space:normal;min-width:160px}
+.targets.t2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mlist{display:flex;flex-direction:column}
+.mlist .mi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:9px 0;border-top:1px solid var(--line2)}
+.mlist .mi:first-child{border-top:0}
+.mlist .mi b{font-weight:600}
+.mlist .mi span{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink2);text-align:right}
+.mlist .mi p{grid-column:1/-1;margin:0;font-size:13px;color:var(--muted);line-height:1.4}
 /* cloud */
 .cloudline{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:500}
 .cloudline i{width:12px;height:12px;border-radius:50%;flex:none;background:var(--steel)}
@@ -438,6 +520,8 @@ body.resting main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
   <section class="view" id="v-charts" hidden></section>
   <section class="view" id="v-food" hidden></section>
   <section class="view" id="v-sleep" hidden></section>
+  <section class="view" id="v-measure" hidden></section>
+  <section class="view" id="v-overview" hidden></section>
   <section class="view" id="v-more" hidden></section>
   <section class="view" id="v-history" hidden></section>
   <section class="view" id="v-cheat" hidden></section>
@@ -450,6 +534,7 @@ body.resting main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
   <button role="tab" id="t-workout" aria-selected="false" data-tab="workout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 7.5v9M17.5 7.5v9M3.5 10v4M20.5 10v4M6.5 12h11"/></svg>Workout</button>
   <button role="tab" id="t-food" aria-selected="false" data-tab="food"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v7.5M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 10.5V21M17 21V3c-2.2 1.2-3.5 4-3.5 8h3.5"/></svg>Food</button>
   <button role="tab" id="t-sleep" aria-selected="false" data-tab="sleep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/></svg>Sleep</button>
+  <button role="tab" id="t-measure" aria-selected="false" data-tab="measure"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9.5" cy="11" r="6.5"/><circle cx="9.5" cy="11" r="2"/><path d="M9.5 17.5H21.5v-3h-4.6M13.5 17.5v-1.6M16.5 17.5v-1.6M19.5 17.5v-1.6"/></svg>Measure</button>
   <button role="tab" id="t-charts" aria-selected="false" data-tab="charts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20.5h18M6 20.5v-7M11 20.5V5M16 20.5v-10"/></svg>Charts</button>
   <button role="tab" id="t-more" aria-selected="false" data-tab="more"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/></svg>More</button>
 </nav>
@@ -483,16 +568,16 @@ const ls = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e
 /* ---------- the plan ---------- */
 const LEAD_START = "2026-10-19";
 const PH = {
-  lead:{ id:"lead", short:"Lead-in", name:"Lead-in · maintenance", range:"Now → Dec 31, 2026", kcal:2800, p:"180", pMin:170, fat:"—", carbs:"—", reset:null, steps:"Build to 10,000", stepsN:10000, trend:"maint" },
-  p1:{ id:"p1", short:"Phase 1", name:"Phase 1 · 204 → 188 lb", range:"From Jan 1, 2027", kcal:2300, p:"180", pMin:170, fat:"70 g", carbs:"~235 g", reset:2800, steps:"10,000", stepsN:10000,
-       resets:[["2027-02-22","2027-02-28"]], trend:{on:[1,1.5], fine:0.5, fast:1.75} },
-  p2:{ id:"p2", short:"Phase 2", name:"Phase 2 · 188 → 176 lb", range:"Projected Apr 19 – Aug 8, 2027", kcal:2250, p:"180", pMin:170, fat:"65 g", carbs:"~235 g", reset:2750, steps:"10,000", stepsN:10000,
-       resets:[["2027-04-19","2027-04-25"],["2027-06-14","2027-06-20"]], trend:{on:[0.75,1.25], fine:0.5, fast:1.5} },
-  p3:{ id:"p3", short:"Phase 3", name:"Phase 3 · 176 → 166 lb", range:"Projected Aug 9 – Nov 28, 2027", kcal:2200, p:"180", pMin:170, fat:"60 g", carbs:"~235 g", reset:2700, steps:"10,000", stepsN:10000,
-       resets:[["2027-08-09","2027-08-15"],["2027-10-04","2027-10-10"]], trend:{on:[0.75,1.25], fine:0.5, fast:1.5} },
-  p4:{ id:"p4", short:"Phase 4", name:"Phase 4 · 166 lb → 10% body fat", range:"Projected Nov 29, 2027 → 2028", kcal:2150, p:"180", pMin:170, fat:"60 g", carbs:"~220 g", reset:2500, steps:"12,000", stepsN:12000,
-       resets:[["2027-11-29","2027-12-05"],["2028-01-24","2028-01-30"],["2028-03-20","2028-03-26"]], trend:{on:[0.5,1], fine:0.4, fast:1.25} },
-  after:{ id:"after", short:"After the cut", name:"After the cut · live at 10–12%", range:"Once you hit the finish line", kcal:null, p:"160–180", pMin:160, fat:"70–80 g", carbs:"the rest", reset:null, steps:"10,000–12,000", stepsN:10000, trend:"maint" }
+  lead:{ id:"lead", short:"Lead-in", name:"Lead-in · maintenance", range:"Step 1 · ends when you're ready, usually after 8–10 weeks of lifting", kcal:2800, p:"180", pMin:170, fat:"—", carbs:"—", reset:null, steps:"Build to 10,000", stepsN:10000, trend:"maint" },
+  p1:{ id:"p1", short:"Phase 1", name:"Phase 1 · 204 → 188 lb", range:"Step 2 · ends when your numbers say so", kcal:2300, p:"180", pMin:170, fat:"70 g", carbs:"~235 g", reset:2800, steps:"10,000", stepsN:10000,
+       trend:{on:[1,1.5], fine:0.5, fast:1.75} },
+  p2:{ id:"p2", short:"Phase 2", name:"Phase 2 · 188 → 176 lb", range:"Step 3 · ends when your numbers say so", kcal:2250, p:"180", pMin:170, fat:"65 g", carbs:"~235 g", reset:2750, steps:"10,000", stepsN:10000,
+       trend:{on:[0.75,1.25], fine:0.5, fast:1.5} },
+  p3:{ id:"p3", short:"Phase 3", name:"Phase 3 · 176 → 166 lb", range:"Step 4 · ends when your numbers say so", kcal:2200, p:"180", pMin:170, fat:"60 g", carbs:"~235 g", reset:2700, steps:"10,000", stepsN:10000,
+       trend:{on:[0.75,1.25], fine:0.5, fast:1.5} },
+  p4:{ id:"p4", short:"Phase 4", name:"Phase 4 · 166 lb → 10% body fat", range:"Step 5 · ends at 10% body fat", kcal:2150, p:"180", pMin:170, fat:"60 g", carbs:"~220 g", reset:2500, steps:"12,000", stepsN:12000,
+       trend:{on:[0.5,1], fine:0.4, fast:1.25} },
+  after:{ id:"after", short:"After the cut", name:"After the cut · live at 10–12%", range:"Step 6 · from the finish line on", kcal:null, p:"160–180", pMin:160, fat:"70–80 g", carbs:"the rest", reset:null, steps:"10,000–12,000", stepsN:10000, trend:"maint" }
 };
 const PH_ORDER = ["lead","p1","p2","p3","p4","after"];
 const SCHED = {
@@ -580,11 +665,39 @@ const CARDIO = {
        6:{cond:"Optional (spring to fall): hill sprints 6–8 × 8–10 s at the start of your walk", walk:"45–60 min zone 2 walk"} }
 };
 
-function phaseStartFor(phaseId){ return (store.settings.phase === phaseId && store.settings.phaseStart) ? store.settings.phaseStart : (phaseId === "lead" ? LEAD_START : store.settings.phaseStart || LEAD_START); }
-function leadWeek(date){ return Math.floor(daysBetween(LEAD_START, date) / 7) + 1; }
-function inRange(date, r){ return date >= r[0] && date <= r[1]; }
-function projectedReset(phaseId, date){ const p = PH[phaseId]; return (p.resets || []).find(r => inRange(date, r)) || null; }
-function isReset(entry, phaseId){ if (entry && typeof entry.reset === "boolean") return entry.reset; return !!projectedReset(phaseId, entry.date); }
+/* Phases have no calendar dates: each starts when you pick it at the top and ends when your numbers say so (Measure tab). */
+function phaseStartFor(phaseId){
+  const st = store.settings, log = st.phases || {};
+  if (st.phase === phaseId && st.phaseStart) return st.phaseStart;
+  if (log[phaseId]) return log[phaseId];
+  if (phaseId === "lead") return LEAD_START;
+  const first = sortedDates().find(d => store.days[d].phase === phaseId);
+  return first || st.phaseStart || LEAD_START;
+}
+function leadStart(){ return phaseStartFor("lead"); }
+function leadWeek(date){ return Math.floor(daysBetween(leadStart(), date) / 7) + 1; }
+/* week 1 of a phase is the first Monday on or after its start; days before that are the hand-off */
+function phaseWeek1(phaseId){ const st = phaseStartFor(phaseId); const dw = parseISO(st).getDay(); return dw === 1 ? st : addDays(st, (8 - dw) % 7); }
+function phaseWeekNo(phaseId, date){ if (phaseId === "lead") return leadWeek(date); const w1 = phaseWeek1(phaseId); return date < w1 ? 0 : Math.floor(daysBetween(w1, date) / 7) + 1; }
+/* reset weeks: Phase 1 in week 8, Phases 2–4 in week 1, then every 8th week. Taking one early restarts the count from there. */
+const RESET_FIRST = { p1: 8, p2: 1, p3: 1, p4: 1 };
+function planResetStart(phaseId, date){
+  if (!RESET_FIRST[phaseId]) return null;
+  const ps = phaseStartFor(phaseId);
+  const manual = (((store.settings.resetStarts || {})[phaseId]) || []).filter(d => d >= ps && d <= date).sort();
+  const anchor = manual.length ? manual[manual.length - 1] : addDays(phaseWeek1(phaseId), (RESET_FIRST[phaseId] - 1) * 7);
+  if (date < anchor) return null;
+  const st = addDays(anchor, Math.floor(daysBetween(anchor, date) / 56) * 56);
+  return daysBetween(st, date) < 7 ? st : null;
+}
+function planReset(phaseId, date){ return !!planResetStart(phaseId, date); }
+function nextReset(phaseId, from){
+  if (!RESET_FIRST[phaseId]) return null;
+  for (let i = 0; i < 420; i++){ const d = addDays(from, i); const st = planResetStart(phaseId, d); if (st) return { start: st, end: addDays(st, 6), week: phaseWeekNo(phaseId, st), now: st <= from }; }
+  return null;
+}
+function isReset(entry, phaseId){ if (entry && typeof entry.reset === "boolean") return entry.reset; return planReset(phaseId, entry.date); }
+function weekTag(phaseId, date){ if (phaseId === "after") return ""; const w = phaseWeekNo(phaseId, date); if (phaseId === "lead") return w >= 1 ? `week ${w}` : "before lifting starts"; return w >= 1 ? `week ${w}` : "hand-off days"; }
 
 function dayPlan(phaseId, date, entry){
   const dow = parseISO(date).getDay();
@@ -595,12 +708,15 @@ function dayPlan(phaseId, date, entry){
     if (wk <= 2){
       c = {0:{walk:"Steps only. Full rest day."}, 6:{walk:"45–60 min zone 2 walk"}}[dow] || {};
       if (wk >= 1) notes.push(`Lead-in week ${wk}: pick weights you could lift 12–15 times and stop about 3 reps short. One set of Nordic curls, no box jumps, no intervals yet.`);
-      else notes.push("Lifting starts Monday, October 19. Use the next few days to buy food, set up your log and start the 7:00 a.m. wake.");
+      else notes.push(`Lifting starts ${fmtLong(leadStart()).replace(/, \d{4}$/, "")}. Use the next few days to buy food, set up your log and start the 7:00 a.m. wake.`);
     } else {
       c = CARDIO.p1[dow];
-      notes.push(`Lead-in week ${wk}: train as written and eat at maintenance (~2,800 kcal). Only the food changes on January 1.`);
+      notes.push(`Lead-in week ${wk}: train as written and eat at maintenance (~2,800 kcal). ${wk >= 8 ? "Check \"Ready for Phase 1?\" on the Measure tab." : "Only the food changes when you move to Phase 1."}`);
     }
-  } else c = CARDIO[phaseId][dow] || {};
+  } else {
+    c = CARDIO[phaseId][dow] || {};
+    if (phaseId !== "after" && date >= phaseStartFor(phaseId) && phaseWeekNo(phaseId, date) === 0) notes.push(`Hand-off days: ${PH[phaseId].short}'s calories start now. Week 1 starts ${fmtDate(phaseWeek1(phaseId))}.`);
+  }
   const ps = phaseStartFor(phaseId);
   const wkIdx = date >= ps ? Math.floor(daysBetween(ps, date) / 7) : 0;
   const ab = (entry && entry.cardio && entry.cardio.ab) || (wkIdx % 2 === 0 ? "A" : "B");
@@ -612,9 +728,9 @@ function dayPlan(phaseId, date, entry){
     notes.unshift(`Reset week: eat ~${fmt(kc)} kcal (protein stays at 180 g). Same exercises at 60–70% of your usual weight, same reps. Zone 2 only, nothing hard.`);
   }
   if (phaseId === "p4" || phaseId === "after") notes.push("Lean-up triceps sets start once your weekly average is 165 lb or less (no scale: after your first Phase 4 reset week).");
-  const preStart = phaseId === "lead" && date < LEAD_START;
+  const preStart = phaseId === "lead" && date < leadStart();
   return { dow, preStart, work: preStart ? null : (WORK[dow] || null), power: reset ? null : (c.power || null), cond: reset && cond ? "Reset week: swap for easy zone 2 (or skip)." : cond,
-    hasAB: !!c.condA && !reset, ab, walk: c.walk || null, hangs: c.hangs || null, note: c.note || null, hard: !!c.hard && !reset, reset, notes };
+    hasAB: !!c.condA && !reset, ab, walk: c.walk || null, hangs: c.hangs || null, note: c.note || null, hard: !!c.hard && !reset, reset, notes, week: phaseWeekNo(phaseId, date) };
 }
 function targetKcal(phaseId, reset){ const p = PH[phaseId]; if (phaseId === "after") return toNum(store.settings.maint) || 2400; return reset && p.reset ? p.reset : p.kcal; }
 
@@ -658,7 +774,12 @@ let lastPhase = "lead";
 let tab = "today", cheatPhase = null, chartRange = "8w", shareRange = 14;
 const openState = ls.get("rt10-open") || { sleep:true, food:true, train:false, cardio:false, measure:false, day:false };
 
-function phaseOf(entry){ return (entry && entry.phase && PH[entry.phase]) ? entry.phase : store.settings.phase; }
+function phaseOf(entry){
+  if (entry && entry.phase && PH[entry.phase]) return entry.phase;
+  const st = store.settings, d = entry && entry.date;
+  if (d && st.phaseStart && d < st.phaseStart && st.phases){ let best = null; Object.keys(st.phases).forEach(p => { const s0 = st.phases[p]; if (p !== st.phase && PH[p] && s0 <= d && (!best || s0 > st.phases[best])) best = p; }); if (best) return best; }
+  return st.phase;
+}
 function loadDraft(){ draft = clone(store.days[curDate] || { date: curDate }); draft.date = curDate; dirty = false; }
 
 /* ---------- saving ---------- */
@@ -676,7 +797,7 @@ async function flush(){
   if (mode === "connecting"){ saveTimer = setTimeout(flush, 300); return; }
   if (saving){ saveTimer = setTimeout(flush, 300); return; }
   saving = true; dirty = false;
-  if (!draft.phase) draft.phase = store.settings.phase;
+  if (!draft.phase) draft.phase = phaseOf(draft);
   draft.updatedAt = new Date().toISOString();
   const body = clone(draft), date = body.date;
   store.days[date] = body;
@@ -744,7 +865,7 @@ function renderToday(){
   const plan = dayPlan(phaseId, curDate, draft);
   const kc = targetKcal(phaseId, plan.reset);
   const today = iso(new Date());
-  const due = measureDue(curDate);
+  const due = mSchedule(curDate);
   const rel = curDate === today ? "TODAY" : curDate === addDays(today,-1) ? "YESTERDAY" : curDate === addDays(today,1) ? "TOMORROW" : parseISO(curDate).getFullYear();
 
   const planLines = [];
@@ -753,23 +874,28 @@ function renderToday(){
   if (plan.walk) planLines.push(`<div class="line"><b>Walk</b><span>${esc(plan.walk)}</span></div>`);
   if (plan.note) planLines.push(`<div class="line"><b>Note</b><span>${esc(plan.note)}</span></div>`);
 
-  const resetProjected = projectedReset(phaseId, curDate);
+  const resetPlanned = planReset(phaseId, curDate);
+  const wtag = weekTag(phaseId, curDate);
+  const nxM = due.keys.length ? null : nextCheckin(curDate);
+  const R = curDate === today ? readiness(store.settings.phase) : null;
+  const why = plan.reset ? null : resetReason(phaseId, curDate);
   const html = `
   ${dateBarHTML()}
   <div class="card plan">
-    <div class="eyebrow">${esc(P.name)} · ${DOWL[plan.dow]}</div>
-    <h2>${plan.work ? esc(plan.work.name) : plan.preStart ? "Lifting starts Monday, Oct 19" : "Rest day · no lifting"}</h2>
+    <div class="eyebrow">${esc(P.name)} · ${wtag ? wtag + " · " : ""}${DOWL[plan.dow]}</div>
+    <h2>${plan.work ? esc(plan.work.name) : plan.preStart ? `Lifting starts ${fmtDate(leadStart())}` : "Rest day · no lifting"}</h2>
     <div class="pills">
       <span class="pill">${kc ? fmt(kc) + " kcal" : "Maintenance"}</span>
       <span class="pill">${esc(P.p)} g protein</span>
       <span class="pill">${esc(P.steps)} steps</span>
       ${plan.reset ? `<span class="pill warn">Reset week</span>` : ""}
-      ${due.waist ? `<span class="pill info">Waist + calipers due</span>` : ""}
-      ${due.full ? `<span class="pill info">Full measurements + photos due</span>` : ""}
+      ${due.keys.length ? `<button type="button" class="pill info" data-go="measure">${esc(dueLabel(due.keys))} due</button>` : nxM && nxM.date === addDays(curDate, 1) ? `<button type="button" class="pill" data-go="measure">Check-in tomorrow morning</button>` : ""}
+      ${R && R.state === "yes" && R.next ? `<button type="button" class="pill ok" data-go="measure">Ready for ${esc(PH[R.next].short)}</button>` : ""}
     </div>
     ${planLines.length ? `<div class="lines">${planLines.join("")}</div>` : ""}
     ${plan.notes.map(n => `<div class="notice${/Reset/.test(n) ? " warn" : ""}">${esc(n)}</div>`).join("")}
-    ${(PH[phaseId].reset) ? `<label class="ck" style="--sec:var(--ink)"><input type="checkbox" id="resetToggle" ${plan.reset ? "checked" : ""}>Treat this as a reset week day${resetProjected ? " (projected)" : ""}</label>` : ""}
+    ${(PH[phaseId].reset) ? `<label class="ck" style="--sec:var(--ink)"><input type="checkbox" id="resetToggle" ${plan.reset ? "checked" : ""}>Treat this as a reset week day${resetPlanned ? " (the plan's reset week)" : ""}</label>` : ""}
+    ${why ? `<div id="resetBox"><div class="notice warn">${esc(why)}</div><div class="row" style="margin-top:8px"><button type="button" class="textbtn" data-reset="ask">Start a reset week ${curDate === today ? "today" : "on " + fmtDate(curDate)}</button></div></div>` : ""}
   </div>
   ${sleepSection()}
   ${foodSection(phaseId, kc, P)}
@@ -849,7 +975,7 @@ function trainSection(phaseId, plan){
       <div class="row" style="margin-top:10px"><button type="button" class="btn" data-go="workout">Open the workout</button></div></div>
       ${tr.status || tr.feelAfter ? `<div class="small muted">${esc([tr.status ? {done:"Done, all of it",partial:"Did part of it",skipped:"Skipped"}[tr.status] : null, tr.feelAfter ? `felt ${tr.feelAfter}/5 after` : null, tr.feltNotes || null].filter(Boolean).join(" · "))}</div>` : ""}`;
   } else {
-    body = `<div class="planbox">${plan.preStart ? "No lifting yet. Your first session is Push A on Monday, October 19." : plan.dow === 0 ? "Sunday is a rest day from lifting. Don't make up missed workouts." : "Saturday is a rest day from lifting. Don't make up missed workouts."} Steps still happen.</div>
+    body = `<div class="planbox">${plan.preStart ? `No lifting yet. Your first session is on ${fmtLong(leadStart()).replace(/, \d{4}$/, "")}.` : plan.dow === 0 ? "Sunday is a rest day from lifting. Don't make up missed workouts." : "Saturday is a rest day from lifting. Don't make up missed workouts."} Steps still happen.</div>
       ${area("train.extra","Did any other activity?","Basketball, a hike, helped a friend move…")}`;
   }
   body += `
@@ -880,24 +1006,11 @@ function cardioSection(phaseId, plan, P){
 }
 
 function measureSection(due){
-  const lastW = due.waistLast ? `Last waist check: ${fmtDate(due.waistLast.date)} (${due.waistLast.v}″).` : "No waist check logged yet.";
-  const lastF = due.fullLast ? `Last full set: ${fmtDate(due.fullLast.date)}.` : "No full set logged yet.";
+  const nx = due.keys.length ? null : nextCheckin(curDate);
+  const today = iso(new Date());
   return section("measure", "s-measure", "Tape & calipers", `
-    <div class="small muted">Waist and calipers every 2 weeks, full measurements and photos every 4 weeks. First thing in the morning, same conditions. ${esc(lastW)} ${esc(lastF)}</div>
-    <div class="sub">Every 2 weeks</div>
-    <div class="grid2">${txt("m.waist","Waist at the navel (in)","Relaxed, end of a normal breath out",{num:true})}</div>
-    <div class="grid3">${txt("m.cChest","Chest fold (mm)","",{num:true})}${txt("m.cAbs","Abdomen fold (mm)","",{num:true})}${txt("m.cThigh","Thigh fold (mm)","",{num:true})}</div>
-    <div class="calc" id="calc-cal"></div>
-    <div class="sub">Every 4 weeks</div>
-    <div class="grid3">
-      ${txt("m.neck","Neck","",{num:true})}${txt("m.shoulders","Shoulders","",{num:true})}${txt("m.chest","Chest","",{num:true})}
-      ${txt("m.hips","Hips","",{num:true})}${txt("m.armR","Arm relaxed","",{num:true})}${txt("m.armF","Arm flexed","",{num:true})}
-      ${txt("m.forearm","Forearm","",{num:true})}${txt("m.thighR","Thigh R","",{num:true})}${txt("m.thighL","Thigh L","",{num:true})}
-      ${txt("m.calfR","Calf R","",{num:true})}${txt("m.calfL","Calf L","",{num:true})}
-    </div>
-    <div class="checks">${ck("m.photos","Front, side and back photos taken")}</div>
-    ${area("m.notes","Notes on measurements","Big salty dinner last night; tape felt loose…")}
-  `);
+    <div class="planbox">${due.keys.length ? `<b>${esc(dueLabel(due.keys))} due${curDate === today ? " today" : ""}.</b> Best first thing in the morning, after the bathroom and before you eat. The Measure tab walks you through it.` : `Nothing to measure today.${nx ? ` Next check-in: <b>${fmtDate(nx.date)}</b> morning (${esc(nx.label.toLowerCase())}).` : ""}`}</div>
+    <div class="row"><button type="button" class="btn" data-go="measure">${due.keys.length ? "Start the check-in" : "Open Measure"}</button></div>`);
 }
 
 function daySection(){
@@ -952,11 +1065,12 @@ function updateDerived(){
   if (el("tsum") && wst) el("tsum").textContent = `${wst.done} of ${wst.total} sets done · ${wst.rated} of ${wst.exN} exercises rated`;
   const c = draft.cardio || {};
   setSum("cardio", [toNum(c.steps) !== null ? fmt(toNum(c.steps)) + " steps" : null, c.status ? {done:"cardio done",partial:"cut short",z2:"swapped for zone 2",skipped:"cardio skipped"}[c.status] : null, toNum(c.walkMin) ? `${c.walkMin} min walk` : null].filter(Boolean).join(" · ") || (plan.cond ? "Steps + today's session" : "Steps"));
-  const due = measureDue(curDate);
-  setSum("measure", [toNum(m.waist) ? `waist ${m.waist}″` : null, sum.every(v => v !== null) ? `${fmt(sum[0]+sum[1]+sum[2],1)} mm` : null].filter(Boolean).join(" · ") || (due.full ? "Full set + photos due" : due.waist ? "Waist + calipers due" : "Not due today"));
+  const due = mSchedule(curDate);
+  setSum("measure", [toNum(m.waist) ? `waist ${inch(toNum(m.waist))}` : null, sum.every(v => v !== null) ? `${fmt(sum[0]+sum[1]+sum[2],1)} mm` : null].filter(Boolean).join(" · ") || (due.keys.length ? `${dueLabel(due.keys)} due` : "Not due today"));
   const f = draft.feel || {};
   setSum("day", [f.overall ? `day ${f.overall}/5` : null, f.mood ? `mood ${f.mood}/5` : null, f.forClaude ? "note for Claude" : null].filter(Boolean).join(" · ") || "Energy, mood, notes for Claude");
   updateWorkoutProgress();
+  updateMeasureDerived();
 }
 
 /* ---------- shared form events (Today + Workout) ---------- */
@@ -966,6 +1080,7 @@ function bindView(el){
     if (t.dataset && t.dataset.sw){ onSetInput(t); return; }
     const p = t.dataset && t.dataset.p; if (!p) return;
     setP(draft, p, t.type === "checkbox" ? t.checked : t.value);
+    const rm = p.match(/^m\.(waist|cChest|cAbs|cThigh)([123])$/); if (rm) syncRounds(rm[1], Number(rm[2]));
     markDirty(); updateDerived();
   });
   el.addEventListener("change", e => {
@@ -979,6 +1094,7 @@ function bindView(el){
     if (b.dataset.nav){ const n = b.dataset.nav; goDate(n === "prev" ? addDays(curDate, -1) : n === "next" ? addDays(curDate, 1) : n === "today" ? iso(new Date()) : n); return; }
     if (b.dataset.go){ goTab(b.dataset.go); return; }
     if (b.dataset.act){ onSetAction(b); return; }
+    if (b.dataset.reset){ onReset(b.dataset.reset, el); return; }
     if (b.classList.contains("chip") && b.dataset.p){
       const p = b.dataset.p, v = b.dataset.v; const cur = String(val(p));
       setP(draft, p, cur === v ? "" : v);
@@ -994,12 +1110,12 @@ function bindView(el){
     openState[d.dataset.sec] = d.open; ls.set("rt10-open", openState);
   }, true);
 }
-bindView($("#v-today")); bindView($("#v-workout"));
-function renderCurrent(){ if (tab === "workout") renderWorkout(); else if (tab === "food") renderFood(); else renderToday(); }
+bindView($("#v-today")); bindView($("#v-workout")); bindView($("#v-measure"));
+function renderCurrent(){ if (tab === "workout") renderWorkout(); else if (tab === "food") renderFood(); else if (tab === "measure") renderMeasure(); else renderToday(); }
 async function goDate(date){
   await flush();
   curDate = date; loadDraft();
-  if (!["today","workout","food"].includes(tab)) showTab("today"); else renderCurrent();
+  if (!["today","workout","food","measure"].includes(tab)) showTab("today"); else renderCurrent();
   window.scrollTo({top:0});
 }
 function dateBarHTML(){
@@ -1124,7 +1240,7 @@ function renderWorkout(){
   if (!plan.work){
     let nd = null;
     for (let k = 1; k <= 7; k++){ const d = addDays(curDate, k); const en = store.days[d] || { date: d }; if (dayPlan(phaseOf(en), d, en).work){ nd = d; break; } }
-    html += `<div class="card plan"><div class="eyebrow">${esc(P.name)} · ${DOWL[plan.dow]}</div><h2>${plan.preStart ? "Lifting starts Monday, Oct 19" : "Rest day · no lifting"}</h2>
+    html += `<div class="card plan"><div class="eyebrow">${esc(P.name)} · ${DOWL[plan.dow]}</div><h2>${plan.preStart ? `Lifting starts ${fmtDate(leadStart())}` : "Rest day · no lifting"}</h2>
       <p class="muted" style="margin:0">${plan.preStart ? "Your first session is Push A." : "Recover today. Steps and the walk still happen. Log other activity on the Today tab."}</p>
       ${nd ? `<div class="row"><button type="button" class="btn" data-nav="${nd}">See the next workout (${fmtDate(nd)})</button></div>` : ""}</div>`;
     $("#v-workout").innerHTML = html; return;
@@ -1840,9 +1956,614 @@ $("#v-sleep").addEventListener("change", async e => {
 setInterval(() => { if (tab === "sleep" && document.visibilityState === "visible" && !formFocused()) renderSleep(); }, 60000);
 
 /* ---------- MORE ---------- */
+/* ---------- MEASURE ---------- */
+const CAL = ["cChest","cAbs","cThigh"];
+const CALN = { cChest:"Chest", cAbs:"Abdomen", cThigh:"Thigh" };
+const PHOTO_CMP = { clear:"Clear change", some:"Some change", none:"No change yet" };
+const ABS_LOOK = { none:"Abs not visible yet", upper:"Upper abs showing", finish:"Upper abs clear, lower abs starting" };
+const MLBL = { waist:"waist", cal:"calipers", tape:"full tape", photos:"photos" };
+const cap = t => t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+const lc1 = t => t ? t.charAt(0).toLowerCase() + t.slice(1) : t;
+const listJoin = a => a.length <= 1 ? (a[0] || "") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+const avgArr = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+const inch = v => fmt(v, 2).replace(/\.?0+$/, "") + "″";
+const sgnIn = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + inch(Math.abs(v));
+const sgnN = (v, dp, u) => (v > 0 ? "+" : v < 0 ? "−" : "±") + fmt(Math.abs(v), dp) + (u || "");
+function calSum(m){ m = m || {}; const v = CAL.map(k => toNum(m[k])); return v.every(x => x !== null) ? v[0] + v[1] + v[2] : null; }
+const M_ITEMS = {
+  waist: { every:14, has: m => toNum(m.waist) !== null },
+  cal: { every:14, has: m => calSum(m) !== null },
+  tape: { every:28, has: m => ["shoulders","chest","armR","thighR","neck"].some(k => toNum(m[k]) !== null) },
+  photos: { every:28, has: m => !!m.photos }
+};
+const MKEYS = Object.keys(M_ITEMS);
+function mDay(){ const v = store.settings.mDay; return Number.isInteger(v) && v >= 0 && v <= 6 ? v : 6; }
+/* move a date to the nearest check-in weekday (at most 3 days either way) */
+function snapToMDay(d){ const wd = mDay(), dw = parseISO(d).getDay(); let diff = (wd - dw + 7) % 7; if (diff > 3) diff -= 7; return addDays(d, diff); }
+function mSchedule(date){
+  const cur = ((date === curDate ? draft : store.days[date]) || {}).m || {};
+  const out = {};
+  MKEYS.forEach(k => {
+    const it = M_ITEMS[k]; const last = lastBefore(date, d => it.has(d.m || {}) ? true : null);
+    const next = last ? snapToMDay(addDays(last.date, it.every)) : null;
+    const doneToday = it.has(cur);
+    out[k] = { last: last ? last.date : null, next, doneToday, first: !last, due: !doneToday && (!next || date >= next), late: next ? daysBetween(next, date) : 0 };
+  });
+  out.keys = MKEYS.filter(k => out[k].due);
+  out.done = MKEYS.filter(k => out[k].doneToday);
+  return out;
+}
+function dueLabel(keys){ if (!keys.length) return ""; if (MKEYS.every(k => keys.includes(k))) return "Full check-in"; return cap(keys.map(k => MLBL[k]).join(" + ")); }
+function nextCheckin(date){
+  const S = mSchedule(date); const up = {};
+  MKEYS.forEach(k => { const x = S[k]; up[k] = (x.doneToday || x.due) ? snapToMDay(addDays(date, M_ITEMS[k].every)) : x.next; });
+  const fut = MKEYS.map(k => up[k]).filter(d => d && d > date).sort();
+  if (!fut.length) return null;
+  const keys = MKEYS.filter(k => up[k] === fut[0]);
+  return { date: fut[0], keys, label: dueLabel(keys) };
+}
+/* repeat readings: m.waist1..3 / m.cChest1..3; the average is saved as m.waist / m.cChest so charts keep working */
+function roundsAny(m, k){ return [1,2,3].some(i => m[k + i] !== undefined); }
+function roundVal(m, k, r){ if (roundsAny(m, k)) return has(m[k + r]) ? m[k + r] : ""; return r === 1 && has(m[k]) ? m[k] : ""; }
+function roundNums(m, k){ if (!roundsAny(m, k)) return has(m[k]) && toNum(m[k]) !== null ? [toNum(m[k])] : []; return [1,2,3].map(i => toNum(m[k + i])).filter(v => v !== null); }
+function syncRounds(base, idx){
+  const m = draft.m = draft.m || {};
+  if (idx !== 1 && m[base + "1"] === undefined && has(m[base])) m[base + "1"] = String(m[base]);
+  const v = [1,2,3].map(i => toNum(m[base + i])).filter(x => x !== null);
+  m[base] = v.length ? String(Math.round(avgArr(v) * 100) / 100) : "";
+}
+function resetReason(phaseId, date){
+  if (!RESET_FIRST[phaseId] || date < phaseStartFor(phaseId)) return null;
+  const nights = [1,2,3,4,5,6,7].map(i => { const e = store.days[addDays(date, -i)]; return e ? sleepHours((e.sleep || {}).bed, (e.sleep || {}).wake) : null; }).filter(v => v !== null);
+  if (nights.length >= 5 && avgArr(nights) < 6.5) return `You've averaged ${fmt(avgArr(nights), 1)} h in bed over the last week. The plan says: take your reset week early.`;
+  const prev = lastBefore(date, () => true);
+  if (prev && daysBetween(prev.date, date) > 21) return `Back after ${daysBetween(prev.date, date)} days away. The plan says: make your first week back a reset week.`;
+  return null;
+}
+function onReset(kind, root){
+  const inCheat = root.id === "v-cheat";
+  const ph = inCheat ? store.settings.phase : phaseOf(draft);
+  const date = inCheat ? iso(new Date()) : curDate;
+  const box = root.querySelector("#resetBox");
+  if (kind === "ask"){
+    if (box) box.innerHTML = `<div class="notice warn">Start a reset week ${date === iso(new Date()) ? "today" : "on " + fmtDate(date)}? Seven days at ~${fmt(PH[ph].reset)} kcal (protein stays at 180 g), the same exercises at 60–70% of your usual weight, zone 2 only and nothing hard. The next one comes 8 weeks later.</div><div class="row" style="margin-top:8px"><button type="button" class="btn" data-reset="yes">Start it</button><button type="button" class="btn ghost" data-reset="no">Cancel</button></div>`;
+    return;
+  }
+  if (kind === "yes"){
+    const st = store.settings; st.resetStarts = Object.assign({}, st.resetStarts || {});
+    st.resetStarts[ph] = Array.from(new Set([...(st.resetStarts[ph] || []), date])).sort();
+    saveSettings();
+    if (!inCheat && draft.reset === false){ delete draft.reset; markDirty(); }
+    showToast("Reset week started");
+  }
+  if (inCheat) renderCheat(); else renderCurrent();
+}
+
+/* ---------- PHASE CHECK (readiness from your numbers) ---------- */
+const EXIT_T = { p1:{ w:188, waist:40, wr:"39–40″" }, p2:{ w:176, waist:38, wr:"36.5–38″" }, p3:{ w:166, waist:36, wr:"34–36″" } };
+function rdData(){ const D = dirty ? Object.assign({}, store.days, { [draft.date]: draft }) : store.days; return { D, ds: Object.keys(D).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort() }; }
+function liftedOn(e){ const t = (e && e.train) || {}; return ["done","partial"].includes(t.status) || Object.values(t.ex || {}).some(x => legacySets(x).some(z => z.done)); }
+function weekAvgs(D, ds, upto){
+  const g = {}; ds.forEach(d => { if (d > upto) return; const w = toNum(D[d].weight); if (w !== null){ const k = weekKey(d); (g[k] = g[k] || []).push(w); } });
+  return Object.keys(g).sort().filter(k => g[k].length >= 3).map(k => ({ k, w: avgArr(g[k]) }));
+}
+function readiness(phaseId){
+  const today = iso(new Date());
+  const { D, ds } = rdData();
+  const start = phaseStartFor(phaseId);
+  const upto = ds.filter(d => d <= today);
+  const since = upto.filter(d => d >= addDays(start, -10));
+  const inPhase = upto.filter(d => d >= start);
+  const recent = n => upto.filter(d => d > addDays(today, -n));
+  const mv = (list, f) => list.map(d => ({ d, v: f(D[d].m || {}) })).filter(x => x.v !== null && x.v !== undefined && x.v !== "");
+  const C = (st, l, t) => ({ s: st, l, t });
+  const fullRecent = recent(6).filter(d => MKEYS.every(k => M_ITEMS[k].has(D[d].m || {}))).pop();
+  const startLine = n => fullRecent ? `Your full check-in on ${fmtDate(fullRecent)} is ${n}'s start line.` : `Do a full check-in in the next few days: it's ${n}'s start line.`;
+
+  const sl = recent(14).map(d => sleepHours((D[d].sleep || {}).bed, (D[d].sleep || {}).wake)).filter(v => v !== null);
+  const sleepC = sl.length < 5 ? C("na", "7+ hours of sleep most nights", sl.length ? `Only ${sl.length} night${sl.length > 1 ? "s" : ""} logged in the last 2 weeks` : "Log your sleep to check this")
+    : (() => { const ok = sl.filter(h => h >= 7).length; return C(ok / sl.length > 0.5 ? "yes" : "no", "7+ hours of sleep most nights", `${ok} of your last ${sl.length} logged nights had 7+ h in bed`); })();
+  const en = recent(14).map(d => { const f = D[d].feel || {}; return avgArr([f.eAm, f.ePm, f.eEve].map(toNum).filter(v => v !== null)); }).filter(v => v !== null);
+  const hu = recent(14).map(d => toNum((D[d].food || {}).hunger)).filter(v => v !== null);
+  const eA = avgArr(en), hA = avgArr(hu);
+  const energyC = eA === null && hA === null ? C("na", "Not constantly drained or hungry", "Rate your energy and hunger on Today to check this")
+    : C((eA !== null && eA < 2.5) || (hA !== null && hA >= 4) ? "no" : "yes", "Not constantly drained or hungry", [eA !== null ? `energy ${fmt(eA, 1)}/5` : null, hA !== null ? `hunger ${fmt(hA, 1)}/5` : null].filter(Boolean).join(" · ") + " over the last 2 weeks");
+  const drops = [], tracked = [];
+  STRENGTH.filter(L => !L.ids.includes("pu") && !L.ids.includes("latA")).forEach(L => {
+    const pts = inPhase.map(d => ({ d, w: topWeight(D[d], L.ids) })).filter(p => p.w !== null && p.w > 0);
+    const rec = pts.filter(p => p.d > addDays(today, -14));
+    if (pts.length < 3 || !rec.length) return;
+    const best = Math.max(...pts.map(p => p.w)), rb = Math.max(...rec.map(p => p.w));
+    tracked.push(L.n); if (rb < best * 0.9) drops.push(`${L.n} ${fmtW(rb)} (best ${fmtW(best)})`);
+  });
+  const strengthC = !tracked.length ? C("na", "Strength-floor lifts holding", "Shows up once you've logged a few weeks of lifting")
+    : drops.length ? C("no", "Strength-floor lifts holding", `Down 10% or more: ${drops.join(", ")}`)
+    : C("yes", "Strength-floor lifts holding", `${tracked.length} key lift${tracked.length > 1 ? "s" : ""} within 10% of their best this phase`);
+
+  if (phaseId === "lead"){
+    const wk = leadWeek(today), full = Math.max(0, wk - 1);
+    const weeksC = C(full >= 8 ? "yes" : "no", "At least 8 weeks of lifting", wk < 1 ? `Lifting starts ${fmtDate(leadStart())}` : `${full} full week${full === 1 ? "" : "s"} done, now in week ${wk} (the plan pictures 8–10)`);
+    const mon = weekKey(today), ls0 = weekKey(leadStart());
+    const wks = [1,2,3,4].map(i => addDays(mon, -7 * i)).filter(k => k >= ls0);
+    const sess = wks.map(k => weekDates(k).filter(d => D[d] && liftedOn(D[d])).length);
+    const good = sess.filter(n => n >= 4).length;
+    const consC = !wks.length ? C("na", "Lifting 4–5 days in most weeks", "Needs a full week of lifting first")
+      : C(wks.length >= 3 && good >= 3 ? "yes" : "no", "Lifting 4–5 days in most weeks", `Sessions in your last ${wks.length} full week${wks.length > 1 ? "s" : ""}: ${sess.slice().reverse().join(", ")} (aim for 4+ in 3 of 4)`);
+    const fd = recent(21).filter(d => foodTotals(D[d]).kcal !== null).length;
+    const foodC = C(fd >= 15 ? "yes" : "no", "Food logged most days", `${fd} of the last 21 days have calories logged (aim for 15+)`);
+    const wa = weekAvgs(D, ds, today), w3k = addDays(ls0, 14), w3 = wa.find(x => x.k === w3k), after = wa.filter(x => x.k > w3k).slice(-2);
+    const steadyC = !w3 || after.length < 2 ? C("na", "Weight holding near maintenance (if you weigh)", w3 ? `Week 3 average ${fmt(w3.w, 1)} lb. Needs two more weeks of weigh-ins` : "From week 3, your weekly average should stay within about 2 lb of your week-3 average")
+      : (() => { const ok = after.every(x => Math.abs(x.w - w3.w) <= 2); return C(ok ? "yes" : "no", "Weight holding near maintenance (if you weigh)", `Last two weekly averages ${after.map(x => fmt(x.w, 1)).join(" and ")} lb vs ${fmt(w3.w, 1)} in week 3${ok ? "" : ": adjust by 200 kcal (see the cheat sheet)"}`); })();
+    const main = [weeksC, consC, foodC], also = [sleepC, steadyC, energyC];
+    const yes = main.every(c => c.s === "yes"), bad = also.filter(c => c.s === "no");
+    return { phaseId, next: "p1", title: "Ready for Phase 1?", rule: "The lead-in has no end date. Move on when all three are true. (This checklist is Claude's: your plan used a calendar date here.)", main, also,
+      state: yes ? (bad.length ? "warn" : "yes") : "no",
+      headline: yes ? (bad.length ? `The lead-in boxes are ticked, but ${listJoin(bad.map(c => lc1(c.l)))} ${bad.length > 1 ? "aren't" : "isn't"} there yet. Sort that out first; another week or two at maintenance costs you nothing.` : `Yes. ${startLine("Phase 1")}`)
+        : `Not yet: ${main.filter(c => c.s === "yes").length} of 3. Keep lifting at maintenance; every week now is muscle you keep.` };
+  }
+
+  if (EXIT_T[phaseId]){
+    const T = EXIT_T[phaseId], next = PH_ORDER[PH_ORDER.indexOf(phaseId) + 1], NN = PH[next].short;
+    const noScale = recent(21).filter(d => toNum(D[d].weight) !== null).length === 0;
+    const wa = weekAvgs(D, ds, today).filter(x => x.k >= weekKey(start)), two = wa.slice(-2);
+    const b2b = two.length === 2 && daysBetween(two[0].k, two[1].k) === 7 && daysBetween(two[1].k, weekKey(today)) <= 7;
+    const r1 = v => Math.round(v * 10) / 10;
+    const wl = `Weekly average at or under ${T.w} lb for 2 weeks`;
+    const weightC = noScale ? C("na", wl, "No weigh-ins in the last 3 weeks, so the no-scale rule applies")
+      : two.length < 2 ? C("no", wl, "Needs 2 weeks with 3+ weigh-ins each")
+      : C(b2b && two.every(x => r1(x.w) <= T.w) ? "yes" : "no", wl, `Last two: ${two.map(x => fmt(x.w, 1)).join(" and ")} lb${b2b ? "" : " (not back-to-back weeks)"}`);
+    const W = mv(since, m => toNum(m.waist)), w0 = W[0], w1 = W[W.length - 1];
+    const waistC = !w1 ? C("na", `Waist about ${T.wr} or less`, "No waist reading this phase yet")
+      : C(w1.v <= T.waist ? "yes" : "no", `Waist about ${T.wr} or less`, `Latest ${inch(w1.v)} (${fmtDate(w1.d)})${w0 && w0.d !== w1.d ? `, ${sgnIn(w1.v - w0.v)} since the phase started` : ""}`);
+    const Ph = mv(inPhase, m => m.photoCmp || null), pc = Ph[Ph.length - 1];
+    const pl = "Photos show a clear change from your phase-start photos";
+    const photoC = !pc ? C("na", pl, "Rate it on your next full check-in (Measure, step 6)") : C(pc.v === "clear" ? "yes" : "no", pl, `${PHOTO_CMP[pc.v] || pc.v} (${fmtDate(pc.d)})`);
+    const Cs = mv(since, m => calSum(m)), c0 = Cs[0], c1 = Cs[Cs.length - 1];
+    const cl = "Caliper sum clearly lower than at the phase start";
+    const calC = !c0 || c0.d === c1.d ? C("na", cl, "Needs a start reading and a newer one") : C(c1.v <= c0.v - 5 ? "yes" : "no", cl, `${fmt(c0.v, 1)} → ${fmt(c1.v, 1)} mm (Claude's bar for "clearly": 5+ mm lower)`);
+    const main = noScale ? [waistC, photoC, calC] : [weightC, waistC, photoC];
+    const k = main.filter(c => c.s === "yes").length, yes = noScale ? k === 3 : k >= 2;
+    const also = [strengthC, sleepC, energyC], bad = also.filter(c => c.s === "no");
+    return { phaseId, next, title: `Ready for ${NN}?`, rule: noScale ? "No scale lately, so all three need to be true:" : "Move on when 2 of these 3 are true:", main, also,
+      state: yes ? (bad.length ? "warn" : "yes") : "no",
+      headline: yes ? (bad.length ? `Your numbers say yes (${k} of 3), but ${listJoin(bad.map(c => lc1(c.l)))} ${bad.length > 1 ? "aren't" : "isn't"} there. The plan says: take a reset week first, then move on.` : `Yes. ${startLine(NN)}`)
+        : `Not yet: ${k} of 3${noScale ? " (no scale: all 3 needed)" : " (2 needed)"}. Keep going and check again after your next check-in.` };
+  }
+
+  if (phaseId === "p4"){
+    const Cs = mv(since, m => calSum(m)), lt = Cs.slice(-2);
+    const cl = "Caliper sum 36–38 mm on two check-ins about 2 weeks apart";
+    const calC = !Cs.length ? C("na", cl, "No caliper readings this phase yet")
+      : C(lt.length === 2 && lt.every(x => x.v <= 38) && daysBetween(lt[0].d, lt[1].d) >= 10 ? "yes" : "no", cl, `Last ${lt.length === 2 ? "two" : "one"}: ${lt.map(x => `${fmt(x.v, 1)} mm (${fmtDate(x.d)})`).join(", ")}`);
+    const A = mv(inPhase, m => m.absLook || null), a1 = A[A.length - 1];
+    const al = "Photos: clear upper abs, lower abs starting";
+    const absC = !a1 ? C("na", al, "Rate it on your next full check-in (Measure, step 6)") : C(a1.v === "finish" ? "yes" : "no", al, `${ABS_LOOK[a1.v]} (${fmtDate(a1.d)})`);
+    const W = mv(since, m => toNum(m.waist)), lw = W[W.length - 1], pw = lw ? W.filter(x => daysBetween(x.d, lw.d) >= 21 && daysBetween(x.d, lw.d) <= 42).pop() : null;
+    const ql = "Waist has mostly stopped shrinking";
+    const plC = !pw ? C("na", ql, "Needs two waist readings about 4 weeks apart") : C(pw.v - lw.v < 0.25 ? "yes" : "no", ql, `${inch(pw.v)} → ${inch(lw.v)} over ${Math.round(daysBetween(pw.d, lw.d) / 7)} weeks (done: under ¼″ per 4 weeks)`);
+    const main = [calC, absC, plC], k = main.filter(c => c.s === "yes").length;
+    const also = [strengthC, sleepC], bad = also.filter(c => c.s === "no");
+    const wkN = phaseWeekNo("p4", today);
+    return { phaseId, next: "after", title: "At the finish line?", rule: "Phase 4 ends at 10%, not at a weight or a date. All three need to be true:", main, also,
+      state: k === 3 ? "yes" : "no",
+      headline: k === 3 ? "Yes, that's 10%. The target was about a 30″ waist; if yours stopped at 31″ with calipers at 36–38 mm, that's your frame."
+        : `Not yet: ${k} of 3. You're in ${wkN >= 1 ? `week ${wkN}` : "the hand-off days"} of Phase 4.${wkN > 24 ? " Past three blocks (about 24 weeks) and not there? The plan says 8–12 weeks at maintenance, then a fourth block." : ""}${bad.length ? ` Watch the guardrails: ${listJoin(bad.map(c => lc1(c.l)))}.` : ""}` };
+  }
+
+  if (phaseId === "after"){
+    const Cs = mv(inPhase, m => calSum(m)), l = Cs[Cs.length - 1];
+    const il = "Caliper sum 36–43 mm (10–12%)";
+    const inC = !l ? C("na", il, "Measure waist and calipers every 2 weeks") : C(l.v >= 36 && l.v <= 43 ? "yes" : "no", il, `Latest ${fmt(l.v, 1)} mm (${fmtDate(l.d)})`);
+    const l3 = Cs.slice(-3), rising = l3.length === 3 && l3[2].v > l3[1].v && l3[1].v > l3[0].v;
+    const hi = Cs.length >= 2 && Cs.slice(-2).every(x => x.v > 45);
+    let headline = "In range. Keep living like this.";
+    if (!l) headline = "Log waist and calipers every 2 weeks to see where you are.";
+    else if (hi) headline = "Above ~45 mm twice: run a mini-cut of 3–5 weeks at about 400 kcal under maintenance.";
+    else if (rising && l.v <= 45) headline = "Rising two check-ins in a row: trim about 200 kcal from carbs for 2–4 weeks.";
+    else if (l.v < 36) headline = "Under ~36 mm: add 100–150 kcal from carbs.";
+    else if (l.v > 43) headline = "A little above range. 43–45 mm is a buffer, not a problem; watch the next check-in.";
+    return { phaseId, next: null, title: "Staying in range", rule: "No more phases. Keep an eye on this:", main: [inC], also: [strengthC, sleepC],
+      state: !l ? "no" : (inC.s === "yes" && !rising) ? "yes" : "warn", headline };
+  }
+  return null;
+}
+function readyInner(){
+  const R = readiness(store.settings.phase); if (!R) return "";
+  const row = c => `<div class="cl ${c.s}"><i role="img" aria-label="${c.s === "yes" ? "Yes" : c.s === "no" ? "Not yet" : "No data yet"}">${c.s === "yes" ? "✓" : c.s === "no" ? "✕" : "–"}</i><b>${esc(c.l)}</b><span>${esc(c.t)}</span></div>`;
+  return `<div class="eyebrow">Phase check · your numbers, not the calendar</div>
+    <h2>${esc(R.title)}</h2>
+    <p class="small muted" style="margin:0">${esc(R.rule)}</p>
+    <div>${R.main.map(row).join("")}</div>
+    <div class="sub" style="margin-top:0">${R.phaseId === "p4" ? "Muscle guardrails" : "Also check"}</div>
+    <div>${R.also.map(row).join("")}</div>
+    <div class="rverdict ${R.state}">${esc(R.headline)}</div>
+    ${R.state === "yes" && R.next ? `<div class="row"><button type="button" class="btn" data-startphase="${R.next}">Start ${esc(PH[R.next].short)}</button></div>` : ""}`;
+}
+
+/* ---------- MEASURE tab ---------- */
+const TAPE_SITES = [
+  ["neck","Neck","Just below the Adam's apple, tape level, looking straight ahead."],
+  ["shoulders","Shoulders","Arms relaxed at your sides, lats not flared, around the widest point of your delts. Easiest with a helper or a mirror."],
+  ["chest","Chest","Across the nipples and under the armpits, arms down."],
+  ["armR","Arm, relaxed","Right arm hanging, halfway between the shoulder tip and the elbow."],
+  ["armF","Arm, flexed","Right arm out to the side, biceps squeezed hard, around the peak."],
+  ["forearm","Forearm","Right arm straight, hand relaxed, at the widest part just below the elbow."],
+  ["hips","Hips","Feet together, around the widest part of your butt."],
+  ["thighR","Thigh, right","Weight on both feet, halfway between the hip crease and the top of the kneecap."],
+  ["thighL","Thigh, left","Same spot on the left leg."],
+  ["calfR","Calf, right","Weight on both feet, at the widest point."],
+  ["calfL","Calf, left","Same on the left leg."]
+];
+function mstep(id, n, title, freq, st, open, body){
+  return `<details class="card mstep ${st.cls || ""}" id="ms-${id}" data-n="${n}" ${open ? "open" : ""}><summary><span class="num" aria-hidden="true">${st.cls === "done" ? "✓" : n}</span><div class="sec-t"><h3>${title}</h3><div class="sum">${esc(freq)}</div></div>${st.pill ? st.pill.replace("<span ", `<span id="mp-${id}" data-cls="${st.pcls || ""}" data-txt="${esc(st.ptxt || "")}" `) : ""}<span class="chev" aria-hidden="true"></span></summary><div class="sec-b">${body}</div></details>`;
+}
+let readyT = null;
+function renderMeasure(){
+  const phaseId = phaseOf(draft);
+  const today = iso(new Date()), isToday = curDate === today;
+  const S = mSchedule(curDate), m = draft.m || {};
+  const due = S.keys, done = S.done;
+  const nx = nextCheckin(curDate);
+  const bigDue = due.includes("tape") || due.includes("photos");
+  let h2, lines = [];
+  if (due.length){
+    h2 = `${dueLabel(due)} ${isToday ? "today" : curDate < today ? "was due" : "due"}`;
+    const firsts = due.filter(k => S[k].first);
+    if (firsts.length) lines.push(`First time for ${listJoin(firsts.map(k => MLBL[k]))}: this one is your starting point.`);
+    const late = Math.max(0, ...due.map(k => S[k].late || 0));
+    if (late > 3) lines.push(`${late} days late. Do it on your next morning and carry on from there; don't double up.`);
+    if (isToday && new Date().getHours() >= 11) lines.push("It's best first thing in the morning. Already eaten or trained? Do it tomorrow morning instead; a day either way is fine.");
+    lines.push(`Work down the steps below, about ${bigDue ? "15" : "5"} minutes. Everything saves as you type.`);
+  } else if (done.length){
+    h2 = "Check-in logged";
+    const bits = [toNum(m.waist) !== null ? `waist ${inch(toNum(m.waist))}` : null, calSum(m) !== null ? `calipers ${fmt(calSum(m), 1)} mm ≈ ${fmt(jp3(calSum(m)), 1)}%` : null, toNum(m.shoulders) !== null ? `shoulders ${inch(toNum(m.shoulders))}` : null, m.photos ? "photos" : null].filter(Boolean);
+    if (bits.length) lines.push(`Logged: ${bits.join(" · ")}.`);
+    if (nx) lines.push(`Next: <b>${fmtLong(nx.date).replace(/, \d{4}$/, "")}</b> morning · ${esc(nx.label.toLowerCase())}.`);
+  } else {
+    h2 = "Nothing to measure today";
+    if (nx) lines.push(`Next: <b>${fmtLong(nx.date).replace(/, \d{4}$/, "")}</b> morning · ${esc(nx.label.toLowerCase())}.`);
+    if (nx && nx.date === addDays(curDate, 1)) lines.push("That's tomorrow. Tonight: a normal dinner (not extra salty), drink normally, and leave the tape and calipers in the bathroom.");
+  }
+  const st = k => S[k].doneToday ? { cls:"done", pill:`<span class="pill ok">Logged</span>`, pcls:"pill", ptxt:"" }
+    : S[k].due ? { cls:"due", pill:`<span class="pill info">${S[k].first ? "First one" : S[k].late > 3 ? "Late" : "Due"}</span>`, pcls:"pill info", ptxt: S[k].first ? "First one" : S[k].late > 3 ? "Late" : "Due" }
+    : { cls:"", pill: S[k].next ? `<span class="pill">${MON[parseISO(S[k].next).getMonth()]} ${parseISO(S[k].next).getDate()}</span>` : "", pcls:"pill", ptxt: S[k].next ? `${MON[parseISO(S[k].next).getMonth()]} ${parseISO(S[k].next).getDate()}` : "" };
+  const wDone = toNum(draft.weight) !== null;
+  const DN = DOWL[mDay()];
+
+  const setupB = `
+    <ol class="how">
+      <li><b>When:</b> ${DN} morning, right after the bathroom and before you eat or drink anything. Before training, never after: a pump adds size for hours.</li>
+      <li><b>What to wear:</b> underwear only (the same pair each time). Same room, same light.</li>
+      <li><b>Have ready:</b> the tape, the calipers, and your phone with a 10-second timer for the photos.</li>
+      <li><b>The day before counts too:</b> don't fast, cut water or load up on salt. If something was off anyway (salty dinner, bad sleep, sick, leg day yesterday), measure and say so in the notes.</li>
+    </ol>
+    <div class="order" aria-label="Order"><span>Bathroom</span><i>→</i><span>Scale</span><i>→</i><span>Waist</span><i>→</i><span>Calipers</span><i>→</i><span>Full tape</span><i>→</i><span>Photos</span><i>→</i><span>Breakfast</span></div>
+    <div class="checks">${ck("m.std", "Measured the normal way: morning, after the bathroom, before food")}</div>`;
+  const weighB = `
+    <ol class="how">
+      <li>Same scale, same spot on a hard floor. After the bathroom, before eating, before measuring.</li>
+      <li>Only the weekly average counts. Daily swings of 2–4 lb are water, salt and food in your gut.</li>
+    </ol>
+    <div class="grid2">${txt("weight", "Morning weight (lb)", "e.g. 203.4", {num:true})}</div>
+    <div class="small muted">Same number as on Today's morning card; log it in either place.</div>`;
+  const rIn = (k, r, lab) => `<label>${lab}<input type="text" inputmode="decimal" id="f-m-${k}${r}" data-p="m.${k}${r}" value="${esc(roundVal(m, k, r))}" autocomplete="off" aria-label="${esc(lab)}"></label>`;
+  const waistB = `
+    <ol class="how">
+      <li>Stand tall, feet together, belly relaxed: don't suck in or push out.</li>
+      <li>Tape around your belly button, level all the way round. Check in a mirror that it isn't dipping at the back.</li>
+      <li>Snug on the skin, not squeezing it.</li>
+      <li>Breathe out normally and read it at the end of the breath out.</li>
+      <li>Take it twice. If the two are more than ¼″ apart, take a third. The app averages them.</li>
+    </ol>
+    <div class="rounds">${rIn("waist", 1, "1st (in)")}${rIn("waist", 2, "2nd (in)")}${rIn("waist", 3, "3rd, if needed")}</div>
+    <div class="rd" id="rd-waist"></div>`;
+  const calB = `
+    <p class="small" style="margin:0">Always your <b>right side</b>, standing relaxed. The same three spots every time.</p>
+    <div class="sites">
+      <div class="site"><h4>1 · Chest</h4><p>A diagonal fold halfway between the front of your armpit and your nipple.</p></div>
+      <div class="site"><h4>2 · Abdomen</h4><p>A vertical fold about 1″ (2 cm) to the right of your belly button.</p></div>
+      <div class="site"><h4>3 · Thigh</h4><p>A vertical fold on the front of your thigh, halfway between the hip crease and the top of the kneecap. Weight on your left leg, right leg relaxed.</p></div>
+    </div>
+    <ol class="how">
+      <li><b>Pinch:</b> grab the fold with your thumb and finger about ½″ above the spot and pull it away from the muscle.</li>
+      <li><b>Measure:</b> put the caliper jaws on the spot, under your fingers, and read it after about 2 seconds, still holding the pinch.</li>
+      <li><b>Go round twice:</b> chest, abdomen, thigh, then all three again. Fill in a row per round.</li>
+      <li>If two readings of one site are more than 2 mm apart, do a 3rd round. The app averages each site and adds them up.</li>
+      <li>Above about 25% body fat the belly fold is hard to pinch and the % is rough. Take it anyway: the trend is what counts. Lean on the tape and photos until about Phase 3.</li>
+    </ol>
+    <div class="calgrid">
+      <span></span>${CAL.map(k => `<b>${CALN[k]}</b>`).join("")}
+      ${[1,2,3].map(r => `<span>${["1st round","2nd round","3rd, if needed"][r - 1]}</span>${CAL.map(k => `<input type="text" inputmode="decimal" id="f-m-${k}${r}" data-p="m.${k}${r}" value="${esc(roundVal(m, k, r))}" aria-label="${CALN[k]}, round ${r} (mm)" autocomplete="off">`).join("")}`).join("")}
+      <span>Average (mm)</span>${CAL.map(k => `<output id="avg-${k}">–</output>`).join("")}
+    </div>
+    <div class="rd" id="rd-cal"></div>
+    <div class="calc" id="calc-msum"></div>`;
+  const tapeB = `
+    <p class="small" style="margin:0">Snug but not squeezing, level all the way round, read at the end of a normal breath out. Relaxed unless it says flexed. Inches.</p>
+    <div class="tapegrid">${TAPE_SITES.map(([k, n, h]) => txt(`m.${k}`, `${esc(n)}<em>${esc(h)}</em>`, "inches", {num:true})).join("")}</div>
+    <div class="small muted">Thighs: mid-thigh is the spot the plan's leg check uses in Phases 3–4. If it reads lower than your first numbers, that's the spot, not lost muscle; just use mid-thigh from now on.</div>
+    <div class="calc" id="calc-ratio"></div>`;
+  const absChips = ["p3","p4","after"].includes(phaseId) ? chips("m.absLook", "My abs right now", [["none","Not visible yet"],["upper","Upper abs showing"],["finish","Upper clear, lower starting"]]) : "";
+  const photoB = `
+    <ol class="how">
+      <li><b>Setup:</b> the same spot, light and distance every time. Bright room, light in front of you, not behind.</li>
+      <li>Phone propped at about belly-button height, 2–2.5 m (7–8 ft) away, 10-second timer. Head to knees in the frame.</li>
+      <li><b>Three shots, relaxed:</b> front (arms slightly out), right side (arms hanging), back (arms slightly out). No flexing, no sucking in. Flexed versions are a bonus.</li>
+      <li>Save them to a "Road to 10" album in Photos. The app doesn't keep photos; they stay on your phone.</li>
+      <li><b>Compare:</b> put today's front and side next to your phase-start ones. Look for less belly from the side and more taper from the back. Skip this on a phase's first check-in.</li>
+    </ol>
+    <div class="checks">${ck("m.photos", "Front, side and back photos taken")}</div>
+    ${chips("m.photoCmp", "Next to my phase-start photos…", [["clear","Clear change"],["some","Some change"],["none","No change yet"]])}
+    ${absChips}`;
+  const notesB = area("m.notes", "Notes on this check-in", "Salty dinner last night, slept 5 h, tape felt loose, leg day yesterday…");
+
+  $("#v-measure").innerHTML = `
+  ${dateBarHTML()}
+  <div class="card plan">
+    <div class="eyebrow">Measure · check-in morning: ${DN}</div>
+    <h2>${esc(h2)}</h2>
+    ${due.length ? `<div class="pills">${due.map(k => `<span class="pill info">${cap(MLBL[k])}</span>`).join("")}</div>` : ""}
+    ${lines.map(l => `<div class="small">${l}</div>`).join("")}
+  </div>
+  ${mstep("setup", 1, "Get set up", "Every check-in · 1 minute", m.std ? { cls:"done" } : {}, due.length > 0 && !done.length, setupB)}
+  ${mstep("weigh", 2, "Weigh in", "Optional · every morning", wDone ? { cls:"done", pill:`<span class="pill ok">Logged</span>`, pcls:"pill", ptxt:"Optional" } : { pill:`<span class="pill">Optional</span>`, pcls:"pill", ptxt:"Optional" }, due.length > 0 && !wDone, weighB)}
+  ${mstep("waist", 3, "Waist", "Every 2 weeks", st("waist"), S.waist.due || S.waist.doneToday, waistB)}
+  ${mstep("cal", 4, "Calipers, 3 sites", "Every 2 weeks · same morning as the waist", st("cal"), S.cal.due || S.cal.doneToday, calB)}
+  ${mstep("tape", 5, "Full tape", "Every 4 weeks", st("tape"), S.tape.due || S.tape.doneToday, tapeB)}
+  ${mstep("photos", 6, "Photos", "Every 4 weeks · same morning as the full tape", st("photos"), S.photos.due || S.photos.doneToday, photoB)}
+  ${mstep("notes", 7, "Anything unusual?", "Every check-in", has(m.notes) ? { cls:"done" } : {}, due.length > 0 || has(m.notes), notesB)}
+  <div class="card panel" id="m-nums">${mNumbersHTML()}</div>
+  <div class="card panel" id="m-ready">${readyInner()}</div>
+  <div class="card panel">
+    <h2>When to measure</h2>
+    <div class="sched">
+      <b>Every morning</b><span>Weight, if you weigh (optional). Only the weekly average counts.</span>
+      <b>Every 2 weeks</b><span>Waist + calipers, about 5 minutes.</span>
+      <b>Every 4 weeks</b><span>The same, plus the full tape and photos, about 15 minutes.</span>
+      <b>New phase</b><span>A full check-in in the few days before you switch. It's the new phase's start line.</span>
+    </div>
+    <div class="f"><span>Your check-in morning</span><div class="chips" role="group" aria-label="Check-in morning">${[1,2,3,4,5,6,0].map(d => `<button type="button" class="chip" data-mday="${d}" aria-pressed="${mDay() === d}">${DOW[d]}</button>`).join("")}</div>
+      <div class="scale-note">${mDay() === 6 ? "Saturday is the default: no gym that morning, no rush, and three days after leg day, so your thighs aren't puffy. " : mDay() === 4 ? "Thursday is the morning after leg day, so thigh numbers may read high. " : ""}The same morning every time matters more than which one. Due dates line up to it.</div></div>
+  </div>`;
+  updateMeasureDerived(true);
+}
+function mNumbersHTML(){
+  const { D, ds } = rdData();
+  const rows = ds.filter(d => { const m = D[d].m || {}; return toNum(m.waist) !== null || calSum(m) !== null || toNum(m.shoulders) !== null; });
+  if (!rows.length) return `<h2>Your numbers</h2><p class="empty">Your check-ins show up here, with the change since the phase started.</p>`;
+  const ph = store.settings.phase, start = phaseStartFor(ph);
+  const val = (d, f) => f(D[d].m || {});
+  const L = f => { for (let i = rows.length - 1; i >= 0; i--){ const v = val(rows[i], f); if (v !== null) return { d: rows[i], v }; } return null; };
+  const F = f => { for (const d of rows){ if (d < addDays(start, -10)) continue; const v = val(d, f); if (v !== null) return { d, v }; } return null; };
+  const wv = m => toNum(m.waist), cv = m => calSum(m), sv = m => toNum(m.shoulders), rv = m => (toNum(m.shoulders) && toNum(m.waist)) ? toNum(m.shoulders) / toNum(m.waist) : null;
+  const tile = (lab, f, show, dl, goal) => { const l = L(f), s0 = F(f); return `<div><small>${lab}</small><strong>${l ? show(l.v) : "–"}</strong><span>${s0 && l && s0.d !== l.d ? `${dl(l.v - s0.v)} this phase · ` : ""}goal ${goal}</span></div>`; };
+  const last8 = rows.slice(-8).reverse();
+  return `<h2>Your numbers</h2>
+    <div class="goals">
+      ${tile("Waist", wv, inch, sgnIn, "30–31″")}
+      ${tile("Caliper sum", cv, v => fmt(v, 1) + " mm", v => sgnN(v, 1, " mm"), "36–38 mm")}
+      ${tile("Body fat (est.)", cv, v => fmt(jp3(v), 1) + "%", v => sgnN(v, 1, " mm"), "~10%")}
+      ${tile("Shoulders ÷ waist", rv, v => fmt(v, 2), v => sgnN(v, 2), "1.53")}
+    </div>
+    <div class="scroll-x"><table><thead><tr><th>Date</th><th class="num">Waist</th><th class="num">Calipers</th><th class="num">≈ BF</th><th class="num">Shoulders</th><th class="num">S ÷ W</th></tr></thead><tbody>
+      ${last8.map(d => { const m = D[d].m || {}; const c = calSum(m), w = toNum(m.waist), sh = toNum(m.shoulders); return `<tr><td>${fmtDate(d)}</td><td class="num">${w !== null ? inch(w) : "–"}</td><td class="num">${c !== null ? fmt(c, 1) + " mm" : "–"}</td><td class="num">${c !== null ? fmt(jp3(c), 1) + "%" : "–"}</td><td class="num">${sh !== null ? inch(sh) : "–"}</td><td class="num">${sh && w ? fmt(sh / w, 2) : "–"}</td></tr>`; }).join("")}
+    </tbody></table></div>
+    <div class="row"><button type="button" class="textbtn" data-go="charts">See the charts</button></div>`;
+}
+function updateMeasureDerived(now){
+  const root = $("#v-measure"); if (!root || root.hidden || !root.firstElementChild) return;
+  const m = draft.m || {}; const el = id => document.getElementById(id);
+  const wv = roundNums(m, "waist");
+  if (el("rd-waist")){
+    const sp = wv.length > 1 ? Math.max(...wv) - Math.min(...wv) : 0, warn = wv.length === 2 && sp > 0.25;
+    el("rd-waist").className = "rd" + (warn ? " warn" : "");
+    el("rd-waist").textContent = !wv.length ? "" : wv.length === 1 ? `${inch(wv[0])}. Take it once more to check.` : warn ? `${inch(sp)} apart: take a 3rd and the app averages all three.` : `Saved: ${inch(avgArr(wv))} (average of ${wv.length})`;
+  }
+  const spread = [];
+  CAL.forEach(k => { const v = roundNums(m, k); const o = el("avg-" + k); if (o) o.textContent = v.length ? fmt(avgArr(v), 1).replace(/\.0$/, "") : "–"; if (v.length === 2 && Math.max(...v) - Math.min(...v) > 2) spread.push(CALN[k].toLowerCase()); });
+  if (el("rd-cal")){ el("rd-cal").className = "rd" + (spread.length ? " warn" : ""); el("rd-cal").textContent = spread.length ? `Your ${listJoin(spread)} readings are more than 2 mm apart: do a 3rd round of ${spread.length > 1 ? "those sites" : "that site"}.` : ""; }
+  const S = calSum(m);
+  if (el("calc-msum")){
+    const prev = lastBefore(curDate, d => calSum(d.m));
+    el("calc-msum").innerHTML = S !== null ? `<span>Sum</span><strong>${fmt(S, 1)} mm</strong><span>≈</span><strong>${fmt(jp3(S), 1)}%</strong><span class="muted small">body fat${prev ? ` · last check ${fmt(prev.v, 1)} mm (${sgnN(S - prev.v, 1, " mm")})` : ""}. Finish line: 36–38 mm (~10%). Trust the trend more than the %.</span>` : `<span class="muted small">Fill in all three sites to get your sum and body-fat estimate.</span>`;
+  }
+  if (el("calc-ratio")){ const a = toNum(m.shoulders), b = toNum(m.waist); el("calc-ratio").innerHTML = a && b ? `<span>Shoulders ÷ waist</span><strong>${fmt(a / b, 2)}</strong><span class="muted small">goal about 1.53 (46″ ÷ 30″)</span>` : `<span class="muted small">Shoulders ÷ waist shows here once both are in (goal about 1.53).</span>`; }
+  const done = { weigh: toNum(draft.weight) !== null, setup: !!m.std, notes: has(m.notes) };
+  MKEYS.forEach(k => done[k] = M_ITEMS[k].has(m));
+  Object.keys(done).forEach(id => {
+    const d = el("ms-" + id); if (!d) return;
+    d.classList.toggle("done", done[id]); if (done[id]) d.classList.remove("due");
+    const n = d.querySelector(".num"); if (n) n.textContent = done[id] ? "✓" : d.dataset.n;
+    const p = el("mp-" + id); if (p){ if (done[id]){ p.className = "pill ok"; p.textContent = "Logged"; } else if (p.dataset.txt){ p.className = p.dataset.cls; p.textContent = p.dataset.txt; } }
+  });
+  if (!now){ clearTimeout(readyT); readyT = setTimeout(() => { if (el("m-ready")) el("m-ready").innerHTML = readyInner(); if (el("m-nums")) el("m-nums").innerHTML = mNumbersHTML(); }, 500); }
+}
+$("#v-measure").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.mday !== undefined){ store.settings.mDay = Number(b.dataset.mday); saveSettings(); const y = window.scrollY; renderMeasure(); window.scrollTo(0, y); return; }
+  if (b.dataset.startphase){ const sel = $("#phaseSel"); sel.value = b.dataset.startphase; sel.dispatchEvent(new Event("change")); }
+});
+
+/* ---------- OVERVIEW ---------- */
+let ovPhase = null;
+const ROLE = {
+  lead:"Learn the lifts and build muscle at maintenance (~2,800 kcal). Set up the habits: steps, sleep and food logging.",
+  p1:"The first cut, 2,300 kcal. Still your building window: add a rep or a little weight to most lifts most weeks.",
+  p2:"2,250 kcal. The last phase where you can expect to gain muscle while losing fat. Plyo work and the Friday circuit come in.",
+  p3:"2,200 kcal. Hold your strength instead of chasing PRs. Hill sprints and the Sunday walk come in.",
+  p4:"2,150 kcal in 6–8 week blocks with a reset week after each, and 12,000 steps. Takes you the rest of the way to 10%.",
+  after:"Live at 10–12% at maintenance and keep building, especially the shoulders."
+};
+const ENDS = {
+  lead:"when the \"Ready for Phase 1?\" checklist is all green, usually after 8–10 weeks of lifting",
+  p1:"2 of 3: weekly average ≤ 188 lb for 2 weeks · waist about 39–40″ or less · a clear change in your photos",
+  p2:"2 of 3: ≤ 176 lb for 2 weeks · waist about 36.5–38″ or less · a clear photo change",
+  p3:"2 of 3: ≤ 166 lb for 2 weeks · waist about 34–36″ or less · a clear photo change",
+  p4:"at 10%: caliper sum 36–38 mm twice, 2 weeks apart · clear upper abs, lower starting · waist stops shrinking",
+  after:"it doesn't. Stay in a caliper sum of 36–43 mm"
+};
+const MICRO_SRC = [
+  ["Fiber","38 g","Oats, beans and lentils, potatoes with the skin, frozen veg, berries, apples, popcorn"],
+  ["Potassium","3,400 mg","Potatoes, bananas, beans, milk and yogurt, frozen veg"],
+  ["Calcium","1,000 mg","Milk, Greek yogurt, cottage cheese, cheese"],
+  ["Magnesium","400 mg","Oats, beans and lentils, peanut butter, potatoes"],
+  ["Iron","8 mg","Beef, beans and lentils, eggs, oats"],
+  ["Zinc","11 mg","Beef, chicken thighs, eggs, dairy, oats"],
+  ["Vitamin D","15 µg (600 IU)","Your D3 supplement covers it; milk (fortified in Canada) and eggs add some"],
+  ["Vitamin B12","2.4 µg","Meat, tuna, eggs, milk, yogurt"],
+  ["Vitamin C","90 mg","Berries, potatoes, frozen veg, oranges"],
+  ["Sodium","under 2,300 mg","An upper limit. Watch bouillon, cheese, bread and canned food; rinse canned beans"]
+];
+function latestM(f){ const ds = sortedDates(); for (let i = ds.length - 1; i >= 0; i--){ const v = f(store.days[ds[i]].m || {}); if (v !== null && v !== undefined) return { d: ds[i], v }; } return null; }
+function renderOverview(){
+  const cur = store.settings.phase, id = ovPhase || cur, P = PH[id], Pc = PH[cur], today = iso(new Date());
+  const ci = PH_ORDER.indexOf(cur);
+  const lw = latestM(m => toNum(m.waist)), lcs = latestM(m => calSum(m)), lsh = latestM(m => toNum(m.shoulders));
+  const lr = latestM(m => (toNum(m.shoulders) && toNum(m.waist)) ? toNum(m.shoulders) / toNum(m.waist) : null);
+  const R = readiness(cur), S0 = mSchedule(today), nx = nextCheckin(today);
+  const cd = CARDIO[id === "lead" ? "p1" : id];
+  const kc = id === "after" ? (toNum(store.settings.maint) ? fmt(toNum(store.settings.maint)) : "Find it") : fmt(P.kcal);
+  const tile = (l, v, sub) => `<div><small>${l}</small><strong>${v}</strong>${sub ? `<span>${sub}</span>` : ""}</div>`;
+  const chipsRow = `<div class="phase-chips" role="group" aria-label="Show targets for a phase">${PH_ORDER.map(p => `<button type="button" class="chip" data-ov="${p}" aria-pressed="${p === id}">${esc(PH[p].short)}</button>`).join("")}</div>`;
+  const sched = [1,2,3,4,5,6,0].map(dw => `<tr><td>${DOW[dw]}</td><td>${WORK[dw] ? esc(WORK[dw].name) : "Rest"}</td><td class="wrap">${esc(SCHED[id][dw])}</td></tr>`).join("");
+  const workouts = [1,2,3,4,5].map(dw => { const W = WORK[dw]; const exs = W.ex.filter(e => !e.only || e.only.includes(id)); const pw = (cd[dw] || {}).power;
+    return `<details class="wk"><summary><b>${esc(W.name)}</b><span>${DOWL[dw]} · ${exs.length} exercises</span><span class="chev" aria-hidden="true"></span></summary>
+      ${pw ? `<p class="pre">First: ${esc(pw)}</p>` : ""}<ol>${exs.map(e => `<li>${esc(e.n)}<span>${esc(e.rx)} · rest ${restText(e.rest)}</span></li>`).join("")}</ol></details>`; }).join("");
+  const build = id === "p3" || id === "p4" ? "<b>Hold</b> your weights and reps: use slower 2–3 s lowering instead of chasing PRs." : id === "after" ? "<b>Progress again:</b> a rep or a little weight every 1–2 weeks. Deload every 8–10 weeks." : "<b>Build:</b> add a rep or a little weight to most lifts most weeks, and log it.";
+  const jumps = [["ov-goal","Goal"],["ov-now","Now"],["ov-phases","Phases"],["ov-train","Training"],["ov-food","Food & water"],["ov-sleep","Sleep"],["ov-track","Tracking"]];
+  $("#v-overview").innerHTML = `
+  <h2 style="font-size:28px">Overview</h2>
+  <div class="jump" role="navigation" aria-label="Jump to a section">${jumps.map(([a, l]) => `<button type="button" data-jump="${a}">${l}</button>`).join("")}</div>
+
+  <div class="card panel ovsec" id="ov-goal">
+    <div class="eyebrow">What we're doing</div>
+    <h2>Get to 10% body fat with a ~30″ waist and 46″ shoulders</h2>
+    <p style="margin:0">Lose the fat slowly enough to keep your muscle, and build more while you still can (the lead-in and Phases 1–2). Food does the fat loss. Lifting builds and keeps the muscle. Steps, cardio and sleep make both easier.</p>
+    <p class="small muted" style="margin:0">The scale is optional and no weight ends the plan. Your tape, calipers and photos decide when each phase ends; there are no set dates.</p>
+    <div class="goals">
+      ${tile("Body fat", "10%", `caliper sum 36–38 mm${lcs ? ` · now ${fmt(lcs.v, 1)} mm ≈ ${fmt(jp3(lcs.v), 0)}%` : " · no caliper reading yet"}`)}
+      ${tile("Waist", "30–31″", lw ? `at the navel · now ${inch(lw.v)}` : "at the navel")}
+      ${tile("Shoulders", "46″", lsh ? `now ${inch(lsh.v)} with more fat on; at 10%, 46″ is real delt muscle` : "")}
+      ${tile("Shoulders ÷ waist", "1.53", lr ? `the V-taper · now ${fmt(lr.v, 2)}` : "the V-taper")}
+    </div>
+  </div>
+
+  <div class="card panel ovsec" id="ov-now">
+    <div class="eyebrow">Where you are now</div>
+    <h2>${esc(Pc.name)}</h2>
+    <p style="margin:0">${esc(ROLE[cur])}</p>
+    <div class="pills">${weekTag(cur, today) ? `<span class="pill">${esc(cap(weekTag(cur, today)))}</span>` : ""}<span class="pill">${cur === "after" ? "Maintenance" : fmt(Pc.kcal) + " kcal"}</span><span class="pill">${esc(Pc.p)} g protein</span><span class="pill">${esc(Pc.steps)} steps</span></div>
+    <div class="small">${S0.keys.length ? `<b>${esc(dueLabel(S0.keys))} due today.</b>` : nx ? `Next check-in: <b>${fmtDate(nx.date)}</b> morning (${esc(nx.label.toLowerCase())}).` : ""}</div>
+    ${R ? `<div class="rverdict ${R.state}"><b>${esc(R.title)}</b> ${esc(R.headline)}</div>` : ""}
+    <div class="row"><button type="button" class="btn" data-go="measure">Measure & phase check</button><button type="button" class="btn ghost" data-go="cheat">This phase's rules</button></div>
+  </div>
+
+  <div class="card panel ovsec" id="ov-phases">
+    <h2>The phases</h2>
+    <p class="small muted" style="margin:0">Each phase ends when your numbers say so, not on a date. The Measure tab checks them for you.</p>
+    <div class="road">${PH_ORDER.map((p, i) => `<div class="st ${i < ci ? "done" : i === ci ? "now" : ""}"><i aria-hidden="true"></i><div><b>${esc(PH[p].short)}</b>${i === ci ? ` <span class="pill info" style="margin-left:4px">You're here</span>` : ""}</div><div class="meta">${esc(ROLE[p])}<br><em>Ends:</em> ${esc(ENDS[p])}</div></div>`).join("")}</div>
+    <p class="small muted" style="margin:0">No scale? Then your waist and photos both have to pass, and your caliper sum has to be clearly lower than at the phase start.</p>
+  </div>
+
+  <div class="card panel cs ovsec" id="ov-train">
+    <div class="eyebrow">Training · ${esc(P.short)}</div>
+    <h2>Push / Pull / Legs, 5 days a week</h2>
+    ${chipsRow}
+    <div class="scroll-x"><table><thead><tr><th>Day</th><th>Lift</th><th>Cardio & extras</th></tr></thead><tbody>${sched}</tbody></table></div>
+    ${id === "lead" ? `<p class="small muted" style="margin:0">Lead-in weeks 1–2: lifting, steps and the Saturday walk only, with weights you could lift 12–15 times, stopping about 3 reps short.</p>` : ""}
+    <div><h3>The five workouts</h3><p class="small muted" style="margin:2px 0 8px">Tap one to see every exercise. The Workout tab has the form cues and logs your sets.</p><div class="wks">${workouts}</div></div>
+    <div><h3>How hard</h3><ul class="rules">
+      <li>Stop 1–3 reps short on every set. Lateral raises, face pulls and rear delts go to 0–1 in reserve. Never to failure on the big lifts.</li>
+      <li>${build}</li>
+      <li>Short on time: the first 3 exercises plus lateral raises. Never make up missed workouts.</li>
+    </ul></div>
+    <div><h3>Steps & cardio</h3><ul class="rules">
+      <li><b>${esc(P.steps)} steps a day</b>, every day${id === "lead" ? ", built up over 3–4 weeks" : ""}. Walk instead of driving, pace on calls, take the stairs.</li>
+      <li><b>Zone 2:</b> easy enough to talk in full sentences (about 120–140 bpm). Incline walk, stair climber or an easy bike.</li>
+      <li><b>Hard sessions</b> only where the plan puts them${id === "p3" || id === "p4" ? " (Friday and Saturday)" : " (Friday)"}. More isn't better; food drives the fat loss.</li>
+      <li>Finish hard sessions 3+ hours before bed, lifting and zone 2 at least 2.</li>
+    </ul></div>
+  </div>
+
+  <div class="card panel cs ovsec" id="ov-food">
+    <div class="eyebrow">Food & water · ${esc(P.short)}</div>
+    <h2>Daily targets</h2>
+    ${chipsRow}
+    <div class="targets t2">
+      ${tile("Calories", kc, id === "after" ? "start ~2,400, add 100 a week while you're still losing" : "same every day, never under 1,900")}
+      ${tile("Protein", esc(P.p) + " g", id === "after" ? "never under 160" : "never under 170")}
+      ${tile("Carbs", P.carbs === "—" ? "Flexible" : esc(P.carbs), P.carbs === "—" ? "the rest of your calories" : "")}
+      ${tile("Fat", P.fat === "—" ? "Flexible" : esc(P.fat), "")}
+      ${tile("Fiber", "38 g", "")}
+      ${tile("Water", "~3 L", "about 13 cups from drinks")}
+      ${tile("Sodium", "≤ 2,300", "mg, an upper limit")}
+      ${tile("Reset week", P.reset ? fmt(P.reset) : "—", P.reset ? "kcal, protein unchanged" : "")}
+    </div>
+    <div><h3>How to eat</h3><ul class="rules">
+      <li><b>Protein first:</b> four feedings of about 40–55 g (breakfast, lunch, snack, dinner). Pick the protein, then add a carb and a vegetable or fruit.</li>
+      <li>Potatoes, oats, cottage cheese and frozen veg keep you full cheaply. Popcorn and sugar-free jello handle cravings.</li>
+      <li>Log everything for the first 2–3 weeks of a phase, and again for a week any time you stall.</li>
+      <li>Alcohol counts and wrecks sleep: skip it near bedtime.</li>
+      ${id === "p3" || id === "p4" ? "<li>About 100 g cottage cheese 1.5–2 h before bed.</li>" : ""}
+    </ul></div>
+    <div><h3>Micronutrients</h3><p class="small muted" style="margin:2px 0 8px">Daily targets for a man aged 19–30 (US/Canada Dietary Reference Intakes). The Food tab adds these up for foods you log from its list.</p>
+      <div class="mlist">${MICRO_SRC.map(([n, t, src]) => `<div class="mi"><b>${esc(n)}</b><span>${esc(t)}</span><p>${esc(src)}</p></div>`).join("")}</div></div>
+    <div><h3>Water</h3><ul class="rules">
+      <li>About <b>3 L a day from drinks</b> (roughly 13 cups). Add 0.5–1 L on training days or when it's hot.</li>
+      <li>Water, milk, protein shakes, tea and coffee all count. Pale-yellow pee means you're fine.</li>
+      <li>Front-load it and slow down 1–2 hours before bed so you're not up at night.</li>
+      <li class="small muted">Your plan doesn't set a water target; this is the standard guideline for men your age (3.7 L of total water a day, about 3 L of it from drinks).</li>
+    </ul></div>
+    <div><h3>Supplements</h3><ul class="rules">
+      <li><b>Creatine monohydrate, 3–5 g a day.</b> Any time, no loading. Expect 1–3 lb of water early on; it isn't fat.</li>
+      <li><b>Vitamin D3, 1,000–2,000 IU a day</b>, all year. Saskatchewan winters give you very little.</li>
+      <li>Whey protein is food, not a supplement: use it when it's the easiest way to hit 180 g.</li>
+    </ul></div>
+  </div>
+
+  <div class="card panel cs ovsec" id="ov-sleep">
+    <div class="eyebrow">Sleep · every phase</div>
+    <h2>7:00 a.m. wake, 7.5–9 hours in bed</h2>
+    <div class="targets t2">
+      ${tile("Wake up", "7:00", "a.m., every day, most weekends too")}
+      ${tile("In bed", "7.5–9 h", "")}
+      ${tile("Bedtime", "10–11:30", "p.m., sleepy around 10:40–11:15")}
+      ${tile("Caffeine", "by 2–3", "p.m., then none")}
+    </div>
+    <ul class="rules">
+      <li>Bright light within 30–60 minutes of waking. From about October to March it's dark at 7:00, so turn your brightest lights on and get outside once the sun is up.</li>
+      <li>Wind down 60–90 minutes before bed: dim lights, night mode, then 20–40 minutes of something boring and off-screen.</li>
+      <li>Room cool (18–20°C), dark and quiet. Main meal 2–3 hours before bed when you can.</li>
+      <li>Awake 20–25 minutes? Get up, low light, something dull, back to bed when sleepy.</li>
+      <li>Under 7 h three nights in a row: swap your next hard session for zone 2. Under 6.5 h for a week: take your reset week early.</li>
+    </ul>
+  </div>
+
+  <div class="card panel ovsec" id="ov-track">
+    <div class="eyebrow">What to log, and when</div>
+    <h2>Tracking</h2>
+    <div class="sched">
+      <b>Morning</b><span>Sleep (bed, wake, how rested) and your weight if you weigh. <em>Sleep tab or Today</em></span>
+      <b>Meals</b><span>What you ate, whether you liked it, how full you were. <em>Food tab</em></span>
+      <b>Gym</b><span>Sets × reps and how each exercise felt. <em>Workout tab</em></span>
+      <b>Evening</b><span>Steps, cardio, energy, mood and how the day went. <em>Today</em></span>
+      <b>Every 2 weeks</b><span>Waist + calipers, then check your weight trend. <em>Measure · History</em></span>
+      <b>Every 4 weeks</b><span>Full tape + photos. <em>Measure</em></span>
+      <b>New phase</b><span>A full check-in: the phase's start line. <em>Measure</em></span>
+      <b>Any time</b><span>Send your log to Claude for adjustments. <em>More → Send to Claude</em></span>
+    </div>
+  </div>`;
+}
+$("#v-overview").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.ov){ ovPhase = b.dataset.ov; const y = window.scrollY; renderOverview(); window.scrollTo(0, y); return; }
+  if (b.dataset.jump){ const t = document.getElementById(b.dataset.jump); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  if (b.dataset.go) goTab(b.dataset.go);
+});
+
 function renderMore(){
   $("#v-more").innerHTML = `<h2 style="font-size:28px">More</h2>
-    ${[["history","History","Weekly averages, strength floor and every day you've logged"],["cheat","Cheat sheet","Targets, your week and the rules for each phase"],["share","Send to Claude","Share a summary, back up or restore your log"]].map(([t, n, d]) => `<button type="button" class="card morelink" data-go="${t}"><span><b>${n}</b><small>${d}</small></span><span class="chev2" aria-hidden="true">›</span></button>`).join("")}`;
+    ${[["overview","Overview","The whole plan on one page: the goal, phases, workouts, food, water and sleep targets"],["history","History","Weekly averages, strength floor and every day you've logged"],["cheat","Cheat sheet","Targets, your week and the rules for each phase"],["share","Send to Claude","Share a summary, back up or restore your log"]].map(([t, n, d]) => `<button type="button" class="card morelink" data-go="${t}"><span><b>${n}</b><small>${d}</small></span><span class="chev2" aria-hidden="true">›</span></button>`).join("")}`;
 }
 $("#v-more").addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) goTab(b.dataset.go); });
 
@@ -2088,9 +2809,10 @@ $("#v-charts").addEventListener("click", e => { const b = e.target.closest("[dat
 
 /* ---------- CHEAT SHEET ---------- */
 const EXIT = {
-  lead:`<li>On <b>January 1, 2027</b>, switch to Phase 1 (2,300 kcal). Keep the same workouts and weights; only the food changes.</li>
-        <li>In the last few days of December, take your starting waist, full measurements, calipers and photos.</li>
-        <li>Book a checkup before January: blood pressure, A1c, cholesterol, and vitamin D if they'll add it.</li>`,
+  lead:`<li><b>No set date.</b> The lead-in ends when the "Ready for Phase 1?" checklist on the Measure tab is all green. The plan pictures about 8–10 weeks of lifting at maintenance first: beginner muscle comes fastest now, and it's what makes 10% look full instead of flat.</li>
+        <li>Ready means at least 8 weeks of lifting, 4+ sessions in most weeks and food logged most days, plus 7+ hours of sleep most nights and your weight holding near maintenance if you weigh.</li>
+        <li>In the few days before you switch, do a full check-in: waist, calipers, full tape, photos and weight. That's Phase 1's start line. Keep the same workouts and weights; only the food changes (2,300 kcal).</li>
+        <li>Book a checkup before the cut starts: blood pressure, A1c, cholesterol, and vitamin D if they'll add it.</li>`,
   p1:`<li>Move on when <b>2 of these 3</b> are true: weekly average at or below <b>188 lb</b> for 2 weeks · waist about <b>39–40″</b> or less · photos show a clear change from your Phase 1 start.</li><li>Also: strength holding, 7+ hours of sleep most nights, not constantly drained. If not, take a reset week first. No scale: the waist and photo checks both have to be true and your caliper sum clearly lower.</li>`,
   p2:`<li>Move on when <b>2 of these 3</b> are true: weekly average at or below <b>176 lb</b> for 2 weeks · waist about <b>36.5–38″</b> or less · photos show a clear change from your Phase 2 start.</li><li>Also: strength holding, 7+ hours of sleep most nights, not constantly drained. If not, take a reset week first.</li>`,
   p3:`<li>Move on when <b>2 of these 3</b> are true: weekly average at or below <b>166 lb</b> for 2 weeks · waist about <b>34–36″</b> or less · photos show a clear change from your Phase 3 start.</li><li>At ~166 lb you'll likely be around 15–22% body fat. Phase 4 takes you the rest of the way.</li>`,
@@ -2103,12 +2825,12 @@ const EXIT = {
         <li>Under ~36 mm, or lifts sliding and constantly hungry: add 100–150 kcal from carbs.</li>`
 };
 const NEW = {
-  lead:`<li>Start lifting <b>Monday, October 19</b>. Weeks 1–2: weights you could lift 12–15 times, stop ~3 reps short, 1 set of Nordic curls, no box jumps.</li>
-        <li>From week 3, add Tuesday zone 2, Friday bike intervals and the power work, so the full Phase 1 week is running by January.</li>
+  lead:`<li>Start lifting on <b>{LEADSTART}</b>. Weeks 1–2: weights you could lift 12–15 times, stop ~3 reps short, 1 set of Nordic curls, no box jumps.</li>
+        <li>From week 3, add Tuesday zone 2, Friday bike intervals and the power work, so the full Phase 1 week is already running when the cut starts.</li>
         <li>Steps: build to 10,000 a day over 3–4 weeks. Saturday walk starts now.</li>
         <li>Start creatine and vitamin D, start the 7:00 a.m. wake, and practise logging food.</li>
         <li>Ignore the scale for the first 3 weeks (creatine + lifting add 2–4 lb of water). Your week-3 average is your starting weight; keep within ~2 lb of it.</li>`,
-  p1:`<li>The cut starts January 1; week 1 is Monday, January 4.</li><li>Ignore the "too fast" rule for the first 2–3 weeks: the early 3–6 lb is mostly water.</li><li>Calipers are least accurate above ~25%. Take them for the trend but lean on the tape and photos until Phase 3.</li><li>This is still your building window: add a rep or a little weight to most lifts most weeks.</li>`,
+  p1:`<li>The cut starts the day you pick Phase 1 at the top. Week 1 starts the first Monday on or after it; reset weeks count from there.</li><li>Ignore the "too fast" rule for the first 2–3 weeks: the early 3–6 lb is mostly water.</li><li>Calipers are least accurate above ~25%. Take them for the trend but lean on the tape and photos until Phase 3.</li><li>This is still your building window: add a rep or a little weight to most lifts most weeks.</li>`,
   p2:`<li>The last phase where you can expect to gain muscle while losing fat. Keep adding reps or weight.</li><li>Friday alternates: week A bike intervals, week B circuit.</li><li>New plyo block on Wednesday and med ball rotational tosses on Monday.</li><li>Calories drop 50 from carbs. Expect a slightly slower pace; that's normal.</li>`,
   p3:`<li>Goal changes to <b>holding</b> your weights and reps. Use slower lowering (2–3 s) instead of chasing PRs.</li><li>Sunday walk added; Saturday hill sprints (bike sprints once it's icy). Tuesday zone 2 goes to 25 min.</li><li>New: ~100 g cottage cheese 1.5–2 h before bed.</li><li>Shoulder tape drifting toward 45″ is fat loss, as long as your laterals and pull-ups hold.</li>`,
   p4:`<li>Steps go to <b>12,000</b>. Saturday is bike sprints plus your walk.</li><li>Stall fix step 3 is now "drop to 2,000 kcal" (never below 1,900).</li><li>Lean-up sets once you're at 165 lb or less: Monday pushdowns to 3 sets, Thursday pushdowns 2 sets plus overhead cable triceps extension 2 × 10–12.</li><li>If recovery suffers, cut Saturday sprints first, then make Friday zone 2, then halve the jumps.</li>`,
@@ -2122,7 +2844,11 @@ function renderCheat(){
     `Weekly-average loss, checked every 2 weeks: <b>${P.trend.on[0]}–${P.trend.on[1]} lb/week</b> on track${id === "p4" ? "" : ` · ${P.trend.fine}–${P.trend.on[0]} fine`} · under ${P.trend.fine} for 2 weeks too slow · over ${P.trend.fast} too fast.`;
   const stall3 = id === "p4" ? "drop to 2,000 kcal (floor 1,900)" : "cut 150 kcal from carbs";
   const sched = [0,1,2,3,4,5,6].map(dw => `<tr><td>${DOW[dw]}</td><td>${WORK[dw] ? esc(WORK[dw].name) : "Rest"}</td><td style="white-space:normal">${esc(SCHED[id][dw])}</td></tr>`).join("");
-  const resets = (P.resets || []).map(r => `<li>${fmtDate(r[0])} – ${fmtDate(r[1])}, ${r[0].slice(0,4)}</li>`).join("");
+  const isCur = id === store.settings.phase;
+  const nxR = isCur ? nextReset(id, iso(new Date())) : null;
+  const resets = RESET_FIRST[id] ? `<li>${id === "p1" ? "Week 8 of the phase, then every 8th week after that (16, 24…) if the phase runs that long." : "Week 1 of the phase (the break between phases), then every 8th week: 9, 17, 25…"}</li>
+    <li>Take it early if you've slept under 6.5 h for a week, or make it your first week back after 3+ weeks off. The count restarts from there.</li>
+    ${nxR ? `<li><b>Your ${nxR.now ? "current" : "next"} one:</b> week ${nxR.week}, ${fmtDate(nxR.start)} – ${fmtDate(nxR.end)} (counted from your ${esc(P.short)} start, ${fmtDate(phaseStartFor(id))}).</li>` : ""}` : "";
   $("#v-cheat").innerHTML = `
     <div class="phase-chips" role="group" aria-label="Choose a phase">${PH_ORDER.map(p => `<button class="chip" data-cheat="${p}" aria-pressed="${p === id}">${esc(PH[p].short)}</button>`).join("")}</div>
     <div class="card panel cs">
@@ -2165,12 +2891,16 @@ function renderCheat(){
         <li><b>Knees, shins, Achilles or lower back ache:</b> pause jumps and sprints for 1–2 weeks; bike and zone 2 stay.</li>
         <li><b>Fell off for a while:</b> come back at this phase's normal calories (not lower), don't measure for 3 days. Off more than 3 weeks? First week back is a reset week.</li>
       </ul></div>
-      <div><h3>${id === "after" ? "Staying in range" : id === "p4" ? "Finish line" : "Move on when"}</h3><ul class="rules">${EXIT[id]}</ul></div>
-      ${resets ? `<div><h3>Reset weeks (projected)</h3><ul>${resets}</ul><p class="small muted" style="margin:4px 0 0">~${fmt(P.reset)} kcal, protein unchanged, same exercises at 60–70% weight, zone 2 only.</p></div>` : ""}
-      <div><h3>${id === "lead" ? "Before January" : "What's different this phase"}</h3><ul class="rules">${NEW[id]}</ul></div>
+      <div><h3>${id === "after" ? "Staying in range" : id === "p4" ? "Finish line" : "Move on when"}</h3><ul class="rules">${EXIT[id]}</ul>${isCur ? `<div class="row" style="margin-top:8px"><button type="button" class="textbtn" data-go="measure">See where your numbers stand</button></div>` : ""}</div>
+      ${resets ? `<div><h3>Reset weeks</h3><ul class="rules">${resets}</ul><p class="small muted" style="margin:4px 0 0">~${fmt(P.reset)} kcal, protein unchanged, same exercises at 60–70% weight, zone 2 only.</p>${isCur && !(nxR && nxR.now) ? `<div id="resetBox" style="margin-top:8px"><button type="button" class="textbtn" data-reset="ask">Start one early (today)</button></div>` : ""}</div>` : ""}
+      <div><h3>${id === "lead" ? "Before the cut" : "What's different this phase"}</h3><ul class="rules">${NEW[id].replace("{LEADSTART}", esc(fmtLong(leadStart()).replace(/, \d{4}$/, "")))}</ul></div>
     </div>`;
 }
-$("#v-cheat").addEventListener("click", e => { const b = e.target.closest("[data-cheat]"); if (b){ cheatPhase = b.dataset.cheat; renderCheat(); } });
+$("#v-cheat").addEventListener("click", e => {
+  const g = e.target.closest("[data-go]"); if (g){ goTab(g.dataset.go); return; }
+  const r = e.target.closest("[data-reset]"); if (r){ onReset(r.dataset.reset, $("#v-cheat")); return; }
+  const b = e.target.closest("[data-cheat]"); if (b){ cheatPhase = b.dataset.cheat; renderCheat(); }
+});
 $("#v-cheat").addEventListener("change", e => { if (e.target.id === "maintIn"){ store.settings.maint = e.target.value; saveSettings(); } });
 
 /* ---------- SHARE ---------- */
@@ -2201,7 +2931,7 @@ function dayText(d){
   if (c.felt) L.push(`  Felt: ${c.felt}`); if (c.notes) L.push(`  Notes: ${c.notes}`);
   const m = e.m || {}; const S = ["cChest","cAbs","cThigh"].map(k => toNum(m[k]));
   const ml = [has(m.waist) ? `waist ${m.waist}″` : null, S.every(v => v !== null) ? `calipers ${S.join("/")} = ${fmt(S[0]+S[1]+S[2],1)} mm (~${fmt(jp3(S[0]+S[1]+S[2]),1)}%)` : null,
-    ...[["neck","neck"],["shoulders","shoulders"],["chest","chest"],["hips","hips"],["armR","arm"],["armF","arm flexed"],["forearm","forearm"],["thighR","thigh R"],["thighL","thigh L"],["calfR","calf R"],["calfL","calf L"]].map(([k,l]) => has(m[k]) ? `${l} ${m[k]}″` : null), m.photos ? "photos taken" : null].filter(Boolean);
+    ...[["neck","neck"],["shoulders","shoulders"],["chest","chest"],["hips","hips"],["armR","arm"],["armF","arm flexed"],["forearm","forearm"],["thighR","thigh R"],["thighL","thigh L"],["calfR","calf R"],["calfL","calf L"]].map(([k,l]) => has(m[k]) ? `${l} ${m[k]}″` : null), m.photos ? "photos taken" : null, m.photoCmp ? `photos vs phase start: ${PHOTO_CMP[m.photoCmp].toLowerCase()}` : null, m.absLook ? ABS_LOOK[m.absLook].toLowerCase() : null].filter(Boolean);
   if (ml.length) L.push(`Measurements: ${ml.join(", ")}`); if (m.notes) L.push(`  Notes: ${m.notes}`);
   const fe = e.feel || {};
   const el = [fe.eAm || fe.ePm || fe.eEve ? `energy am/pm/eve ${fe.eAm||"–"}/${fe.ePm||"–"}/${fe.eEve||"–"}` : null, fe.mood ? `mood ${fe.mood}/5` : null, fe.stress ? `stress ${fe.stress}/5` : null, fe.load ? `load ${RATE[fe.load]}` : null, fe.overall ? `day ${fe.overall}/5` : null].filter(Boolean);
@@ -2214,7 +2944,9 @@ function shareText(){
   const ds = sortedDates(); const today = iso(new Date());
   const from = shareRange === 0 ? "0000" : addDays(today, -(shareRange - 1));
   const pick = ds.filter(d => d >= from && d <= today);
-  const head = `ROAD TO 10% LOG — ${PH[store.settings.phase].name} (since ${fmtDate(store.settings.phaseStart)}) — ${pick.length} day${pick.length===1?"":"s"}\nTargets: ${store.settings.phase === "after" ? "maintenance" : fmt(PH[store.settings.phase].kcal) + " kcal"}, ${PH[store.settings.phase].p} g protein, ${PH[store.settings.phase].steps} steps\n`;
+  const R = readiness(store.settings.phase);
+  const rtxt = R ? `PHASE CHECK (${R.title}) ${R.main.concat(R.also).map(c => `${c.l}: ${c.s === "yes" ? "yes" : c.s === "no" ? "NO" : "no data"} (${c.t})`).join("; ")}\n→ ${R.headline}\n` : "";
+  const head = `ROAD TO 10% LOG — ${PH[store.settings.phase].name} (since ${fmtDate(store.settings.phaseStart)}${weekTag(store.settings.phase, today) ? ", " + weekTag(store.settings.phase, today) : ""}) — ${pick.length} day${pick.length===1?"":"s"}\nTargets: ${store.settings.phase === "after" ? "maintenance" : fmt(PH[store.settings.phase].kcal) + " kcal"}, ${PH[store.settings.phase].p} g protein, ${PH[store.settings.phase].steps} steps\n` + rtxt;
   const wk = weeklyRows().slice(0, 4).map(r => `Week of ${fmtDate(r.k)}: avg ${r.w !== null ? fmt(r.w,1) + " lb" : "–"}, ${fmt(r.kcal)} kcal, ${r.prot !== null ? fmt(r.prot) + " g" : "–"} protein, ${fmt(r.steps)} steps, ${r.sleep !== null ? fmt(r.sleep,1) + " h" : "–"} sleep, ${r.lifts}/5 lifts`).join("\n");
   return head + (wk ? `\nWEEKLY AVERAGES\n${wk}\n` : "") + "\n" + (pick.map(dayText).join("\n\n") || "No days logged in this range yet.");
 }
@@ -2224,7 +2956,7 @@ function csvAll(){
     "kcal_total","protein_total","carbs_total","fat_total","fiber_total","sodium_total","hunger","cravings","creatine","vitamin_d","alcohol","food_notes",
     "workout","workout_status","workout_min","energy_before","felt_after","effort","soreness","pain","exercise_log","workout_notes",
     "steps","cardio_option","cardio_status","cardio_min","cardio_rounds","cardio_rpe","walk_min","cardio_notes",
-    "waist","cal_chest","cal_abs","cal_thigh","cal_sum","bf_est","neck","shoulders","chest","hips","arm","arm_flexed","forearm","thigh_r","thigh_l","calf_r","calf_l",
+    "waist","cal_chest","cal_abs","cal_thigh","cal_sum","bf_est","neck","shoulders","chest","hips","arm","arm_flexed","forearm","thigh_r","thigh_l","calf_r","calf_l","photos","photo_compare","abs_look",
     "energy_am","energy_pm","energy_eve","mood","stress","load","day_overall","how_i_felt","for_claude"];
   const q = v => { const s = v === undefined || v === null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; };
   const rows = sortedDates().map(d => {
@@ -2237,7 +2969,7 @@ function csvAll(){
       ft.kcal, ft.protein, ft.carbs, ft.fat, f.fiberTotal, f.sodiumTotal, f.hunger, f.cravings, f.creatine ? "yes" : "", f.vitd ? "yes" : "", f.alcohol, f.notes,
       plan.work ? plan.work.name : "rest", t.status, t.length, t.energyPre, t.feelAfter, t.effort ? RATE[t.effort] : "", t.soreness, t.pain, exlog, [t.feltNotes, t.swaps, t.extra].filter(Boolean).join(" | "),
       c.steps, c.ab, c.status, c.minutes, c.rounds, c.rpe, c.walkMin, [c.felt, c.notes].filter(Boolean).join(" | "),
-      m.waist, m.cChest, m.cAbs, m.cThigh, sum !== null ? sum.toFixed(1) : "", sum !== null ? jp3(sum).toFixed(1) : "", m.neck, m.shoulders, m.chest, m.hips, m.armR, m.armF, m.forearm, m.thighR, m.thighL, m.calfR, m.calfL,
+      m.waist, m.cChest, m.cAbs, m.cThigh, sum !== null ? sum.toFixed(1) : "", sum !== null ? jp3(sum).toFixed(1) : "", m.neck, m.shoulders, m.chest, m.hips, m.armR, m.armF, m.forearm, m.thighR, m.thighL, m.calfR, m.calfL, m.photos ? "yes" : "", m.photoCmp ? PHOTO_CMP[m.photoCmp] : "", m.absLook ? ABS_LOOK[m.absLook] : "",
       fe.eAm, fe.ePm, fe.eEve, fe.mood, fe.stress, fe.load, fe.overall, fe.notes, fe.forClaude].map(q).join(",");
   });
   return cols.join(",") + "\n" + rows.join("\n");
@@ -2524,17 +3256,19 @@ $("#v-share").addEventListener("click", e => {
 $("#v-share").addEventListener("change", e => { if (e.target.id === "restoreIn" && e.target.files && e.target.files[0]){ restoreFrom(e.target.files[0]); e.target.value = ""; } });
 
 /* ---------- tabs, phase picker, mode ---------- */
-const TABS = ["today","workout","food","sleep","charts","more","history","cheat","share"];
-const NAVTABS = ["today","workout","food","sleep","charts","more"];
+const TABS = ["today","workout","food","sleep","measure","charts","more","history","cheat","share","overview"];
+const NAVTABS = ["today","workout","food","sleep","measure","charts","more"];
 function showTab(t){
-  const prev = tab; tab = t; const navKey = ["history","cheat","share"].includes(t) ? "more" : t;
+  const prev = tab; tab = t; const navKey = ["history","cheat","share","overview"].includes(t) ? "more" : t;
   TABS.forEach(x => { $("#v-" + x).hidden = x !== t; });
   NAVTABS.forEach(x => $("#t-" + x).setAttribute("aria-selected", String(x === navKey)));
-  if (prev !== t && ["today","workout","food","sleep"].includes(prev)) $("#v-" + prev).innerHTML = "";
+  if (prev !== t && ["today","workout","food","sleep","measure"].includes(prev)) $("#v-" + prev).innerHTML = "";
   if (t === "today") renderToday();
   if (t === "workout") renderWorkout();
   if (t === "food") renderFood();
   if (t === "sleep") renderSleep();
+  if (t === "measure") renderMeasure();
+  if (t === "overview") renderOverview();
   if (t === "charts") renderCharts();
   if (t === "more") renderMore();
   if (t === "history") renderHistory();
@@ -2552,9 +3286,12 @@ function renderPhaseSel(){
 $("#phaseSel").addEventListener("change", e => {
   const p = e.target.value; if (p === store.settings.phase) return;
   const c = $("#phaseConfirm");
+  const curP = store.settings.phase, R = PH_ORDER[PH_ORDER.indexOf(curP) + 1] === p ? readiness(curP) : null;
   c.innerHTML = `<h3 style="font-size:20px">Start ${esc(PH[p].name)}?</h3>
-    <p class="small" style="margin:0">New days will use ${esc(PH[p].short)}'s targets and schedule. Days you've already logged keep their phase. Check the "Move on when" list on the cheat sheet first.</p>
+    ${R ? `<div class="rverdict ${R.state}"><b>${esc(R.title)}</b> ${esc(R.headline)}</div>` : ""}
+    <p class="small" style="margin:0">New days will use ${esc(PH[p].short)}'s targets and schedule. Days you've already logged keep their phase. Do a full check-in on the Measure tab within a few days of switching: it's this phase's start line.</p>
     <label class="f" style="max-width:220px"><span>Phase start date</span><input type="date" id="phaseStartIn" value="${iso(new Date())}"></label>
+    <p class="small muted" style="margin:0">${p === "lead" || p === "after" ? "Counts from this date." : `Week 1 starts on the first Monday on or after this date${p === "p1" ? "; the reset week is week 8" : "; week 1 is a reset week"}.`}</p>
     <div class="row"><button class="btn" id="phaseYes">Start ${esc(PH[p].short)}</button><button class="btn ghost" id="phaseNo">Cancel</button></div>`;
   c.dataset.phase = p; c.hidden = false; window.scrollTo({top:0});
 });
@@ -2562,8 +3299,10 @@ $("#phaseConfirm").addEventListener("click", async e => {
   const c = $("#phaseConfirm");
   if (e.target.id === "phaseNo"){ c.hidden = true; renderPhaseSel(); }
   if (e.target.id === "phaseYes"){
-    store.settings.phase = c.dataset.phase; store.settings.phaseStart = $("#phaseStartIn").value || iso(new Date());
-    c.hidden = true; await saveSettings(); renderPhaseSel(); cheatPhase = null;
+    const st = store.settings; st.phases = Object.assign({}, st.phases || {});
+    if (st.phaseStart && !st.phases[st.phase]) st.phases[st.phase] = st.phaseStart;
+    st.phase = c.dataset.phase; st.phaseStart = $("#phaseStartIn").value || iso(new Date()); st.phases[st.phase] = st.phaseStart;
+    c.hidden = true; await saveSettings(); renderPhaseSel(); cheatPhase = null; ovPhase = null;
     if (!store.days[curDate]) { loadDraft(); }
     rerenderAll();
   }
@@ -2587,23 +3326,25 @@ function rerenderAll(force){
   if (tab === "charts") renderCharts();
   if (tab === "food"){ if (force || !formFocused()) renderFood(); }
   if (tab === "sleep"){ if (force || !formFocused()) renderSleep(); }
+  if (tab === "measure"){ if (force || !formFocused()) renderMeasure(); else updateDerived(); }
+  if (tab === "overview") renderOverview();
   if (tab === "history") renderHistory();
   if (tab === "cheat") renderCheat();
   if (tab === "share") renderShare();
 }
-function formFocused(){ const a = document.activeElement; return !!(a && ["#v-today","#v-workout","#v-food","#v-sleep"].some(v => $(v).contains(a)) && a.matches("input,textarea,select")); }
+function formFocused(){ const a = document.activeElement; return !!(a && ["#v-today","#v-workout","#v-food","#v-sleep","#v-measure"].some(v => $(v).contains(a)) && a.matches("input,textarea,select")); }
 
 /* ---------- boot ---------- */
 renderPhaseSel();
 renderToday();
 const startTab = (location.hash || "").replace("#","");
-if (["workout","food","sleep","charts","more","history","cheat","share"].includes(startTab)) showTab(startTab);
+if (["workout","food","sleep","measure","charts","more","history","cheat","share","overview"].includes(startTab)) showTab(startTab);
 
 let bootToday = iso(new Date());
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState !== "visible") return;
   const t = iso(new Date());
-  if (t !== bootToday){ const wasOnToday = curDate === bootToday; bootToday = t; renderModeNote(); if (wasOnToday && ["today","workout","food"].includes(tab) && !dirty) goDate(t); else if (tab === "sleep") renderSleep(); else rerenderAll(); }
+  if (t !== bootToday){ const wasOnToday = curDate === bootToday; bootToday = t; renderModeNote(); if (wasOnToday && ["today","workout","food","measure"].includes(tab) && !dirty) goDate(t); else if (tab === "sleep") renderSleep(); else rerenderAll(); }
 });
 (async () => {
   try {
