@@ -334,6 +334,25 @@ body.resting main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
 .shop h4{grid-column:1/-1;margin:8px 0 0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .shop .ck.done{color:var(--muted);text-decoration:line-through}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:12;background:var(--btn);color:var(--on-btn);padding:10px 16px;border-radius:12px;font-size:14px;width:max-content;max-width:min(92vw,520px);box-shadow:0 8px 24px rgb(0 0 0 / .25)}
+/* nutrients */
+.nmode{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;max-width:100%}
+.nmode button{border:0;background:transparent;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);white-space:nowrap}
+.nmode button[aria-pressed="true"]{background:var(--green);color:var(--on-green)}
+.nutline{display:block;color:var(--muted);font-size:12px;font-weight:400;font-variant-numeric:tabular-nums;line-height:1.45}
+.nrows{display:flex;flex-direction:column;gap:8px}
+.nrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;font-size:13.5px;font-variant-numeric:tabular-nums}
+.nrow .nl{font-weight:500}
+.nrow .nv{text-align:right;color:var(--ink2)}
+.nrow .track{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line2);overflow:hidden}
+.nrow .fill{height:100%;border-radius:3px;background:var(--green)}
+.nrow .fill.over{background:var(--bad)}
+.nrow .fill.limit{background:var(--yellow)}
+.daynut>summary{cursor:pointer;font-weight:600;font-size:14.5px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.daynut>summary::-webkit-details-marker{display:none}
+.daynut[open]>summary{margin-bottom:10px}
+.healthbox{display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:12px}
+.healthbox ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.codeline{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px 10px;word-break:break-all}
 /* sleep */
 .nightcard{border:0;padding:18px 16px;display:flex;flex-direction:column;gap:10px;color:#E8EDFF;background:radial-gradient(1.6px 1.6px at 16% 20%,#ffffffb0 50%,transparent 52%),radial-gradient(1.1px 1.1px at 70% 13%,#ffffffa0 50%,transparent 52%),radial-gradient(1.3px 1.3px at 88% 42%,#ffffff90 50%,transparent 52%),radial-gradient(1px 1px at 42% 9%,#ffffff80 50%,transparent 52%),radial-gradient(1px 1px at 58% 30%,#ffffff70 50%,transparent 52%),linear-gradient(160deg,#1B2C5C 0%,#0D1631 100%)}
 .nightcard .eyebrow,.morncard .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
@@ -600,10 +619,11 @@ function sleepHours(bed, wake){
 }
 const MEALS = [["breakfast","Breakfast"],["lunch","Lunch"],["snack","Snack"],["dinner","Dinner"],["extra","Before bed & extras"]];
 function foodTotals(d){
-  let k = 0, p = 0, kn = 0, pn = 0;
-  MEALS.forEach(([id]) => { const m = (d.meals || {})[id] || {}; const a = toNum(m.kcal), b = toNum(m.protein); if (a !== null){ k += a; kn++; } if (b !== null){ p += b; pn++; } });
-  const ok = toNum(d.food && d.food.kcalTotal), op = toNum(d.food && d.food.proteinTotal);
-  return { kcal: ok !== null ? ok : (kn ? k : null), protein: op !== null ? op : (pn ? p : null) };
+  const sum = { kcal:[0,0], protein:[0,0], carbs:[0,0], fat:[0,0] };
+  MEALS.forEach(([id]) => { const m = (d.meals || {})[id] || {}; [["kcal","kcal"],["protein","protein"],["carbs","carbs"],["fat","fat"]].forEach(([k, f]) => { const v = toNum(m[f]); if (v !== null){ sum[k][0] += v; sum[k][1]++; } }); });
+  const fo = d.food || {}; const ov = { kcal: toNum(fo.kcalTotal), protein: toNum(fo.proteinTotal), carbs: toNum(fo.carbsTotal), fat: toNum(fo.fatTotal) };
+  const pick = k => ov[k] !== null ? ov[k] : (sum[k][1] ? sum[k][0] : null);
+  return { kcal: pick("kcal"), protein: pick("protein"), carbs: pick("carbs"), fat: pick("fat") };
 }
 
 /* ---------- state ---------- */
@@ -781,7 +801,7 @@ function foodSection(phaseId, kc, P){
     <div class="meal">
       <div class="meal-h"><h4>${label}</h4><span>${id === "extra" ? "optional" : "aim for 40–55 g protein"}</span></div>
       ${area(`meals.${id}.text`, "What I ate", mealPh[id])}
-      <div class="grid2">${txt(`meals.${id}.kcal`,"Calories","",{num:true})}${txt(`meals.${id}.protein`,"Protein (g)","",{num:true})}</div>
+      <div class="grid2">${txt(`meals.${id}.kcal`,"Calories","",{num:true})}${txt(`meals.${id}.protein`,"Protein (g)","",{num:true})}${txt(`meals.${id}.carbs`,"Carbs (g)","optional",{num:true})}${txt(`meals.${id}.fat`,"Fat (g)","optional",{num:true})}</div>
       ${chips(`meals.${id}.liked`,"Did I like it?",[["loved","Loved it"],["ok","It was OK"],["no","Didn't like it"]])}
       ${chips(`meals.${id}.full`,"Afterwards I was…",[["hungry","Still hungry"],["right","Satisfied"],["stuffed","Too full"]])}
       ${txt(`meals.${id}.felt`,"How I felt after","Energy, bloating, sleepy, cravings…")}
@@ -790,7 +810,8 @@ function foodSection(phaseId, kc, P){
     <div class="bars" id="calc-food"></div>
     ${meals}
     <div class="sub">Day totals</div>
-    <div class="grid2">${txt("food.kcalTotal","Total calories from your app","Leave blank to add up the meals",{num:true})}${txt("food.proteinTotal","Total protein (g) from your app","Leave blank to add up the meals",{num:true})}</div>
+    <div class="small muted">Log in MyFitnessPal? Use <b>Paste from Apple Health</b> on the Food tab to fill these in.</div>
+    <div class="grid2">${txt("food.kcalTotal","Total calories from your app","Leave blank to add up the meals",{num:true})}${txt("food.proteinTotal","Total protein (g) from your app","Leave blank to add up the meals",{num:true})}${txt("food.carbsTotal","Total carbs (g)","optional",{num:true})}${txt("food.fatTotal","Total fat (g)","optional",{num:true})}</div>
     ${scale5("food.hunger","Hunger across the day","not hungry","starving")}
     ${txt("food.cravings","Cravings","What, and when?")}
     <div class="checks">${ck("food.creatine","Creatine 3–5 g")}${ck("food.vitd","Vitamin D 1,000–2,000 IU")}${ck("food.logged","Logged everything in the app")}</div>
@@ -1390,6 +1411,51 @@ const SHOP = [
   ["Supplements", ["Creatine monohydrate","Vitamin D3"]]
 ];
 const isMass = f => f.unit === "g" || f.unit === "ml";
+/* nutrients: [kcal, protein g, carbs g, fat g, fiber g, sodium mg, potassium mg, calcium mg, iron mg, magnesium mg, zinc mg, vitamin D µg, B12 µg, vitamin C mg]
+   per 100 g (or 100 ml) for foods weighed in g/ml, per piece for everything else. Typical values for plain grocery-store versions. */
+const NKEYS = ["kcal","p","c","f","fib","na","k","ca","fe","mg","zn","vd","b12","vc"];
+const NU = {
+  chicken:[185,25,0,9.4,0,95,250,12,1.2,24,2.4,0.1,0.5,0], beef:[272,26,0,18,0,80,330,20,2.6,22,6.2,0.1,2.7,0],
+  eggs:[72,6.3,0.4,4.8,0,71,69,28,0.9,6,0.65,1.0,0.45,0], tuna:[130,29,0,1,0,340,280,15,1.8,35,1.0,2.0,3.0,0],
+  whey:[120,24,3,1.5,0,60,150,120,0.5,20,0.5,0,0.3,0], greek:[59,10.2,3.6,0.4,0,36,141,110,0.1,11,0.5,0,0.75,0],
+  cottage:[82,11,4,2.3,0,330,125,100,0.15,9,0.5,0,0.5,0], lentils:[113,8,19,0.4,7.5,180,300,20,3.0,30,1.2,0,0,1],
+  milk:[44,3.6,5,1,0,44,155,125,0.03,12,0.4,1.0,0.5,0], rice:[130,2.7,28.2,0.3,0.4,1,35,10,0.2,12,0.5,0,0,0],
+  potato:[87,1.9,20.1,0.1,1.8,4,379,5,0.3,22,0.3,0,0,13], oats:[379,13.2,67.7,6.5,10.1,6,362,52,4.3,138,3.6,0,0,0],
+  bread:[90,4,15,1.2,2.2,160,85,50,0.9,24,0.6,0,0,0], veg:[65,2.9,13.1,0.2,4.4,35,169,25,0.8,22,0.5,0,0,3],
+  peas:[50,3.1,10.1,0.4,3.1,68,157,23,0.9,16,0.5,0,0,8], berries:[50,0.7,12,0.4,2.7,1,70,10,0.3,8,0.1,0,0,15],
+  apple:[95,0.5,25,0.3,4.4,2,195,11,0.2,9,0.1,0,0,8.4], banana:[105,1.3,27,0.4,3.1,1,422,6,0.3,32,0.2,0,0,10.3],
+  pb:[95,3.5,3.5,8,0.8,70,105,7,0.3,27,0.4,0,0,0], oil:[40,0,0,4.5,0,0,0,0,0,0,0,0,0,0],
+  butter:[34,0,0,3.8,0,30,1,1,0,0,0,0,0.01,0], cheese:[403,24.9,1.3,33,0,621,98,721,0.7,28,3.1,0.6,0.83,0],
+  popcorn:[31,1,6.2,0.4,1.2,1,26,1,0.3,12,0.3,0,0,0], jello:[10,0.2,0,0,0,45,0,0,0,0,0,0,0,0]
+};
+FOODS.forEach(f => { const r = NU[f.id]; if (r){ f.k = isMass(f) ? r[0] / 100 : r[0]; f.p = isMass(f) ? r[1] / 100 : r[1]; } });
+const NUTS = [
+  {k:"p", l:"Protein", u:"g", g:"macro"}, {k:"c", l:"Carbs", u:"g", g:"macro"}, {k:"f", l:"Fat", u:"g", g:"macro"}, {k:"fib", l:"Fiber", u:"g", g:"macro"},
+  {k:"na", l:"Sodium", u:"mg", g:"micro", limit:true}, {k:"k", l:"Potassium", u:"mg", g:"micro"}, {k:"ca", l:"Calcium", u:"mg", g:"micro"},
+  {k:"fe", l:"Iron", u:"mg", g:"micro"}, {k:"mg", l:"Magnesium", u:"mg", g:"micro"}, {k:"zn", l:"Zinc", u:"mg", g:"micro"},
+  {k:"vd", l:"Vitamin D", u:"µg", g:"micro"}, {k:"b12", l:"Vitamin B12", u:"µg", g:"micro"}, {k:"vc", l:"Vitamin C", u:"mg", g:"micro"}
+];
+/* daily targets for a man aged 19–30 (US/Canada Dietary Reference Intakes); sodium is an upper limit */
+const DRI = { fib:38, na:2300, k:3400, ca:1000, fe:8, mg:400, zn:11, vd:15, b12:2.4, vc:90 };
+const firstNum = v => { const m = String(v ?? "").match(/\d+(\.\d+)?/); return m ? Number(m[0]) : null; };
+function nutTargets(){
+  const ph = phaseOf(draft); const P = PH[ph];
+  return Object.assign({ p: toNum(P.p) || firstNum(P.p) || 170, c: firstNum(P.carbs), f: firstNum(P.fat) }, DRI);
+}
+function nutOf(id, amt){ const f = FOOD_BY[id], r = NU[id], o = {}; NKEYS.forEach((k, i) => { o[k] = f && r ? (isMass(f) ? r[i] * amt / 100 : r[i] * amt) : 0; }); return o; }
+function sumNut(items){ const o = {}; NKEYS.forEach(k => o[k] = 0); (items || []).forEach(it => { const n = nutOf(it.id, it.amt); NKEYS.forEach(k => { o[k] += n[k]; }); }); return o; }
+const nfmt = (v, u) => `${v >= 100 ? fmt(v) : v >= 10 ? fmt(v, 0) : fmt(v, 1).replace(/\.0$/, "")} ${u}`;
+function nutLine(n, mode){
+  if (mode === "macro") return `Protein ${nfmt(n.p, "g")} · Carbs ${nfmt(n.c, "g")} · Fat ${nfmt(n.f, "g")} · Fiber ${nfmt(n.fib, "g")}`;
+  if (mode === "micro") return NUTS.filter(z => z.g === "micro").map(z => `${z.l} ${nfmt(n[z.k], z.u)}`).join(" · ");
+  return `${fmt(n.kcal)} kcal · ${nfmt(n.p, "g")} protein`;
+}
+function nutRows(n, keys, T, ofLabel){
+  return `<div class="nrows">${NUTS.filter(z => keys.includes(z.k)).map(z => { const t = T[z.k]; const v = n[z.k] || 0; const pct = t ? Math.min(100, v / t * 100) : 0;
+    const cls = z.limit ? (v > t ? " over" : " limit") : (t && v > t * 1.15 && (z.k === "f" || z.k === "c") ? " over" : "");
+    return `<div class="nrow"><span class="nl">${z.l}</span><span class="nv">${nfmt(v, z.u)}${t ? ` <span class="muted">/ ${nfmt(t, z.u)}${z.limit ? " limit" : ""}${ofLabel ? ` · ${Math.round(v / t * 100)}%` : ""}</span>` : ""}</span>${t ? `<div class="track"><div class="fill${cls}" style="width:${pct}%"></div></div>` : ""}</div>`; }).join("")}</div>`;
+}
+let nutMode = ls.get("rt10-nutmode") || "basic", dayNutMode = ls.get("rt10-daynut") || "macro", healthOpen = false;
 function amtLabel(f, amt){ const a = fmtW(amt); if (isMass(f)) return `${a} ${f.unit}`; return `${a} ${amt === 1 ? f.unit : (f.pl || f.unit + "s")}`; }
 function itemText(f, amt){ return f.self ? amtLabel(f, amt) : `${amtLabel(f, amt)} ${f.sn}`; }
 function plateTotals(items){ return items.reduce((a, it) => { const f = FOOD_BY[it.id]; if (f){ a.k += f.k * it.amt; a.p += f.p * it.amt; } return a; }, { k:0, p:0 }); }
@@ -1408,7 +1474,7 @@ function defaultSlot(){
 function dayFuel(){
   const ph = phaseOf(draft), plan = dayPlan(ph, curDate, draft);
   const K = targetKcal(ph, plan.reset), PT = toNum(PH[ph].p) || 170; const ft = foodTotals(draft);
-  return { ph, K, PT, k: ft.kcal || 0, p: ft.protein || 0 };
+  return { ph, K, PT, k: ft.kcal || 0, p: ft.protein || 0, ft };
 }
 function slotTargets(slot){
   const F = dayFuel(); const remK = F.K - F.k, remP = F.PT - F.p;
@@ -1434,13 +1500,15 @@ function suggestions(slot){
   if (tg.remK <= 80) return { tg, list: [] };
   return { tg, list: TEMPLATES.filter(t => t.slots.includes(slot)).map(t => buildTemplate(t, tg.k, tg.p)).sort((a, b) => a.score - b.score).slice(0, 3) };
 }
-function logToSlot(slot, text, k, p){
+function dayItems(d){ return MEALS.flatMap(([id]) => (((d.meals || {})[id] || {}).items) || []); }
+function logToSlot(slot, text, n, items){
   const m = clone(getP(draft, `meals.${slot}`) || {});
+  const add = (key, v) => { if (v === null || v === undefined || !Number.isFinite(v)) return; m[key] = String(Math.round((toNum(m[key]) || 0) + v)); };
   m.text = has(m.text) ? `${m.text}; ${text}` : text;
-  m.kcal = String(Math.round((toNum(m.kcal) || 0) + k));
-  m.protein = String(Math.round((toNum(m.protein) || 0) + p));
+  add("kcal", n.kcal); add("protein", n.p); add("carbs", n.c); add("fat", n.f);
+  if (items && items.length) m.items = (Array.isArray(m.items) ? m.items : []).concat(items.map(it => ({ id: it.id, amt: it.amt })));
   setP(draft, `meals.${slot}`, m); markDirty();
-  showToast(`Added to ${SLOTNAME[slot]}: ${fmt(k)} kcal, ${fmt(p)} g protein. Rate it on the Today tab.`);
+  showToast(`Added to ${SLOTNAME[slot]}: ${fmt(n.kcal)} kcal, ${fmt(n.p)} g protein. Rate it on the Today tab.`);
 }
 function renderFood(){
   if (!plate.slot) plate.slot = defaultSlot();
@@ -1457,9 +1525,10 @@ function renderFood(){
       <li>Hungry and drained for more than a few days running? Tell Claude. It may be time for a reset week.</li></ul></div>`;
   renderFuel(); renderBuilder(); renderFavs(); renderShop();
 }
+const SHORTCUT_TEXT = "R10 date=[Current Date] kcal=[kcal] protein=[protein] carbs=[carbs] fat=[fat] fiber=[fiber] sodium=[sodium] steps=[steps]";
 function renderFuel(){
   const el = document.getElementById("fuelCard"); if (!el) return;
-  const F = dayFuel(); const meals = draft.meals || {};
+  const F = dayFuel(); const meals = draft.meals || {}; const fo = draft.food || {};
   const remK = F.K - F.k, remP = F.PT - F.p;
   const open = MAIN_SLOTS.filter(id => !has((meals[id] || {}).kcal));
   const bar = (v, t) => { const pct = t ? Math.min(100, v / t * 100) : 0; return `<div class="track"><div class="fill${v > t * 1.05 ? " over" : ""}" style="width:${pct}%"></div></div>`; };
@@ -1468,6 +1537,16 @@ function renderFuel(){
   else if (F.p >= F.PT) hint = "Protein's done for today. Fill the rest with carbs and veg.";
   else if (open.length) hint = `${open.length} meal${open.length > 1 ? "s" : ""} left: aim for about ${fmt(remP / open.length)} g protein and ${fmt(remK / open.length)} kcal each.`;
   else hint = `All four meals are in. ${fmt(remP)} g protein to go: cottage cheese, Greek yogurt or a whey shake closes it.`;
+  /* day nutrients */
+  const T = nutTargets(); const items = dayItems(draft); const fromItems = sumNut(items);
+  const dn = Object.assign({}, fromItems, { kcal: F.k, p: F.p, c: F.ft.carbs !== null ? F.ft.carbs : fromItems.c, f: F.ft.fat !== null ? F.ft.fat : fromItems.f });
+  if (has(fo.fiberTotal)) dn.fib = toNum(fo.fiberTotal) || 0;
+  if (has(fo.sodiumTotal)) dn.na = toNum(fo.sodiumTotal) || 0;
+  const mealsLogged = MEALS.filter(([id]) => has((meals[id] || {}).kcal) || has((meals[id] || {}).text)).length;
+  const mealsBuilt = MEALS.filter(([id]) => ((meals[id] || {}).items || []).length).length;
+  const cover = dayNutMode === "micro" ? `Counts foods added with the plate builder or favorites (${mealsBuilt} of ${mealsLogged} meal${mealsLogged === 1 ? "" : "s"} today)${has(fo.sodiumTotal) ? ", plus sodium from Apple Health" : ""}. Vitamin D doesn't include your supplement (1,000–2,000 IU = 25–50 µg).`
+    : `Carbs and fat come from your meals${fo.source ? " and Apple Health" : ""}. Targets are this phase's: ${T.c ? fmt(T.c) + " g carbs" : "no carb target"}, ${T.f ? fmt(T.f) + " g fat" : "no fat target"}, 38 g fiber.`;
+  const imported = fo.source === "Apple Health" && fo.importedAt;
   el.innerHTML = `<div class="eyebrow" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600">Fuel · ${esc(fmtLong(curDate))}</div>
     <div class="fuelrow">
       <div class="fuelnum"><small>Calories</small><strong>${fmt(F.k)}</strong><span>of ${fmt(F.K)} kcal</span></div>
@@ -1475,43 +1554,72 @@ function renderFuel(){
     </div>
     <div class="bars"><div class="bar">${bar(F.k, F.K)}</div><div class="bar">${bar(F.p, F.PT)}</div></div>
     <div class="leftline">Left today: <b>${fmt(Math.max(0, remK))} kcal</b> · <b>${fmt(Math.max(0, remP))} g protein</b></div>
+    ${imported ? `<div class="notice">Totals from MyFitnessPal via Apple Health, pasted ${esc(fmtDate(fo.importedAt.slice(0, 10)))} at ${endS(clock(hm(new Date(fo.importedAt).toTimeString().slice(0, 5))))} <button type="button" class="textbtn" data-fa="healthclear" style="margin-left:4px">Use my meals instead</button></div>` : ""}
     <div class="pips" role="group" aria-label="Protein per meal">${MAIN_SLOTS.map(id => { const m = meals[id] || {}; const pv = toNum(m.protein); const logged = has(m.kcal) || pv !== null;
       return `<button type="button" class="pip${pv !== null && pv >= 40 ? " ok" : logged ? " part" : ""}${plate.slot === id ? " sel" : ""}" data-fa="slot" data-slot="${id}"><span>${SLOTNAME[id]}</span><b>${pv !== null ? fmt(pv) + " g" : "–"}</b></button>`; }).join("")}</div>
-    <div class="small muted">${esc(hint)} Each box fills in green at 40 g protein.</div>`;
+    <div class="small muted">${esc(hint)} Each box fills in green at 40 g protein.</div>
+    <details class="daynut" ${ls.get("rt10-daynut-open") ? "open" : ""}><summary><span>Nutrients today</span><span class="chev" aria-hidden="true"></span></summary>
+      <div class="nmode" role="group" aria-label="Show"><button type="button" data-fa="dmode" data-m="macro" aria-pressed="${dayNutMode === "macro"}">Macros</button><button type="button" data-fa="dmode" data-m="micro" aria-pressed="${dayNutMode === "micro"}">Micronutrients</button></div>
+      <div style="margin-top:10px">${dayNutMode === "micro" ? nutRows(dn, ["na","k","ca","fe","mg","zn","vd","b12","vc"], T) : nutRows(dn, ["p","c","f","fib"], T)}</div>
+      <div class="small muted" style="margin-top:8px">${esc(cover)}</div>
+    </details>
+    <div class="row"><button type="button" class="btn ghost" data-fa="health">Paste from Apple Health</button><button type="button" class="textbtn" data-fa="healthhelp">${healthOpen ? "Hide setup" : "Use MyFitnessPal? Set it up"}</button></div>
+    <div id="healthMsg" class="small muted" role="status"></div>
+    <div id="healthPaste" hidden><label class="f"><span>Paste the text from your shortcut here</span><textarea id="healthTxt" rows="2" placeholder="R10 date=2026-10-19 kcal=2280 protein=178 …"></textarea></label><div class="row"><button type="button" class="btn" data-fa="healthparse">Import</button></div></div>
+    ${healthOpen ? `<div class="healthbox">
+      <b>Bring in your MyFitnessPal totals (about 5 minutes to set up)</b>
+      <ol>
+        <li><b>MyFitnessPal:</b> More → Apps & Devices → Apple Health. Turn on writing for Dietary Energy, Protein, Carbohydrates and Total Fat (also Fiber and Sodium if offered). Log a meal, then check Health → Browse → Nutrition to make sure it arrived.</li>
+        <li><b>Shortcuts app:</b> tap + and name the shortcut <b>Road to 10%</b>.</li>
+        <li>Add <b>Find Health Samples</b>. Set Type to <b>Dietary Energy</b>, add the filter <b>Start Date is today</b>, set Group By to <b>Day</b>, and turn Fill Missing off. Then add <b>Set Variable</b> named <b>kcal</b>.</li>
+        <li>Repeat step 3 for <b>Protein</b> (variable <b>protein</b>), <b>Carbohydrates</b> (<b>carbs</b>), <b>Total Fat</b> (<b>fat</b>), and if you like <b>Fiber</b>, <b>Sodium</b> and <b>Steps</b>.</li>
+        <li>Add a <b>Text</b> action and type the line below, inserting each variable where its name is in brackets. For Current Date, tap it and choose a custom format of <b>yyyy-MM-dd</b>.</li>
+        <li>Add <b>Copy to Clipboard</b>. Done.</li>
+        <li>Each night after logging in MyFitnessPal: run the shortcut (from a widget, Siri, or Back Tap in Settings → Accessibility → Touch), open this app and tap <b>Paste from Apple Health</b>.</li>
+      </ol>
+      <div class="codeline" id="scText">${esc(SHORTCUT_TEXT)}</div>
+      <div class="row"><button type="button" class="textbtn" data-fa="copysc">Copy this line</button></div>
+      <div class="small muted">Anything you leave out is skipped. Pasted totals replace the meal sums for that day; tap "Use my meals instead" to undo. MyFitnessPal shares meal totals, not single foods, so micronutrients other than fiber and sodium still come from the plate builder.</div>
+    </div>` : ""}`;
 }
 function renderBuilder(){
   const el = document.getElementById("builder"); if (!el) return;
-  const slot = plate.slot || defaultSlot(); const tot = plateTotals(plate.items); const F = dayFuel();
-  const suggHTML = lastSugg ? (lastSugg.list.length ? `<div class="suggs">${lastSugg.list.map((z, i) => `<div class="sugg-card"><b>${esc(z.n)}</b><div class="small">${esc(plateText(z.items))}</div><div class="small muted">${fmt(z.k)} kcal · ${fmt(z.p)} g protein</div><div><button type="button" class="textbtn" data-fa="use" data-si="${i}">Use this plate</button></div></div>`).join("")}</div><div class="small muted">Sized to fit what's left today: about ${fmt(lastSugg.tg.k)} kcal and ${fmt(lastSugg.tg.p)} g protein for this meal.</div>`
+  const slot = plate.slot || defaultSlot(); const F = dayFuel(); const T = nutTargets();
+  const tn = sumNut(plate.items);
+  const suggHTML = lastSugg ? (lastSugg.list.length ? `<div class="suggs">${lastSugg.list.map((z, i) => `<div class="sugg-card"><b>${esc(z.n)}</b><div class="small">${esc(plateText(z.items))}</div><div class="small muted">${esc(nutLine(sumNut(z.items), nutMode))}</div><div><button type="button" class="textbtn" data-fa="use" data-si="${i}">Use this plate</button></div></div>`).join("")}</div><div class="small muted">Sized to fit what's left today: about ${fmt(lastSugg.tg.k)} kcal and ${fmt(lastSugg.tg.p)} g protein for this meal.</div>`
     : `<div class="notice">You're at or over today's calories, so there's nothing to suggest. If you're hungry, see the tips at the bottom.</div>`) : "";
+  const totBlock = nutMode === "macro" ? `<span>This plate</span><strong>${fmt(tn.kcal)} kcal</strong>${nutRows(tn, ["p","c","f","fib"], T, true)}<span class="muted small">Bars show this plate's share of your daily targets.</span>`
+    : nutMode === "micro" ? `<span>This plate</span><strong>${fmt(tn.kcal)} kcal</strong>${nutRows(tn, ["na","k","ca","fe","mg","zn","vd","b12","vc"], T, true)}<span class="muted small">Share of a day's needs. Sodium is a limit, so lower is fine.</span>`
+    : `<span>This plate</span><strong>${fmt(tn.kcal)} kcal · ${fmt(tn.p)} g protein</strong><span class="muted">After it: ${fmt(F.k + tn.kcal)} of ${fmt(F.K)} kcal · ${fmt(F.p + tn.p)} of ${F.PT} g protein</span>`;
   el.innerHTML = `<h2>Build a plate</h2>
     <div class="chips" role="group" aria-label="Meal">${MEALS.map(([id]) => `<button type="button" class="chip" data-fa="slot" data-slot="${id}" aria-pressed="${slot === id}">${SLOTNAME[id]}</button>`).join("")}</div>
     <div class="row"><button type="button" class="btn" data-fa="suggest">Suggest a ${esc(SLOTNAME[slot].toLowerCase())}</button><span class="small muted">sized to what you have left</span></div>
     ${suggHTML}
     <div class="sub">Tap a food to add it</div>
     ${FOOD_CATS.map(([c, l]) => `<div class="foodcat"><div class="small muted" style="font-weight:600">${l}</div><div class="chips">${FOODS.filter(f => f.c === c).map(f => `<button type="button" class="chip" data-fa="add" data-id="${f.id}" aria-pressed="${plate.items.some(it => it.id === f.id)}">${esc(f.chip)}</button>`).join("")}</div></div>`).join("")}
-    <div class="sub">Your plate</div>
-    ${plate.items.length ? `<div class="platelist">${plate.items.map((it, i) => { const f = FOOD_BY[it.id]; return `<div class="plate-it"><div class="nm">${esc(f.chip)}<small>${fmt(f.k * it.amt)} kcal · ${fmt(f.p * it.amt, 1).replace(/\.0$/, "")} g protein</small></div>
+    <div class="row" style="justify-content:space-between;margin-top:6px"><div class="sub" style="margin:0">Your plate</div>
+      <div class="nmode" role="group" aria-label="Nutrients to show"><button type="button" data-fa="nmode" data-m="basic" aria-pressed="${nutMode === "basic"}">Basics</button><button type="button" data-fa="nmode" data-m="macro" aria-pressed="${nutMode === "macro"}">Macros</button><button type="button" data-fa="nmode" data-m="micro" aria-pressed="${nutMode === "micro"}">Micros</button></div></div>
+    ${plate.items.length ? `<div class="platelist">${plate.items.map((it, i) => { const f = FOOD_BY[it.id]; return `<div class="plate-it"><div class="nm">${esc(f.chip)}<span class="nutline">${esc(nutLine(nutOf(it.id, it.amt), nutMode))}</span></div>
       <div class="stepper"><button type="button" data-fa="dec" data-i="${i}" aria-label="Less ${esc(f.chip)}">−</button><span>${esc(amtLabel(f, it.amt))}</span><button type="button" data-fa="inc" data-i="${i}" aria-label="More ${esc(f.chip)}">+</button></div>
       <button type="button" class="rmx" data-fa="rm" data-i="${i}" aria-label="Remove ${esc(f.chip)}">✕</button></div>`; }).join("")}</div>
-      <div class="plate-tot"><span>This plate</span><strong>${fmt(tot.k)} kcal · ${fmt(tot.p)} g protein</strong><span class="muted">After it: ${fmt(F.k + tot.k)} of ${fmt(F.K)} kcal · ${fmt(F.p + tot.p)} of ${F.PT} g protein</span></div>
+      <div class="plate-tot">${totBlock}</div>
       <div class="row"><button type="button" class="btn" data-fa="log">Add to ${esc(SLOTNAME[slot])}</button><button type="button" class="btn ghost" data-fa="fav">★ Save as favorite</button><button type="button" class="textbtn" data-fa="clear">Clear</button></div>`
-      : `<p class="empty">Your plate is empty. Tap foods above, or ask for a suggestion.</p>`}
-    <p class="small muted" style="margin:0">Numbers are estimates for typical grocery-store versions. Your food app or the label is more exact.</p>`;
+      : `<p class="empty">Your plate is empty. Tap foods above, or ask for a suggestion. Switch between Basics, Macros and Micros to see what each food gives you.</p>`}
+    <p class="small muted" style="margin:0">Nutrition numbers are estimates for typical grocery-store versions. Your food app or the label is more exact.</p>`;
 }
 function lovedMeals(){
   const seen = new Set(), out = [];
   const ds = sortedDates().reverse().slice(0, 120);
   for (const d of ds){ const e = entryFor(d) || {}; for (const [id] of MEALS){ const m = (e.meals || {})[id]; if (!m || m.liked !== "loved" || !has(m.text)) continue;
     const key = String(m.text).trim().toLowerCase(); if (seen.has(key)) continue; seen.add(key);
-    out.push({ text: String(m.text).trim(), k: toNum(m.kcal) || 0, p: toNum(m.protein) || 0, slot: id, d }); if (out.length >= 8) return out; } }
+    out.push({ text: String(m.text).trim(), k: toNum(m.kcal) || 0, p: toNum(m.protein) || 0, c: toNum(m.carbs), f: toNum(m.fat), items: Array.isArray(m.items) ? m.items : null, slot: id, d }); if (out.length >= 8) return out; } }
   return out;
 }
 function renderFavs(){
   const el = document.getElementById("favCard"); if (!el) return;
   const favs = store.settings.favs || []; lovedCache = lovedMeals(); const slot = plate.slot || defaultSlot();
   el.innerHTML = `<h2>Favorites</h2>
-    ${favs.length ? `<div>${favs.map((f, i) => `<div class="favrow"><div class="t">${esc(f.name)}</div><div class="d">${esc(f.text)} · ${fmt(f.k)} kcal · ${fmt(f.p)} g</div><div class="acts"><button type="button" class="textbtn" data-fa="favlog" data-i="${i}">Log to ${esc(SLOTNAME[slot])}</button><button type="button" class="rmx" data-fa="favdel" data-i="${i}" aria-label="Delete favorite">✕</button></div></div>`).join("")}</div>` : `<p class="empty">Build a plate you like and tap ★ Save as favorite. It shows up here for one-tap logging.</p>`}
+    ${favs.length ? `<div>${favs.map((f, i) => `<div class="favrow"><div class="t">${esc(f.name)}</div><div class="d">${esc(f.text)} · ${esc(f.items ? nutLine(sumNut(f.items), nutMode) : `${fmt(f.k)} kcal · ${fmt(f.p)} g`)}</div><div class="acts"><button type="button" class="textbtn" data-fa="favlog" data-i="${i}">Log to ${esc(SLOTNAME[slot])}</button><button type="button" class="rmx" data-fa="favdel" data-i="${i}" aria-label="Delete favorite">✕</button></div></div>`).join("")}</div>` : `<p class="empty">Build a plate you like and tap ★ Save as favorite. It shows up here for one-tap logging.</p>`}
     <h3 style="font-size:18px;margin-top:6px">Meals you loved</h3>
     ${lovedCache.length ? `<div>${lovedCache.map((m, i) => `<div class="favrow"><div class="t">${esc(SLOTNAME[m.slot])} · ${fmtDate(m.d)}</div><div class="d">${esc(m.text)}${m.k ? ` · ${fmt(m.k)} kcal` : ""}${m.p ? ` · ${fmt(m.p)} g` : ""}</div><div class="acts"><button type="button" class="textbtn" data-fa="lovedlog" data-i="${i}">Log to ${esc(SLOTNAME[slot])}</button></div></div>`).join("")}</div>` : `<p class="empty">Meals you rate "Loved it" on the Today tab land here so you can eat them again with one tap.</p>`}`;
 }
@@ -1520,25 +1628,63 @@ function renderShop(){
   const got = store.settings.shop || {}; const n = Object.values(got).filter(Boolean).length;
   el.innerHTML = `<div class="row" style="justify-content:space-between"><h2>Shopping list</h2>${n ? `<button type="button" class="textbtn" data-fa="shopclear">Uncheck all (${n})</button>` : ""}</div>
     <div class="small muted">Superstore, No Frills, Walmart or Co-op. Buy shelf-stable and frozen in bulk every 3 weeks; use PC Optimum and Flipp for meat sales.</div>
-    <div class="shop">${SHOP.map(([cat, items]) => `<h4>${cat}</h4>${items.map(it => `<label class="ck${got[it] ? " done" : ""}"><input type="checkbox" data-shop="${esc(it)}" ${got[it] ? "checked" : ""}>${esc(it)}</label>`).join("")}`).join("")}</div>`;
+    <div class="shop">${SHOP.map(([cat, list]) => `<h4>${cat}</h4>${list.map(it => `<label class="ck${got[it] ? " done" : ""}"><input type="checkbox" data-shop="${esc(it)}" ${got[it] ? "checked" : ""}>${esc(it)}</label>`).join("")}`).join("")}</div>`;
+}
+function parseHealthText(t){
+  const str = String(t || ""); if (!/\b(kcal|calories|energy|protein|carbs|fat|steps)\s*[=:]/i.test(str)) return null;
+  const get = keys => { for (const k of keys){ const m = str.match(new RegExp("\\b" + k + "\\s*[=:]\\s*(-?[\\d][\\d.,]*)", "i")); if (m){ const v = Number(m[1].replace(/,/g, "")); if (Number.isFinite(v)) return v; } } return null; };
+  const o = { date: (str.match(/\b(20\d\d-\d\d-\d\d)\b/) || [])[1] || null, kcal: get(["kcal","calories","energy"]), protein: get(["protein"]), carbs: get(["carbs","carbohydrates"]), fat: get(["fat"]), fiber: get(["fiber","fibre"]), sodium: get(["sodium"]), steps: get(["steps"]) };
+  return [o.kcal, o.protein, o.carbs, o.fat, o.steps].some(v => v !== null) ? o : null;
+}
+async function applyHealth(o){
+  const date = o.date || curDate; const r = v => String(Math.round(v));
+  await patchDay(date, e => {
+    if (o.kcal !== null) setP(e, "food.kcalTotal", r(o.kcal));
+    if (o.protein !== null) setP(e, "food.proteinTotal", r(o.protein));
+    if (o.carbs !== null) setP(e, "food.carbsTotal", r(o.carbs));
+    if (o.fat !== null) setP(e, "food.fatTotal", r(o.fat));
+    if (o.fiber !== null) setP(e, "food.fiberTotal", r(o.fiber));
+    if (o.sodium !== null) setP(e, "food.sodiumTotal", r(o.sodium));
+    if (o.steps !== null) setP(e, "cardio.steps", r(o.steps));
+    if ([o.kcal, o.protein, o.carbs, o.fat].some(v => v !== null)){ setP(e, "food.source", "Apple Health"); setP(e, "food.importedAt", new Date().toISOString()); }
+  });
+  const parts = [o.kcal !== null ? `${fmt(o.kcal)} kcal` : null, o.protein !== null ? `${fmt(o.protein)} g protein` : null, o.carbs !== null ? `${fmt(o.carbs)} g carbs` : null, o.fat !== null ? `${fmt(o.fat)} g fat` : null, o.steps !== null ? `${fmt(o.steps)} steps` : null].filter(Boolean);
+  showToast(`Pasted for ${fmtDate(date)}: ${parts.join(", ")}.`);
+  if (date !== curDate){ await flush(); curDate = date; loadDraft(); }
+  renderFood();
 }
 function onFoodAction(b){
   const a = b.dataset.fa; const i = Number(b.dataset.i);
   if (a === "slot"){ plate.slot = b.dataset.slot; lastSugg = null; savePlate(); renderFuel(); renderBuilder(); renderFavs(); if (b.classList.contains("pip")) document.getElementById("builder").scrollIntoView({ behavior:"smooth", block:"start" }); return; }
+  if (a === "nmode"){ nutMode = b.dataset.m; ls.set("rt10-nutmode", nutMode); renderBuilder(); renderFavs(); return; }
+  if (a === "dmode"){ dayNutMode = b.dataset.m; ls.set("rt10-daynut", dayNutMode); ls.set("rt10-daynut-open", true); renderFuel(); return; }
+  if (a === "healthhelp"){ healthOpen = !healthOpen; renderFuel(); return; }
+  if (a === "copysc"){ navigator.clipboard.writeText(SHORTCUT_TEXT).then(() => showToast("Copied. Paste it into the Text action.")).catch(() => showToast("Copy was blocked. Press and hold the line to copy it.")); return; }
+  if (a === "health"){
+    const box = document.getElementById("healthPaste"); const msg = document.getElementById("healthMsg");
+    const fallback = why => { box.hidden = false; msg.textContent = why; };
+    if (!navigator.clipboard || !navigator.clipboard.readText){ fallback("Paste the shortcut's text into the box below."); return; }
+    navigator.clipboard.readText().then(t => { const o = parseHealthText(t); if (o) applyHealth(o); else fallback("The clipboard doesn't have your shortcut's text. Run the Road to 10% shortcut first, or paste the text below."); })
+      .catch(() => fallback("Couldn't read the clipboard. Paste the shortcut's text into the box below."));
+    return;
+  }
+  if (a === "healthparse"){ const o = parseHealthText(document.getElementById("healthTxt").value); if (o) applyHealth(o); else document.getElementById("healthMsg").textContent = "That text doesn't look like the shortcut's output. It should start with R10 and have values like kcal=2280."; return; }
+  if (a === "healthclear"){ ["kcalTotal","proteinTotal","carbsTotal","fatTotal","fiberTotal","sodiumTotal","source","importedAt"].forEach(k => setP(draft, "food." + k, "")); markDirty(); renderFood(); return; }
   if (a === "add"){ const f = FOOD_BY[b.dataset.id]; const ex = plate.items.find(z => z.id === f.id); if (ex) ex.amt = Math.min(f.max * 2, ex.amt + f.step); else plate.items.push({ id: f.id, amt: f.def }); }
   else if (a === "inc" || a === "dec"){ const it = plate.items[i]; if (!it) return; const f = FOOD_BY[it.id]; it.amt = Math.round((it.amt + (a === "inc" ? f.step : -f.step)) * 100) / 100; if (it.amt <= 0) plate.items.splice(i, 1); }
   else if (a === "rm") plate.items.splice(i, 1);
   else if (a === "clear") plate.items = [];
   else if (a === "suggest") lastSugg = suggestions(plate.slot || defaultSlot());
   else if (a === "use"){ const z = lastSugg && lastSugg.list[Number(b.dataset.si)]; if (z) plate.items = z.items.map(it => ({ id: it.id, amt: it.amt })); lastSugg = null; }
-  else if (a === "log"){ if (!plate.items.length) return; const t = plateTotals(plate.items); logToSlot(plate.slot, plateText(plate.items), t.k, t.p); plate.items = []; lastSugg = null; savePlate(); renderFuel(); renderBuilder(); return; }
+  else if (a === "log"){ if (!plate.items.length) return; logToSlot(plate.slot, plateText(plate.items), sumNut(plate.items), plate.items); plate.items = []; lastSugg = null; savePlate(); renderFuel(); renderBuilder(); return; }
   else if (a === "fav"){ if (!plate.items.length) return; const t = plateTotals(plate.items); store.settings.favs = (store.settings.favs || []).concat([{ name: plateName(plate.items), text: plateText(plate.items), k: Math.round(t.k), p: Math.round(t.p), items: plate.items.map(it => ({ id: it.id, amt: it.amt })) }]); saveSettings(); renderFavs(); showToast("Saved to favorites."); return; }
-  else if (a === "favlog"){ const f = (store.settings.favs || [])[i]; if (f){ logToSlot(plate.slot || defaultSlot(), f.text, f.k, f.p); renderFuel(); } return; }
+  else if (a === "favlog"){ const f = (store.settings.favs || [])[i]; if (f){ logToSlot(plate.slot || defaultSlot(), f.text, f.items ? sumNut(f.items) : { kcal: f.k, p: f.p }, f.items); renderFuel(); } return; }
   else if (a === "favdel"){ store.settings.favs = (store.settings.favs || []).filter((_, k) => k !== i); saveSettings(); renderFavs(); return; }
-  else if (a === "lovedlog"){ const m = lovedCache[i]; if (m){ logToSlot(plate.slot || defaultSlot(), m.text, m.k, m.p); renderFuel(); } return; }
+  else if (a === "lovedlog"){ const m = lovedCache[i]; if (m){ logToSlot(plate.slot || defaultSlot(), m.text, { kcal: m.k, p: m.p, c: m.c, f: m.f }, m.items); renderFuel(); } return; }
   else if (a === "shopclear"){ store.settings.shop = {}; saveSettings(); renderShop(); return; }
   savePlate(); renderBuilder();
 }
+$("#v-food").addEventListener("toggle", e => { if (e.target.classList && e.target.classList.contains("daynut")) ls.set("rt10-daynut-open", e.target.open); }, true);
 bindView($("#v-food"));
 $("#v-food").addEventListener("click", e => { const b = e.target.closest("[data-fa]"); if (b) onFoodAction(b); });
 $("#v-food").addEventListener("change", e => { const t = e.target; if (t.dataset && "shop" in t.dataset){ store.settings.shop = Object.assign({}, store.settings.shop || {}, { [t.dataset.shop]: t.checked }); saveSettings(); t.closest(".ck").classList.toggle("done", t.checked); const n = Object.values(store.settings.shop).filter(Boolean).length; if (!n || n === 1) renderShop(); } });
@@ -2026,7 +2172,7 @@ function dayText(d){
   if (sl.length || s.notes) L.push(`Sleep: ${sl.join(", ")}${s.notes ? ` — "${s.notes}"` : ""}`);
   if (has(e.weight)) L.push(`Weight: ${e.weight} lb`);
   const ft = foodTotals(e); const f = e.food || {};
-  const fl = [ft.kcal !== null ? `${fmt(ft.kcal)} kcal (target ${fmt(targetKcal(phaseId, plan.reset))})` : null, ft.protein !== null ? `${fmt(ft.protein)} g protein` : null, f.hunger ? `hunger ${f.hunger}/5` : null,
+  const fl = [ft.kcal !== null ? `${fmt(ft.kcal)} kcal (target ${fmt(targetKcal(phaseId, plan.reset))})` : null, ft.protein !== null ? `${fmt(ft.protein)} g protein` : null, ft.carbs !== null ? `${fmt(ft.carbs)} g carbs` : null, ft.fat !== null ? `${fmt(ft.fat)} g fat` : null, has(f.fiberTotal) ? `${f.fiberTotal} g fiber` : null, has(f.sodiumTotal) ? `${f.sodiumTotal} mg sodium` : null, f.source ? `totals from ${f.source}` : null, f.hunger ? `hunger ${f.hunger}/5` : null,
     f.creatine ? "creatine" : null, f.vitd ? "vit D" : null, has(f.alcohol) && toNum(f.alcohol) ? `${f.alcohol} drinks` : null, f.cravings ? `cravings: ${f.cravings}` : null].filter(Boolean);
   if (fl.length) L.push(`Food: ${fl.join(", ")}`);
   MEALS.forEach(([id, label]) => { const m = (e.meals || {})[id]; if (!m) return; const parts = [m.text, (has(m.kcal) || has(m.protein)) ? `(${has(m.kcal) ? m.kcal + " kcal" : ""}${has(m.kcal) && has(m.protein) ? ", " : ""}${has(m.protein) ? m.protein + " g P" : ""})` : null, m.liked ? RATE[m.liked] : null, m.full ? RATE[m.full] : null, m.felt ? `felt: ${m.felt}` : null].filter(Boolean); if (parts.length) L.push(`  ${label}: ${parts.join(" · ")}`); });
@@ -2062,7 +2208,7 @@ function shareText(){
 function csvAll(){
   const cols = ["date","phase","reset","weight","sleep_bed","sleep_wake","sleep_hours","sleep_latency_min","sleep_wakeups","sleep_quality","sleep_rested","sleep_notes",
     ...MEALS.flatMap(([id]) => [`${id}_what`,`${id}_kcal`,`${id}_protein`,`${id}_liked`,`${id}_fullness`,`${id}_felt`]),
-    "kcal_total","protein_total","hunger","cravings","creatine","vitamin_d","alcohol","food_notes",
+    "kcal_total","protein_total","carbs_total","fat_total","fiber_total","sodium_total","hunger","cravings","creatine","vitamin_d","alcohol","food_notes",
     "workout","workout_status","workout_min","energy_before","felt_after","effort","soreness","pain","exercise_log","workout_notes",
     "steps","cardio_option","cardio_status","cardio_min","cardio_rounds","cardio_rpe","walk_min","cardio_notes",
     "waist","cal_chest","cal_abs","cal_thigh","cal_sum","bf_est","neck","shoulders","chest","hips","arm","arm_flexed","forearm","thigh_r","thigh_l","calf_r","calf_l",
@@ -2075,7 +2221,7 @@ function csvAll(){
     const h = sleepHours(s.bed, s.wake);
     return [d, PH[ph].short, plan.reset ? "yes" : "", e.weight, s.bed, s.wake, h !== null ? h.toFixed(2) : "", s.latency, s.wakeups, s.quality, s.rested, s.notes,
       ...MEALS.flatMap(([id]) => { const x = (e.meals||{})[id] || {}; return [x.text, x.kcal, x.protein, x.liked ? RATE[x.liked] : "", x.full ? RATE[x.full] : "", x.felt]; }),
-      ft.kcal, ft.protein, f.hunger, f.cravings, f.creatine ? "yes" : "", f.vitd ? "yes" : "", f.alcohol, f.notes,
+      ft.kcal, ft.protein, ft.carbs, ft.fat, f.fiberTotal, f.sodiumTotal, f.hunger, f.cravings, f.creatine ? "yes" : "", f.vitd ? "yes" : "", f.alcohol, f.notes,
       plan.work ? plan.work.name : "rest", t.status, t.length, t.energyPre, t.feelAfter, t.effort ? RATE[t.effort] : "", t.soreness, t.pain, exlog, [t.feltNotes, t.swaps, t.extra].filter(Boolean).join(" | "),
       c.steps, c.ab, c.status, c.minutes, c.rounds, c.rpe, c.walkMin, [c.felt, c.notes].filter(Boolean).join(" | "),
       m.waist, m.cChest, m.cAbs, m.cThigh, sum !== null ? sum.toFixed(1) : "", sum !== null ? jp3(sum).toFixed(1) : "", m.neck, m.shoulders, m.chest, m.hips, m.armR, m.armF, m.forearm, m.thighR, m.thighL, m.calfR, m.calfL,
