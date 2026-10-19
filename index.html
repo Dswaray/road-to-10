@@ -568,16 +568,16 @@ const ls = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e
 /* ---------- the plan ---------- */
 const LEAD_START = "2026-10-19";
 const PH = {
-  lead:{ id:"lead", short:"Lead-in", name:"Lead-in · maintenance", range:"Step 1 · ends when you're ready, usually after 8–10 weeks of lifting", kcal:2800, p:"180", pMin:170, fat:"—", carbs:"—", reset:null, steps:"Build to 10,000", stepsN:10000, trend:"maint" },
-  p1:{ id:"p1", short:"Phase 1", name:"Phase 1 · 204 → 188 lb", range:"Step 2 · ends when your numbers say so", kcal:2300, p:"180", pMin:170, fat:"70 g", carbs:"~235 g", reset:2800, steps:"10,000", stepsN:10000,
+  lead:{ id:"lead", short:"Lead-in", name:"Lead-in · maintenance", range:"Step 1 · ends when you're ready, usually after 8–10 weeks of lifting", kcal:2800, p:"150–160", pT:160, pMin:150, fat:"—", carbs:"—", reset:null, steps:"Build to 10,000", stepsN:10000, trend:"maint" },
+  p1:{ id:"p1", short:"Phase 1", name:"Phase 1 · 204 → 188 lb", range:"Step 2 · ends when your numbers say so", kcal:2300, p:"150–160", pT:160, pMin:150, fat:"70 g", carbs:"~255 g", reset:2800, steps:"10,000", stepsN:10000,
        trend:{on:[1,1.5], fine:0.5, fast:1.75} },
-  p2:{ id:"p2", short:"Phase 2", name:"Phase 2 · 188 → 176 lb", range:"Step 3 · ends when your numbers say so", kcal:2250, p:"180", pMin:170, fat:"65 g", carbs:"~235 g", reset:2750, steps:"10,000", stepsN:10000,
+  p2:{ id:"p2", short:"Phase 2", name:"Phase 2 · 188 → 176 lb", range:"Step 3 · ends when your numbers say so", kcal:2250, p:"150–160", pT:160, pMin:150, fat:"65 g", carbs:"~255 g", reset:2750, steps:"10,000", stepsN:10000,
        trend:{on:[0.75,1.25], fine:0.5, fast:1.5} },
-  p3:{ id:"p3", short:"Phase 3", name:"Phase 3 · 176 → 166 lb", range:"Step 4 · ends when your numbers say so", kcal:2200, p:"180", pMin:170, fat:"60 g", carbs:"~235 g", reset:2700, steps:"10,000", stepsN:10000,
+  p3:{ id:"p3", short:"Phase 3", name:"Phase 3 · 176 → 166 lb", range:"Step 4 · ends when your numbers say so", kcal:2200, p:"150–160", pT:160, pMin:150, fat:"60 g", carbs:"~255 g", reset:2700, steps:"10,000", stepsN:10000,
        trend:{on:[0.75,1.25], fine:0.5, fast:1.5} },
-  p4:{ id:"p4", short:"Phase 4", name:"Phase 4 · 166 lb → 10% body fat", range:"Step 5 · ends at 10% body fat", kcal:2150, p:"180", pMin:170, fat:"60 g", carbs:"~220 g", reset:2500, steps:"12,000", stepsN:12000,
+  p4:{ id:"p4", short:"Phase 4", name:"Phase 4 · 166 lb → 10% body fat", range:"Step 5 · ends at 10% body fat", kcal:2150, p:"150–160", pT:160, pMin:150, fat:"60 g", carbs:"~240 g", reset:2500, steps:"12,000", stepsN:12000,
        trend:{on:[0.5,1], fine:0.4, fast:1.25} },
-  after:{ id:"after", short:"After the cut", name:"After the cut · live at 10–12%", range:"Step 6 · from the finish line on", kcal:null, p:"160–180", pMin:160, fat:"70–80 g", carbs:"the rest", reset:null, steps:"10,000–12,000", stepsN:10000, trend:"maint" }
+  after:{ id:"after", short:"After the cut", name:"After the cut · live at 10–12%", range:"Step 6 · from the finish line on", kcal:null, p:"150–160", pT:160, pMin:150, fat:"70–80 g", carbs:"the rest", reset:null, steps:"10,000–12,000", stepsN:10000, trend:"maint" }
 };
 const PH_ORDER = ["lead","p1","p2","p3","p4","after"];
 const SCHED = {
@@ -725,7 +725,7 @@ function dayPlan(phaseId, date, entry){
   const reset = isReset(entry || {date}, phaseId);
   if (reset){
     const kc = PH[phaseId].reset;
-    notes.unshift(`Reset week: eat ~${fmt(kc)} kcal (protein stays at 180 g). Same exercises at 60–70% of your usual weight, same reps. Zone 2 only, nothing hard.`);
+    notes.unshift(`Reset week: eat ~${fmt(kc)} kcal (protein stays at 150–160 g). Same exercises at 60–70% of your usual weight, same reps. Zone 2 only, nothing hard.`);
   }
   if (phaseId === "p4" || phaseId === "after") notes.push("Lean-up triceps sets start once your weekly average is 165 lb or less (no scale: after your first Phase 4 reset week).");
   const preStart = phaseId === "lead" && date < leadStart();
@@ -938,7 +938,7 @@ function foodSection(phaseId, kc, P){
   };
   const meals = MEALS.map(([id, label]) => `
     <div class="meal">
-      <div class="meal-h"><h4>${label}</h4><span>${id === "extra" ? "optional" : "aim for 40–55 g protein"}</span></div>
+      <div class="meal-h"><h4>${label}</h4><span>${id === "extra" ? "optional" : "aim for about 40 g protein"}</span></div>
       ${area(`meals.${id}.text`, "What I ate", mealPh[id])}
       <div class="grid2">${txt(`meals.${id}.kcal`,"Calories","",{num:true})}${txt(`meals.${id}.protein`,"Protein (g)","",{num:true})}${txt(`meals.${id}.carbs`,"Carbs (g)","optional",{num:true})}${txt(`meals.${id}.fat`,"Fat (g)","optional",{num:true})}</div>
       ${chips(`meals.${id}.liked`,"Did I like it?",[["loved","Loved it"],["ok","It was OK"],["no","Didn't like it"]])}
@@ -1044,7 +1044,7 @@ function updateDerived(){
   const st = wk.map(d => toNum(((entryFor(d) || {}).cardio || {}).steps)).filter(v => v !== null);
   if (el("calc-steps")) el("calc-steps").innerHTML = st.length ? `<strong>${fmt(st.reduce((a,b)=>a+b,0)/st.length)}</strong><span class="muted small">over ${st.length} day${st.length>1?"s":""}</span>` : `<span class="muted small">No steps logged this week yet.</span>`;
   const ft = foodTotals(draft);
-  const pT = toNum(P.p) || 180;
+  const pT = P.pT || toNum(P.p) || 160;
   if (el("calc-food")){
     const bar = (lab, v, t, unit) => { const pct = v && t ? Math.min(100, v/t*100) : 0; const over = v && t && v > t*1.05;
       return `<div class="bar"><div class="lab"><span>${lab}</span><span>${v !== null ? fmt(v) : "–"} / ${t ? fmt(t) : "–"} ${unit}</span></div><div class="track"><div class="fill${over ? " over" : ""}" style="width:${pct}%"></div></div></div>`; };
@@ -1569,7 +1569,7 @@ const DRI = { fib:38, na:2300, k:3400, ca:1000, fe:8, mg:400, zn:11, vd:15, b12:
 const firstNum = v => { const m = String(v ?? "").match(/\d+(\.\d+)?/); return m ? Number(m[0]) : null; };
 function nutTargets(){
   const ph = phaseOf(draft); const P = PH[ph];
-  return Object.assign({ p: toNum(P.p) || firstNum(P.p) || 170, c: firstNum(P.carbs), f: firstNum(P.fat) }, DRI);
+  return Object.assign({ p: P.pT || toNum(P.p) || firstNum(P.p) || 160, c: firstNum(P.carbs), f: firstNum(P.fat) }, DRI);
 }
 function nutOf(id, amt){ const f = FOOD_BY[id], r = NU[id], o = {}; NKEYS.forEach((k, i) => { o[k] = f && r ? (isMass(f) ? r[i] * amt / 100 : r[i] * amt) : 0; }); return o; }
 function sumNut(items){ const o = {}; NKEYS.forEach(k => o[k] = 0); (items || []).forEach(it => { const n = nutOf(it.id, it.amt); NKEYS.forEach(k => { o[k] += n[k]; }); }); return o; }
@@ -1602,7 +1602,7 @@ function defaultSlot(){
 }
 function dayFuel(){
   const ph = phaseOf(draft), plan = dayPlan(ph, curDate, draft);
-  const K = targetKcal(ph, plan.reset), PT = toNum(PH[ph].p) || 170; const ft = foodTotals(draft);
+  const K = targetKcal(ph, plan.reset), PT = PH[ph].pT || toNum(PH[ph].p) || 160; const ft = foodTotals(draft);
   return { ph, K, PT, k: ft.kcal || 0, p: ft.protein || 0, ft };
 }
 function slotTargets(slot){
@@ -1844,7 +1844,7 @@ function sleepAlerts(){
   const l3 = N.slice(0, 3);
   if (l3.every(x => x.h !== null && x.h < 7)) a.push(["warn", "Under 7 hours three nights in a row.", "Swap your next hard session (intervals, circuit, sprints or jumps) for easy zone 2, or skip it. Keep your steps, don't cut calories and keep every protein feeding. Nights that are short only because you're moving your bedtime earlier, and still 6.5 h or more, don't count."]);
   const wk = N.slice(0, 7).filter(x => x.h !== null);
-  if (wk.length >= 5 && wk.reduce((s, x) => s + x.h, 0) / wk.length < 6.5){ const ph = store.settings.phase; a.push(["bad", "Under 6.5 hours a night this week.", `Take your reset week early: about ${fmt(PH[ph].reset || 2800)} kcal, lighter lifting, and protect the ${clock(hm(store.settings.wake || "07:00"))} wake. Protein stays at 180 g.`]); }
+  if (wk.length >= 5 && wk.reduce((s, x) => s + x.h, 0) / wk.length < 6.5){ const ph = store.settings.phase; a.push(["bad", "Under 6.5 hours a night this week.", `Take your reset week early: about ${fmt(PH[ph].reset || 2800)} kcal, lighter lifting, and protect the ${clock(hm(store.settings.wake || "07:00"))} wake. Protein stays at 150–160 g.`]); }
   if (N.filter(x => x.snore).length >= 2) a.push(["info", "You've flagged snoring, gasping or still being tired more than once.", "Ask a doctor about a sleep apnea check. It's more common at higher body weight, quietly hurts recovery, and often improves as you lose weight."]);
   if (!a.length && N[0].h !== null && N[0].h < 6.5) a.push(["info", "One rough night.", "Nothing changes. Keep the wake time, get bright light and train as planned."]);
   return a;
@@ -2026,7 +2026,7 @@ function onReset(kind, root){
   const date = inCheat ? iso(new Date()) : curDate;
   const box = root.querySelector("#resetBox");
   if (kind === "ask"){
-    if (box) box.innerHTML = `<div class="notice warn">Start a reset week ${date === iso(new Date()) ? "today" : "on " + fmtDate(date)}? Seven days at ~${fmt(PH[ph].reset)} kcal (protein stays at 180 g), the same exercises at 60–70% of your usual weight, zone 2 only and nothing hard. The next one comes 8 weeks later.</div><div class="row" style="margin-top:8px"><button type="button" class="btn" data-reset="yes">Start it</button><button type="button" class="btn ghost" data-reset="no">Cancel</button></div>`;
+    if (box) box.innerHTML = `<div class="notice warn">Start a reset week ${date === iso(new Date()) ? "today" : "on " + fmtDate(date)}? Seven days at ~${fmt(PH[ph].reset)} kcal (protein stays at 150–160 g), the same exercises at 60–70% of your usual weight, zone 2 only and nothing hard. The next one comes 8 weeks later.</div><div class="row" style="margin-top:8px"><button type="button" class="btn" data-reset="yes">Start it</button><button type="button" class="btn ghost" data-reset="no">Cancel</button></div>`;
     return;
   }
   if (kind === "yes"){
@@ -2491,7 +2491,7 @@ function renderOverview(){
     ${chipsRow}
     <div class="targets t2">
       ${tile("Calories", kc, id === "after" ? "start ~2,400, add 100 a week while you're still losing" : "same every day, never under 1,900")}
-      ${tile("Protein", esc(P.p) + " g", id === "after" ? "never under 160" : "never under 170")}
+      ${tile("Protein", esc(P.p) + " g", "never under 150")}
       ${tile("Carbs", P.carbs === "—" ? "Flexible" : esc(P.carbs), P.carbs === "—" ? "the rest of your calories" : "")}
       ${tile("Fat", P.fat === "—" ? "Flexible" : esc(P.fat), "")}
       ${tile("Fiber", "38 g", "")}
@@ -2500,7 +2500,7 @@ function renderOverview(){
       ${tile("Reset week", P.reset ? fmt(P.reset) : "—", P.reset ? "kcal, protein unchanged" : "")}
     </div>
     <div><h3>How to eat</h3><ul class="rules">
-      <li><b>Protein first:</b> four feedings of about 40–55 g (breakfast, lunch, snack, dinner). Pick the protein, then add a carb and a vegetable or fruit.</li>
+      <li><b>Protein first:</b> four feedings of about 40 g (breakfast, lunch, snack, dinner). Pick the protein, then add a carb and a vegetable or fruit.</li>
       <li>Potatoes, oats, cottage cheese and frozen veg keep you full cheaply. Popcorn and sugar-free jello handle cravings.</li>
       <li>Log everything for the first 2–3 weeks of a phase, and again for a week any time you stall.</li>
       <li>Alcohol counts and wrecks sleep: skip it near bedtime.</li>
@@ -2517,7 +2517,7 @@ function renderOverview(){
     <div><h3>Supplements</h3><ul class="rules">
       <li><b>Creatine monohydrate, 3–5 g a day.</b> Any time, no loading. Expect 1–3 lb of water early on; it isn't fat.</li>
       <li><b>Vitamin D3, 1,000–2,000 IU a day</b>, all year. Saskatchewan winters give you very little.</li>
-      <li>Whey protein is food, not a supplement: use it when it's the easiest way to hit 180 g.</li>
+      <li>Whey protein is food, not a supplement: use it when it's the easiest way to hit 150–160 g.</li>
     </ul></div>
   </div>
 
@@ -2753,9 +2753,9 @@ function drawAllCharts(sp){
   drawTime(H("kcal"), Object.assign({}, base, { kind:"bar", series:[{ name:"Calories", pts: kc }], refPts: kcT, vFmt: v => fmt(v) + " kcal", tipExtra: d => { const t = kcT.find(q => q.d === d); return t ? `Target ${fmt(t.v)}` : ""; }, empty:"Log your meals to see calories per day.", aria:"Calories per day" }));
   sub("kcal", kc.length ? `Average ${fmt(avgOf(kc))} kcal · never under 1,900` : "");
   const pr = pick(sp, e => foodTotals(e).protein);
-  const prT = toNum(PH[store.settings.phase].p) || 170;
+  const prT = PH[store.settings.phase].pT || toNum(PH[store.settings.phase].p) || 160;
   drawTime(H("prot"), Object.assign({}, base, { kind:"bar", series:[{ name:"Protein", pts: pr, color:"var(--s3)" }], ref: prT, refLabel: `Target ${prT} g`, vFmt: v => fmt(v) + " g", empty:"Add protein to your meals to see it here.", aria:"Protein per day" }));
-  sub("prot", pr.length ? `Average ${fmt(avgOf(pr))} g · ${pr.filter(p => p.v >= (PH[store.settings.phase].pMin || 170)).length} of ${pr.length} days at ${PH[store.settings.phase].pMin || 170} g or more` : "");
+  sub("prot", pr.length ? `Average ${fmt(avgOf(pr))} g · ${pr.filter(p => p.v >= (PH[store.settings.phase].pMin || 150)).length} of ${pr.length} days at ${PH[store.settings.phase].pMin || 150} g or more` : "");
   const mealVals = (e, k) => MEALS.map(([id]) => ((e.meals || {})[id] || {})[k]).filter(Boolean);
   const liked = countBy(sp, e => mealVals(e, "liked"), ["loved","ok","no"]);
   drawDonut(H("liked"), [{ label:"Loved it", v: liked.loved }, { label:"It was OK", v: liked.ok }, { label:"Didn't like it", v: liked.no }], "meals", "Rate your meals on the Today tab.");
@@ -2834,12 +2834,12 @@ const NEW = {
   p2:`<li>The last phase where you can expect to gain muscle while losing fat. Keep adding reps or weight.</li><li>Friday alternates: week A bike intervals, week B circuit.</li><li>New plyo block on Wednesday and med ball rotational tosses on Monday.</li><li>Calories drop 50 from carbs. Expect a slightly slower pace; that's normal.</li>`,
   p3:`<li>Goal changes to <b>holding</b> your weights and reps. Use slower lowering (2–3 s) instead of chasing PRs.</li><li>Sunday walk added; Saturday hill sprints (bike sprints once it's icy). Tuesday zone 2 goes to 25 min.</li><li>New: ~100 g cottage cheese 1.5–2 h before bed.</li><li>Shoulder tape drifting toward 45″ is fat loss, as long as your laterals and pull-ups hold.</li>`,
   p4:`<li>Steps go to <b>12,000</b>. Saturday is bike sprints plus your walk.</li><li>Stall fix step 3 is now "drop to 2,000 kcal" (never below 1,900).</li><li>Lean-up sets once you're at 165 lb or less: Monday pushdowns to 3 sets, Thursday pushdowns 2 sets plus overhead cable triceps extension 2 × 10–12.</li><li>If recovery suffers, cut Saturday sprints first, then make Friday zone 2, then halve the jumps.</li>`,
-  after:`<li>Switch to your long-term week first, then find maintenance on it: start ~2,400 kcal and add 100 a week while your trend still falls.</li><li>Protein 160–180 g. Fat about 70–80 g.</li><li>Progress again: add a rep or a little weight every 1–2 weeks. Deload every 8–10 weeks.</li><li>Expect the scale to rise 2–4 lb as carbs and water refill. Judge by waist and calipers.</li>`
+  after:`<li>Switch to your long-term week first, then find maintenance on it: start ~2,400 kcal and add 100 a week while your trend still falls.</li><li>Protein 150–160 g. Fat about 70–80 g.</li><li>Progress again: add a rep or a little weight every 1–2 weeks. Deload every 8–10 weeks.</li><li>Expect the scale to rise 2–4 lb as carbs and water refill. Judge by waist and calipers.</li>`
 };
 function renderCheat(){
   const id = cheatPhase || store.settings.phase; const P = PH[id];
   const kc = id === "after" ? (toNum(store.settings.maint) || null) : P.kcal;
-  const proteinLine = id === "after" ? "160–180 g protein (never under 160)" : "180 g protein (never under 170). Four feedings of 40–55 g";
+  const proteinLine = id === "after" ? "150–160 g protein (never under 150)" : "150–160 g protein (never under 150). Four feedings of about 40 g";
   const trend = P.trend === "maint" ? (id === "lead" ? "Eat at maintenance. After week 3, keep your weekly average within ~2 lb of your week-3 average: drop 200 kcal if it climbs past that, add 200 if it falls past it." : "See the range rules below.") :
     `Weekly-average loss, checked every 2 weeks: <b>${P.trend.on[0]}–${P.trend.on[1]} lb/week</b> on track${id === "p4" ? "" : ` · ${P.trend.fine}–${P.trend.on[0]} fine`} · under ${P.trend.fine} for 2 weeks too slow · over ${P.trend.fast} too fast.`;
   const stall3 = id === "p4" ? "drop to 2,000 kcal (floor 1,900)" : "cut 150 kcal from carbs";
