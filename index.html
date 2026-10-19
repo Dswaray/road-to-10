@@ -3366,7 +3366,21 @@ document.addEventListener("visibilitychange", () => {
   if (cloud){ if (cloud.lastPush) Object.keys(store.days).forEach(d => { if (String(store.days[d].updatedAt || "") > cloud.lastPush) cloudDirty.months[ymOf(d)] = cloudDirty.months[ymOf(d)] || ++cloudDirty.seq; }); setTimeout(cloudSync, 400); }
   if (typed) flush();
 })();
-if ("serviceWorker" in navigator && location.protocol !== "file:"){ window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); }); }
+if ("serviceWorker" in navigator && location.protocol !== "file:"){
+  /* When a new version takes over, save anything unsaved and reload once so it shows straight away. */
+  const hadWorker = !!navigator.serviceWorker.controller; let reloading = false;
+  navigator.serviceWorker.addEventListener("controllerchange", async () => {
+    if (!hadWorker || reloading) return; reloading = true;
+    try { for (let i = 0; i < 20 && saving; i++) await new Promise(r => setTimeout(r, 100)); if (dirty) await flush(); } catch(e){}
+    location.reload();
+  });
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then(reg => {
+      /* iPhone resumes the app without reloading it, so check for a new version each time it comes back. */
+      document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") reg.update().catch(() => {}); });
+    }).catch(() => {});
+  });
+}
 })();
 </script>
 </body>
