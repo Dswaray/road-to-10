@@ -313,6 +313,12 @@ body.resting main{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
 .pip.sel{box-shadow:0 0 0 2px var(--ink)}
 .foodcat{display:flex;flex-direction:column;gap:6px}
 .foodcat .chip{min-height:34px;font-size:13.5px;padding:0 11px}
+.myedit{display:flex;flex-direction:column;gap:12px;border:1px solid var(--line2);border-radius:12px;padding:12px}
+.mynlist{display:flex;flex-direction:column;gap:8px}
+.myn{display:grid;grid-template-columns:minmax(0,1fr) 96px 78px;gap:8px;align-items:center;font-size:14px}
+.myn input,.myn select{width:100%;min-width:0;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px;font-size:16px;min-height:40px}
+.myn .u{color:var(--muted);font-size:13px;padding-left:4px}
+.myerr{color:var(--red);font-size:13.5px;font-weight:600}
 .platelist{display:flex;flex-direction:column;gap:6px}
 .plate-it{display:grid;grid-template-columns:minmax(0,1fr) 128px 32px;gap:8px;align-items:center;padding:6px 6px 6px 10px;border-radius:10px;background:var(--sunk)}
 .plate-it .nm{font-size:14px;min-width:0;font-weight:500}
@@ -1600,7 +1606,8 @@ const SHOP = [
 const isMass = f => f.unit === "g" || f.unit === "ml";
 /* nutrients: [kcal, protein g, carbs g, fat g, fiber g, sodium mg, potassium mg, calcium mg, iron mg, magnesium mg, zinc mg, vitamin D µg, B12 µg, vitamin C mg]
    per 100 g (or 100 ml) for foods weighed in g/ml, per piece for everything else. Typical values for plain grocery-store versions. */
-const NKEYS = ["kcal","p","c","f","fib","na","k","ca","fe","mg","zn","vd","b12","vc"];
+const NKEYS = ["kcal","p","c","f","fib","na","k","ca","fe","mg","zn","vd","b12","vc",
+  /* extras: only foods you enter yourself (My foods) can have these */ "sug","sat","trans","chol","phos","se","va","ve","vk","b6","fol","wat","caf"];
 const NU = {
   chicken:[185,25,0,9.4,0,95,250,12,1.2,24,2.4,0.1,0.5,0], beef:[272,26,0,18,0,80,330,20,2.6,22,6.2,0.1,2.7,0],
   eggs:[72,6.3,0.4,4.8,0,71,69,28,0.9,6,0.65,1.0,0.45,0], tuna:[130,29,0,1,0,340,280,15,1.8,35,1.0,2.0,3.0,0],
@@ -1620,21 +1627,54 @@ const NUTS = [
   {k:"p", l:"Protein", u:"g", g:"macro"}, {k:"c", l:"Carbs", u:"g", g:"macro"}, {k:"f", l:"Fat", u:"g", g:"macro"}, {k:"fib", l:"Fiber", u:"g", g:"macro"},
   {k:"na", l:"Sodium", u:"mg", g:"micro", limit:true}, {k:"k", l:"Potassium", u:"mg", g:"micro"}, {k:"ca", l:"Calcium", u:"mg", g:"micro"},
   {k:"fe", l:"Iron", u:"mg", g:"micro"}, {k:"mg", l:"Magnesium", u:"mg", g:"micro"}, {k:"zn", l:"Zinc", u:"mg", g:"micro"},
-  {k:"vd", l:"Vitamin D", u:"µg", g:"micro"}, {k:"b12", l:"Vitamin B12", u:"µg", g:"micro"}, {k:"vc", l:"Vitamin C", u:"mg", g:"micro"}
+  {k:"vd", l:"Vitamin D", u:"µg", g:"micro"}, {k:"b12", l:"Vitamin B12", u:"µg", g:"micro"}, {k:"vc", l:"Vitamin C", u:"mg", g:"micro"},
+  {k:"sug", l:"Sugars", u:"g", g:"macro", x:true}, {k:"sat", l:"Saturated fat", u:"g", g:"macro", x:true, limit:true}, {k:"trans", l:"Trans fat", u:"g", g:"macro", x:true},
+  {k:"chol", l:"Cholesterol", u:"mg", g:"macro", x:true}, {k:"phos", l:"Phosphorus", u:"mg", g:"micro", x:true}, {k:"se", l:"Selenium", u:"µg", g:"micro", x:true},
+  {k:"va", l:"Vitamin A", u:"µg", g:"micro", x:true}, {k:"ve", l:"Vitamin E", u:"mg", g:"micro", x:true}, {k:"vk", l:"Vitamin K", u:"µg", g:"micro", x:true},
+  {k:"b6", l:"Vitamin B6", u:"mg", g:"micro", x:true}, {k:"fol", l:"Folate", u:"µg", g:"micro", x:true},
+  {k:"wat", l:"Water", u:"ml", g:"water", x:true}, {k:"caf", l:"Caffeine", u:"mg", g:"water", x:true, limit:true}
 ];
+/* what you can pick when entering your own food */
+const MY_GROUPS = [["Macros", ["fib","sug","sat","trans","chol"]], ["Minerals", ["na","k","ca","fe","mg","zn","phos","se"]], ["Vitamins", ["va","vc","vd","ve","vk","b6","fol","b12"]], ["Water & other", ["wat","caf"]]];
+/* Daily Values printed on Canadian Nutrition Facts tables, for entering vitamins and minerals as % DV */
+const LABEL_DV = { na:2300, k:3400, ca:1300, fe:18, mg:420, zn:11, phos:1250, se:55, va:900, vc:90, vd:20, ve:15, vk:120, b6:1.7, fol:400, b12:2.4 };
+const X_MACRO = ["sug","sat","trans","chol"], X_MICRO = ["phos","se","va","ve","vk","b6","fol"];
+const nutMeta = k => NUTS.find(z => z.k === k) || { k, l:k, u:"" };
 /* daily targets for a man aged 19–30 (US/Canada Dietary Reference Intakes); sodium is an upper limit */
-const DRI = { fib:38, na:2300, k:3400, ca:1000, fe:8, mg:400, zn:11, vd:15, b12:2.4, vc:90 };
+const DRI = { fib:38, na:2300, k:3400, ca:1000, fe:8, mg:400, zn:11, vd:15, b12:2.4, vc:90,
+  phos:700, se:55, va:900, ve:15, vk:120, b6:1.3, fol:400, wat:3000, caf:400 }; /* water: ~3 L from drinks; caffeine: 400 mg upper limit */
 const firstNum = v => { const m = String(v ?? "").match(/\d+(\.\d+)?/); return m ? Number(m[0]) : null; };
 function nutTargets(){
   const ph = phaseOf(draft); const P = PH[ph];
-  return Object.assign({ p: P.pT || toNum(P.p) || firstNum(P.p) || 160, c: firstNum(P.carbs), f: firstNum(P.fat) }, DRI);
+  const K = targetKcal(ph, false) || 2300; /* saturated fat: under 10% of calories */
+  return Object.assign({ p: P.pT || toNum(P.p) || firstNum(P.p) || 160, c: firstNum(P.carbs), f: firstNum(P.fat), sat: Math.round(K * 0.1 / 9) }, DRI);
 }
-function nutOf(id, amt){ const f = FOOD_BY[id], r = NU[id], o = {}; NKEYS.forEach((k, i) => { o[k] = f && r ? (isMass(f) ? r[i] * amt / 100 : r[i] * amt) : 0; }); return o; }
-function sumNut(items){ const o = {}; NKEYS.forEach(k => o[k] = 0); (items || []).forEach(it => { const n = nutOf(it.id, it.amt); NKEYS.forEach(k => { o[k] += n[k]; }); }); return o; }
+/* ---------- My foods: foods you enter yourself. They live in settings, so backups and cloud sync carry them. ---------- */
+function myFoods(){ return Array.isArray(store.settings.myFoods) ? store.settings.myFoods : []; }
+function myFood(id){ return myFoods().find(f => f.id === id) || null; }
+function asFood(m){ const n = m.n || {}; return { id:m.id, c:"my", chip:m.name, sn:m.name, unit:"serving", pl:"servings", step:0.5, def:1, min:0.5, max:20, k: toNum(n.kcal) || 0, p: toNum(n.p) || 0, my:true, serving:m.serving || "" }; }
+function foodById(id){ if (FOOD_BY[id]) return FOOD_BY[id]; const m = myFood(id); return m ? asFood(m) : null; }
+function nutVals(id){ if (NU[id]) return NKEYS.map((k, i) => NU[id][i] === undefined ? null : NU[id][i]); const m = myFood(id); return m ? NKEYS.map(k => toNum((m.n || {})[k])) : null; }
+/* logged items of your own foods carry a copy of the numbers (snap), so editing or deleting the food later doesn't change past days */
+function nutOf(id, amt, snap){
+  const f = snap ? { unit:"serving" } : foodById(id), r = snap ? NKEYS.map(k => toNum((snap.n || {})[k])) : nutVals(id), o = {};
+  NKEYS.forEach((k, i) => { const v = r ? r[i] : null; o[k] = f && v !== null && v !== undefined ? (isMass(f) ? v * amt / 100 : v * amt) : 0; }); return o;
+}
+function sumNut(items){ const o = {}; NKEYS.forEach(k => o[k] = 0); (items || []).forEach(it => { const n = nutOf(it.id, it.amt, it.snap); NKEYS.forEach(k => { o[k] += n[k]; }); }); return o; }
+/* which extra nutrients any of these items actually lists */
+function extrasIn(items, keys){ return keys.filter(k => (items || []).some(it => { const src = it.snap ? it.snap.n : (myFood(it.id) || {}).n; return !!src && toNum(src[k]) !== null; })); }
+function isMine(it){ return !!(it && (it.snap || myFood(it.id))); }
+function logItem(it){ const o = { id: it.id, amt: it.amt }; const m = myFood(it.id); const s = it.snap || (m ? { name: m.name, n: clone(m.n) } : null); if (s) o.snap = s; return o; }
 const nfmt = (v, u) => `${v >= 100 ? fmt(v) : v >= 10 ? fmt(v, 0) : fmt(v, 1).replace(/\.0$/, "")} ${u}`;
-function nutLine(n, mode){
+function nutLine(n, mode, known){
+  if (known){ /* one of your own foods: only what you entered */
+    if (mode !== "macro" && mode !== "micro") return `${fmt(n.kcal)} kcal${known.includes("p") ? ` · ${nfmt(n.p, "g")} protein` : ""}`;
+    const keys = mode === "macro" ? ["p","c","f","fib"].concat(X_MACRO) : NUTS.filter(z => z.g === "micro").map(z => z.k);
+    const parts = keys.filter(k => known.includes(k)).map(k => { const z = nutMeta(k); return `${z.l} ${nfmt(n[k], z.u)}`; });
+    return parts.length ? parts.join(" · ") : (mode === "micro" ? "No vitamins or minerals entered" : "No macros entered beyond calories");
+  }
   if (mode === "macro") return `Protein ${nfmt(n.p, "g")} · Carbs ${nfmt(n.c, "g")} · Fat ${nfmt(n.f, "g")} · Fiber ${nfmt(n.fib, "g")}`;
-  if (mode === "micro") return NUTS.filter(z => z.g === "micro").map(z => `${z.l} ${nfmt(n[z.k], z.u)}`).join(" · ");
+  if (mode === "micro") return NUTS.filter(z => z.g === "micro" && !z.x).map(z => `${z.l} ${nfmt(n[z.k], z.u)}`).join(" · ");
   return `${fmt(n.kcal)} kcal · ${nfmt(n.p, "g")} protein`;
 }
 function nutRows(n, keys, T, ofLabel){
@@ -1643,11 +1683,11 @@ function nutRows(n, keys, T, ofLabel){
     return `<div class="nrow"><span class="nl">${z.l}</span><span class="nv">${nfmt(v, z.u)}${t ? ` <span class="muted">/ ${nfmt(t, z.u)}${z.limit ? " limit" : ""}${ofLabel ? ` · ${Math.round(v / t * 100)}%` : ""}</span>` : ""}</span>${t ? `<div class="track"><div class="fill${cls}" style="width:${pct}%"></div></div>` : ""}</div>`; }).join("")}</div>`;
 }
 let nutMode = ls.get("rt10-nutmode") || "basic", dayNutMode = ls.get("rt10-daynut") || "macro", healthOpen = false;
-function amtLabel(f, amt){ const a = fmtW(amt); if (isMass(f)) return `${a} ${f.unit}`; return `${a} ${amt === 1 ? f.unit : (f.pl || f.unit + "s")}`; }
-function itemText(f, amt){ return f.self ? amtLabel(f, amt) : `${amtLabel(f, amt)} ${f.sn}`; }
-function plateTotals(items){ return items.reduce((a, it) => { const f = FOOD_BY[it.id]; if (f){ a.k += f.k * it.amt; a.p += f.p * it.amt; } return a; }, { k:0, p:0 }); }
-function plateText(items){ return items.map(it => itemText(FOOD_BY[it.id], it.amt)).join(", "); }
-function plateName(items){ const names = items.slice(0, 2).map(it => FOOD_BY[it.id].chip.toLowerCase()); return names.length ? names.join(" + ").replace(/^./, c => c.toUpperCase()) : "My plate"; }
+function amtLabel(f, amt){ const a = fmtW(amt); if (f.my) return `${a} serving${amt === 1 ? "" : "s"}`; if (isMass(f)) return `${a} ${f.unit}`; return `${a} ${amt === 1 ? f.unit : (f.pl || f.unit + "s")}`; }
+function itemText(f, amt){ if (f.my) return amt === 1 ? f.chip : `${f.chip} ×${fmtW(amt)}`; return f.self ? amtLabel(f, amt) : `${amtLabel(f, amt)} ${f.sn}`; }
+function plateTotals(items){ return items.reduce((a, it) => { const f = foodById(it.id); if (f){ a.k += f.k * it.amt; a.p += f.p * it.amt; } return a; }, { k:0, p:0 }); }
+function plateText(items){ return items.map(it => { const f = foodById(it.id); return f ? itemText(f, it.amt) : (it.snap ? it.snap.name : ""); }).filter(Boolean).join(", "); }
+function plateName(items){ const names = items.slice(0, 2).map(it => ((foodById(it.id) || {}).chip || (it.snap || {}).name || "food").toLowerCase()); return names.length ? names.join(" + ").replace(/^./, c => c.toUpperCase()) : "My plate"; }
 let plate = (() => { const p = ls.get("rt10-plate"); return p && Array.isArray(p.items) ? p : { slot:null, items:[] }; })();
 let lastSugg = null, lovedCache = [];
 function savePlate(){ ls.set("rt10-plate", plate); }
@@ -1693,7 +1733,7 @@ function logToSlot(slot, text, n, items){
   const add = (key, v) => { if (v === null || v === undefined || !Number.isFinite(v)) return; m[key] = String(Math.round((toNum(m[key]) || 0) + v)); };
   m.text = has(m.text) ? `${m.text}; ${text}` : text;
   add("kcal", n.kcal); add("protein", n.p); add("carbs", n.c); add("fat", n.f);
-  if (items && items.length) m.items = (Array.isArray(m.items) ? m.items : []).concat(items.map(it => ({ id: it.id, amt: it.amt })));
+  if (items && items.length) m.items = (Array.isArray(m.items) ? m.items : []).concat(items.map(logItem));
   setP(draft, `meals.${slot}`, m); markDirty();
   showToast(`Added to ${SLOTNAME[slot]}: ${fmt(n.kcal)} kcal, ${fmt(n.p)} g protein. Rate it on the Today tab.`);
 }
@@ -1702,6 +1742,7 @@ function renderFood(){
   $("#v-food").innerHTML = `${dateBarHTML()}
     <div class="card fuel" id="fuelCard"></div>
     <div class="card panel" id="builder" style="--sec:var(--green);--on-sec:var(--on-green)"></div>
+    <div class="card panel" id="myCard" style="--sec:var(--green);--on-sec:var(--on-green)"></div>
     <div class="card panel" id="favCard" style="--sec:var(--green);--on-sec:var(--on-green)"></div>
     <div class="card panel" id="shopCard" style="--sec:var(--green);--on-sec:var(--on-green)"></div>
     <div class="card panel"><h2>When you're hungry</h2><ul class="rules" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
@@ -1710,7 +1751,7 @@ function renderFood(){
       <li>For cravings: 3 cups of air-popped popcorn is about 95 kcal, and a sugar-free jello is about 10.</li>
       <li>Have a big glass of water first. Thirst often feels like hunger.</li>
       <li>Hungry and drained for more than a few days running? Tell Claude. It may be time for a reset week.</li></ul></div>`;
-  renderFuel(); renderBuilder(); renderFavs(); renderShop();
+  renderFuel(); renderBuilder(); renderMyFoods(); renderFavs(); renderShop();
 }
 const SHORTCUT_TEXT = "R10 date=[Current Date] kcal=[kcal] protein=[protein] carbs=[carbs] fat=[fat] fiber=[fiber] sodium=[sodium] steps=[steps]";
 function renderFuel(){
@@ -1729,10 +1770,13 @@ function renderFuel(){
   const dn = Object.assign({}, fromItems, { kcal: F.k, p: F.p, c: F.ft.carbs !== null ? F.ft.carbs : fromItems.c, f: F.ft.fat !== null ? F.ft.fat : fromItems.f });
   if (has(fo.fiberTotal)) dn.fib = toNum(fo.fiberTotal) || 0;
   if (has(fo.sodiumTotal)) dn.na = toNum(fo.sodiumTotal) || 0;
+  const cups = toNum(fo.water) || 0; dn.wat = (fromItems.wat || 0) + cups * 250;
+  const mine = items.some(isMine);
   const mealsLogged = MEALS.filter(([id]) => has((meals[id] || {}).kcal) || has((meals[id] || {}).text)).length;
   const mealsBuilt = MEALS.filter(([id]) => ((meals[id] || {}).items || []).length).length;
-  const cover = dayNutMode === "micro" ? `Counts foods added with the plate builder or favorites (${mealsBuilt} of ${mealsLogged} meal${mealsLogged === 1 ? "" : "s"} today)${has(fo.sodiumTotal) ? ", plus sodium from Apple Health" : ""}. Vitamin D doesn't include your supplement (1,000–2,000 IU = 25–50 µg).`
-    : `Carbs and fat come from your meals${fo.source ? " and Apple Health" : ""}. Targets are this phase's: ${T.c ? fmt(T.c) + " g carbs" : "no carb target"}, ${T.f ? fmt(T.f) + " g fat" : "no fat target"}, 38 g fiber.`;
+  const cover = dayNutMode === "water" ? `Counts the cups of water you enter on the Today tab (${fmt(cups)} × 250 ml) plus drinks you logged here with water filled in. Don't count the same drink in both. Aim for about 3 L from drinks.${extrasIn(items, ["caf"]).length ? " Caffeine counts only your own foods that list it." : ""}`
+    : (dayNutMode === "micro" ? `Counts foods added with the plate builder or favorites (${mealsBuilt} of ${mealsLogged} meal${mealsLogged === 1 ? "" : "s"} today)${has(fo.sodiumTotal) ? ", plus sodium from Apple Health" : ""}. Vitamin D doesn't include your supplement (1,000–2,000 IU = 25–50 µg).`
+    : `Carbs and fat come from your meals${fo.source ? " and Apple Health" : ""}. Targets are this phase's: ${T.c ? fmt(T.c) + " g carbs" : "no carb target"}, ${T.f ? fmt(T.f) + " g fat" : "no fat target"}, 38 g fiber.`) + (mine && dayNutMode !== "water" ? " Your own foods count only the nutrients you entered for them; sugars, saturated fat and the like come only from them." : "");
   const imported = fo.source === "Apple Health" && fo.importedAt;
   el.innerHTML = `<div class="eyebrow" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600">Fuel · ${esc(fmtLong(curDate))}</div>
     <div class="fuelrow">
@@ -1746,8 +1790,8 @@ function renderFuel(){
       return `<button type="button" class="pip${pv !== null && pv >= 40 ? " ok" : logged ? " part" : ""}${plate.slot === id ? " sel" : ""}" data-fa="slot" data-slot="${id}"><span>${SLOTNAME[id]}</span><b>${pv !== null ? fmt(pv) + " g" : "–"}</b></button>`; }).join("")}</div>
     <div class="small muted">${esc(hint)} Each box fills in green at 40 g protein.</div>
     <details class="daynut" ${ls.get("rt10-daynut-open") ? "open" : ""}><summary><span>Nutrients today</span><span class="chev" aria-hidden="true"></span></summary>
-      <div class="nmode" role="group" aria-label="Show"><button type="button" data-fa="dmode" data-m="macro" aria-pressed="${dayNutMode === "macro"}">Macros</button><button type="button" data-fa="dmode" data-m="micro" aria-pressed="${dayNutMode === "micro"}">Micronutrients</button></div>
-      <div style="margin-top:10px">${dayNutMode === "micro" ? nutRows(dn, ["na","k","ca","fe","mg","zn","vd","b12","vc"], T) : nutRows(dn, ["p","c","f","fib"], T)}</div>
+      <div class="nmode" role="group" aria-label="Show"><button type="button" data-fa="dmode" data-m="macro" aria-pressed="${dayNutMode === "macro"}">Macros</button><button type="button" data-fa="dmode" data-m="micro" aria-pressed="${dayNutMode === "micro"}">Micronutrients</button><button type="button" data-fa="dmode" data-m="water" aria-pressed="${dayNutMode === "water"}">Water</button></div>
+      <div style="margin-top:10px">${dayNutMode === "micro" ? nutRows(dn, ["na","k","ca","fe","mg","zn","vd","b12","vc", ...extrasIn(items, X_MICRO)], T) : dayNutMode === "water" ? nutRows(dn, ["wat", ...extrasIn(items, ["caf"])], T) : nutRows(dn, ["p","c","f","fib", ...extrasIn(items, X_MACRO)], T)}</div>
       <div class="small muted" style="margin-top:8px">${esc(cover)}</div>
     </details>
     <div class="row"><button type="button" class="btn ghost" data-fa="health">Paste from Apple Health</button><button type="button" class="textbtn" data-fa="healthhelp">${healthOpen ? "Hide setup" : "Use MyFitnessPal? Set it up"}</button></div>
@@ -1771,12 +1815,13 @@ function renderFuel(){
 }
 function renderBuilder(){
   const el = document.getElementById("builder"); if (!el) return;
+  plate.items = plate.items.filter(it => foodById(it.id));
   const slot = plate.slot || defaultSlot(); const F = dayFuel(); const T = nutTargets();
   const tn = sumNut(plate.items);
   const suggHTML = lastSugg ? (lastSugg.list.length ? `<div class="suggs">${lastSugg.list.map((z, i) => `<div class="sugg-card"><b>${esc(z.n)}</b><div class="small">${esc(plateText(z.items))}</div><div class="small muted">${esc(nutLine(sumNut(z.items), nutMode))}</div><div><button type="button" class="textbtn" data-fa="use" data-si="${i}">Use this plate</button></div></div>`).join("")}</div><div class="small muted">Sized to fit what's left today: about ${fmt(lastSugg.tg.k)} kcal and ${fmt(lastSugg.tg.p)} g protein for this meal.</div>`
     : `<div class="notice">You're at or over today's calories, so there's nothing to suggest. If you're hungry, see the tips at the bottom.</div>`) : "";
-  const totBlock = nutMode === "macro" ? `<span>This plate</span><strong>${fmt(tn.kcal)} kcal</strong>${nutRows(tn, ["p","c","f","fib"], T, true)}<span class="muted small">Bars show this plate's share of your daily targets.</span>`
-    : nutMode === "micro" ? `<span>This plate</span><strong>${fmt(tn.kcal)} kcal</strong>${nutRows(tn, ["na","k","ca","fe","mg","zn","vd","b12","vc"], T, true)}<span class="muted small">Share of a day's needs. Sodium is a limit, so lower is fine.</span>`
+  const totBlock = nutMode === "macro" ? `<span>This plate</span><strong>${fmt(tn.kcal)} kcal</strong>${nutRows(tn, ["p","c","f","fib", ...extrasIn(plate.items, X_MACRO)], T, true)}<span class="muted small">Bars show this plate's share of your daily targets.</span>`
+    : nutMode === "micro" ? `<span>This plate</span><strong>${fmt(tn.kcal)} kcal</strong>${nutRows(tn, ["na","k","ca","fe","mg","zn","vd","b12","vc", ...extrasIn(plate.items, X_MICRO)], T, true)}<span class="muted small">Share of a day's needs. Sodium is a limit, so lower is fine.</span>`
     : `<span>This plate</span><strong>${fmt(tn.kcal)} kcal · ${fmt(tn.p)} g protein</strong><span class="muted">After it: ${fmt(F.k + tn.kcal)} of ${fmt(F.K)} kcal · ${fmt(F.p + tn.p)} of ${F.PT} g protein</span>`;
   el.innerHTML = `<h2>Build a plate</h2>
     <div class="chips" role="group" aria-label="Meal">${MEALS.map(([id]) => `<button type="button" class="chip" data-fa="slot" data-slot="${id}" aria-pressed="${slot === id}">${SLOTNAME[id]}</button>`).join("")}</div>
@@ -1784,15 +1829,85 @@ function renderBuilder(){
     ${suggHTML}
     <div class="sub">Tap a food to add it</div>
     ${FOOD_CATS.map(([c, l]) => `<div class="foodcat"><div class="small muted" style="font-weight:600">${l}</div><div class="chips">${FOODS.filter(f => f.c === c).map(f => `<button type="button" class="chip" data-fa="add" data-id="${f.id}" aria-pressed="${plate.items.some(it => it.id === f.id)}">${esc(f.chip)}</button>`).join("")}</div></div>`).join("")}
+    <div class="foodcat"><div class="small muted" style="font-weight:600">My foods</div><div class="chips">${myFoods().slice().sort((a, b) => a.name.localeCompare(b.name)).map(m => `<button type="button" class="chip" data-fa="add" data-id="${m.id}" aria-pressed="${plate.items.some(it => it.id === m.id)}">${esc(m.name)}</button>`).join("")}<button type="button" class="chip" data-fa="mynew">+ New food</button></div></div>
     <div class="row" style="justify-content:space-between;margin-top:6px"><div class="sub" style="margin:0">Your plate</div>
       <div class="nmode" role="group" aria-label="Nutrients to show"><button type="button" data-fa="nmode" data-m="basic" aria-pressed="${nutMode === "basic"}">Basics</button><button type="button" data-fa="nmode" data-m="macro" aria-pressed="${nutMode === "macro"}">Macros</button><button type="button" data-fa="nmode" data-m="micro" aria-pressed="${nutMode === "micro"}">Micros</button></div></div>
-    ${plate.items.length ? `<div class="platelist">${plate.items.map((it, i) => { const f = FOOD_BY[it.id]; return `<div class="plate-it"><div class="nm">${esc(f.chip)}<span class="nutline">${esc(nutLine(nutOf(it.id, it.amt), nutMode))}</span></div>
+    ${plate.items.length ? `<div class="platelist">${plate.items.map((it, i) => { const f = foodById(it.id); return `<div class="plate-it"><div class="nm">${esc(f.chip)}<span class="nutline">${f.my && f.serving ? `1 serving = ${esc(f.serving)} · ` : ""}${esc(nutLine(nutOf(it.id, it.amt), nutMode, f.my ? Object.keys((myFood(it.id) || {}).n || {}) : null))}</span></div>
       <div class="stepper"><button type="button" data-fa="dec" data-i="${i}" aria-label="Less ${esc(f.chip)}">−</button><span>${esc(amtLabel(f, it.amt))}</span><button type="button" data-fa="inc" data-i="${i}" aria-label="More ${esc(f.chip)}">+</button></div>
       <button type="button" class="rmx" data-fa="rm" data-i="${i}" aria-label="Remove ${esc(f.chip)}">✕</button></div>`; }).join("")}</div>
       <div class="plate-tot">${totBlock}</div>
       <div class="row"><button type="button" class="btn" data-fa="log">Add to ${esc(SLOTNAME[slot])}</button><button type="button" class="btn ghost" data-fa="fav">★ Save as favorite</button><button type="button" class="textbtn" data-fa="clear">Clear</button></div>`
       : `<p class="empty">Your plate is empty. Tap foods above, or ask for a suggestion. Switch between Basics, Macros and Micros to see what each food gives you.</p>`}
-    <p class="small muted" style="margin:0">Nutrition numbers are estimates for typical grocery-store versions. Your food app or the label is more exact.</p>`;
+    <p class="small muted" style="margin:0">Nutrition numbers are estimates for typical grocery-store versions. Your food app or the label is more exact: add it under My foods.</p>`;
+}
+/* ---------- My foods card ---------- */
+let myEdit = null, myDelArm = null, myDelTimer = null;
+const MY_CORE = [["kcal","Calories","kcal"],["p","Protein","g"],["c","Carbs","g"],["f","Fat","g"]];
+function myBlank(){ return { id:null, name:"", serving:"", n:{}, show:[], pct:{}, err:"" }; }
+function myEditFrom(m){ const n = m.n || {}; return { id:m.id, name:m.name, serving:m.serving || "", n:Object.fromEntries(Object.entries(n).map(([k, v]) => [k, String(v)])), show:MY_GROUPS.flatMap(([, ks]) => ks).filter(k => toNum(n[k]) !== null), pct:{}, err:"" }; }
+function mySummary(m){
+  const n = m.n || {}; const bits = [`${fmt(toNum(n.kcal) || 0)} kcal`].concat([["p","protein"],["c","carbs"],["f","fat"]].filter(([k]) => toNum(n[k]) !== null).map(([k, l]) => `${nfmt(toNum(n[k]), "g")} ${l}`));
+  const more = Object.keys(n).filter(k => !["kcal","p","c","f"].includes(k) && toNum(n[k]) !== null).length;
+  return `${m.serving ? m.serving + " · " : ""}${bits.join(" · ")}${more ? ` · +${more} more` : ""}`;
+}
+function myEditorHTML(){
+  const E = myEdit; const v = k => esc(E.n[k] === undefined ? "" : E.n[k]);
+  const picked = MY_GROUPS.flatMap(([, ks]) => ks).filter(k => E.show.includes(k));
+  const rows = picked.map(k => { const z = nutMeta(k); return `<div class="myn"><span>${esc(z.l)}</span><input type="text" inputmode="decimal" data-myn="${k}" value="${v(k)}" placeholder="0" aria-label="${esc(z.l)} per serving" autocomplete="off">${LABEL_DV[k]
+      ? `<select data-myu="${k}" aria-label="${esc(z.l)} unit"><option value="u"${E.pct[k] ? "" : " selected"}>${z.u}</option><option value="pct"${E.pct[k] ? " selected" : ""}>% DV</option></select>` : `<span class="u">${z.u}</span>`}</div>`; }).join("");
+  return `<div class="myedit">
+    <h3 style="font-size:19px;margin:0">${E.id ? "Edit food" : "New food"}</h3>
+    <div class="grid2"><label class="f"><span>Food name</span><input type="text" data-my="name" value="${esc(E.name)}" placeholder="e.g. Quest bar, cookies & cream" autocomplete="off"></label>
+      <label class="f"><span>Serving size</span><input type="text" data-my="serving" value="${esc(E.serving)}" placeholder="e.g. 1 bar (60 g)" autocomplete="off"></label></div>
+    <div class="small muted" style="margin-top:-4px">Enter what one serving has, the way the label lists it.</div>
+    <div class="grid2">${MY_CORE.map(([k, l, u]) => `<label class="f"><span>${l} (${u})</span><input type="text" inputmode="decimal" data-myn="${k}" value="${v(k)}" placeholder="${k === "kcal" ? "required" : "0"}" autocomplete="off"></label>`).join("")}</div>
+    <div class="sub" style="margin-top:2px">Add more from the label</div>
+    ${MY_GROUPS.map(([g, ks]) => `<div class="foodcat"><div class="small muted" style="font-weight:600">${g}</div><div class="chips">${ks.map(k => `<button type="button" class="chip" data-fa="mytog" data-k="${k}" aria-pressed="${E.show.includes(k)}">${esc(nutMeta(k).l)}</button>`).join("")}</div></div>`).join("")}
+    ${rows ? `<div class="mynlist">${rows}</div>${picked.some(k => LABEL_DV[k]) ? `<div class="small muted">Label only shows a %? Pick % DV and type the percent: it's converted using the Daily Values on Canadian labels.</div>` : ""}` : `<div class="small muted">Tap any of these to add a box for it. Only what you fill in is counted.</div>`}
+    ${E.err ? `<div class="myerr" role="alert">${esc(E.err)}</div>` : ""}
+    <div class="row"><button type="button" class="btn" data-fa="mysave">Save food</button><button type="button" class="btn ghost" data-fa="mysaveadd">Save and add to plate</button><button type="button" class="textbtn" data-fa="mycancel">Cancel</button></div>
+  </div>`;
+}
+function renderMyFoods(){
+  const el = document.getElementById("myCard"); if (!el) return;
+  const list = myFoods().slice().sort((a, b) => a.name.localeCompare(b.name));
+  el.innerHTML = `<div class="row" style="justify-content:space-between"><h2>My foods</h2>${myEdit ? "" : `<button type="button" class="btn" data-fa="mynew">+ Add a food</button>`}</div>
+    <div class="small muted">Foods you enter yourself from a label or your food app, saved for next time. Pick the nutrients you want and fill them in. They show up under My foods in Build a plate.</div>
+    ${myEdit ? myEditorHTML() : ""}
+    ${list.length ? `<div>${list.map(m => `<div class="favrow"><div class="t">${esc(m.name)}</div><div class="d">${esc(mySummary(m))}</div><div class="acts">
+      <button type="button" class="textbtn" data-fa="myadd" data-id="${m.id}">Add</button><button type="button" class="textbtn" data-fa="myedit" data-id="${m.id}">Edit</button>
+      <button type="button" class="${myDelArm === m.id ? "btn ghost" : "rmx"}" data-fa="mydel" data-id="${m.id}" aria-label="Delete ${esc(m.name)}">${myDelArm === m.id ? "Delete?" : "✕"}</button></div></div>`).join("")}</div>`
+      : myEdit ? "" : `<p class="empty">Nothing saved yet. Tap + Add a food.</p>`}`;
+}
+function mySave(andAdd){
+  const E = myEdit; const name = String(E.name || "").trim(); E.err = "";
+  if (!name){ E.err = "Give the food a name."; renderMyFoods(); return; }
+  const n = {}, bad = [];
+  ["kcal","p","c","f"].concat(E.show).forEach(k => {
+    const raw = String(E.n[k] === undefined ? "" : E.n[k]).trim(); if (!raw) return;
+    const x = toNum(raw.replace(/[^\d.,-]/g, ""));
+    if (x === null || x < 0){ bad.push(k === "kcal" ? "Calories" : nutMeta(k).l); return; }
+    n[k] = E.pct[k] && LABEL_DV[k] ? Math.round(x / 100 * LABEL_DV[k] * 1000) / 1000 : x;
+  });
+  if (bad.length){ E.err = `Check ${bad.length > 1 ? "these numbers" : "this number"}: ${bad.join(", ")}.`; renderMyFoods(); return; }
+  if (n.kcal === undefined){ E.err = "Add the calories for one serving."; renderMyFoods(); return; }
+  const id = E.id || "my_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  const food = { id, name, serving: String(E.serving || "").trim(), n, updated: new Date().toISOString() };
+  const list = myFoods().slice(); const i = list.findIndex(f => f.id === id); if (i >= 0) list[i] = food; else list.push(food);
+  store.settings.myFoods = list; saveSettings(); myEdit = null;
+  if (andAdd){ const ex = plate.items.find(z => z.id === id); if (ex) ex.amt += 1; else plate.items.push({ id, amt: 1 }); savePlate(); }
+  renderMyFoods(); renderBuilder(); renderFavs();
+  showToast(andAdd ? `Saved ${name} and added it to your plate.` : `Saved ${name}. It's under My foods in Build a plate.`);
+  if (andAdd) document.getElementById("builder").scrollIntoView({ behavior:"smooth", block:"start" });
+}
+function myDelete(id){
+  const m = myFood(id); if (!m) return;
+  store.settings.myFoods = myFoods().filter(f => f.id !== id);
+  store.settings.favs = (store.settings.favs || []).map(f => f.items ? Object.assign({}, f, { items: f.items.filter(it => it.id !== id) }) : f).filter(f => !f.items || f.items.length);
+  plate.items = plate.items.filter(it => it.id !== id); savePlate();
+  if (myEdit && myEdit.id === id) myEdit = null; myDelArm = null;
+  saveSettings(); renderMyFoods(); renderBuilder(); renderFavs();
+  showToast(`Deleted ${m.name}. Meals you already logged keep its numbers.`);
 }
 function lovedMeals(){
   const seen = new Set(), out = [];
@@ -1857,8 +1972,15 @@ function onFoodAction(b){
   }
   if (a === "healthparse"){ const o = parseHealthText(document.getElementById("healthTxt").value); if (o) applyHealth(o); else document.getElementById("healthMsg").textContent = "That text doesn't look like the shortcut's output. It should start with R10 and have values like kcal=2280."; return; }
   if (a === "healthclear"){ ["kcalTotal","proteinTotal","carbsTotal","fatTotal","fiberTotal","sodiumTotal","source","importedAt"].forEach(k => setP(draft, "food." + k, "")); markDirty(); renderFood(); return; }
-  if (a === "add"){ const f = FOOD_BY[b.dataset.id]; const ex = plate.items.find(z => z.id === f.id); if (ex) ex.amt = Math.min(f.max * 2, ex.amt + f.step); else plate.items.push({ id: f.id, amt: f.def }); }
-  else if (a === "inc" || a === "dec"){ const it = plate.items[i]; if (!it) return; const f = FOOD_BY[it.id]; it.amt = Math.round((it.amt + (a === "inc" ? f.step : -f.step)) * 100) / 100; if (it.amt <= 0) plate.items.splice(i, 1); }
+  if (a === "mynew"){ myEdit = myBlank(); myDelArm = null; renderMyFoods(); const c = document.getElementById("myCard"); c.scrollIntoView({ behavior:"smooth", block:"start" }); const nm = c.querySelector('[data-my="name"]'); if (nm) nm.focus({ preventScroll:true }); return; }
+  if (a === "myedit"){ const m = myFood(b.dataset.id); if (!m) return; myEdit = myEditFrom(m); myDelArm = null; renderMyFoods(); document.getElementById("myCard").scrollIntoView({ behavior:"smooth", block:"start" }); return; }
+  if (a === "mycancel"){ myEdit = null; renderMyFoods(); return; }
+  if (a === "mytog"){ if (!myEdit) return; const k = b.dataset.k; myEdit.show = myEdit.show.includes(k) ? myEdit.show.filter(x => x !== k) : myEdit.show.concat([k]); renderMyFoods(); const inp = document.querySelector(`#myCard [data-myn="${k}"]`); if (inp) inp.focus({ preventScroll:true }); return; }
+  if (a === "mysave" || a === "mysaveadd"){ if (myEdit) mySave(a === "mysaveadd"); return; }
+  if (a === "mydel"){ const id = b.dataset.id; clearTimeout(myDelTimer); if (myDelArm === id){ myDelete(id); return; } myDelArm = id; renderMyFoods(); myDelTimer = setTimeout(() => { if (myDelArm === id){ myDelArm = null; renderMyFoods(); } }, 4000); return; }
+  if (a === "myadd"){ const f = foodById(b.dataset.id); if (!f) return; const ex = plate.items.find(z => z.id === f.id); if (ex) ex.amt += 1; else plate.items.push({ id: f.id, amt: 1 }); savePlate(); renderBuilder(); showToast(`Added ${f.chip} to your plate.`); return; }
+  if (a === "add"){ const f = foodById(b.dataset.id); if (!f) return; const ex = plate.items.find(z => z.id === f.id); if (ex) ex.amt = Math.min(f.max * 2, ex.amt + (f.my ? 1 : f.step)); else plate.items.push({ id: f.id, amt: f.def }); }
+  else if (a === "inc" || a === "dec"){ const it = plate.items[i]; if (!it) return; const f = foodById(it.id); if (!f) return; it.amt = Math.round((it.amt + (a === "inc" ? f.step : -f.step)) * 100) / 100; if (it.amt <= 0) plate.items.splice(i, 1); }
   else if (a === "rm") plate.items.splice(i, 1);
   else if (a === "clear") plate.items = [];
   else if (a === "suggest") lastSugg = suggestions(plate.slot || defaultSlot());
@@ -1874,6 +1996,9 @@ function onFoodAction(b){
 $("#v-food").addEventListener("toggle", e => { if (e.target.classList && e.target.classList.contains("daynut")) ls.set("rt10-daynut-open", e.target.open); }, true);
 bindView($("#v-food"));
 $("#v-food").addEventListener("click", e => { const b = e.target.closest("[data-fa]"); if (b) onFoodAction(b); });
+/* typing in the My foods editor: kept in memory so tapping nutrient chips doesn't lose what you typed */
+$("#v-food").addEventListener("input", e => { const t = e.target; if (!myEdit || !t.dataset) return; if (t.dataset.my) myEdit[t.dataset.my] = t.value; else if (t.dataset.myn) myEdit.n[t.dataset.myn] = t.value; });
+$("#v-food").addEventListener("change", e => { const t = e.target; if (myEdit && t.dataset && t.dataset.myu) myEdit.pct[t.dataset.myu] = t.value === "pct"; });
 $("#v-food").addEventListener("change", e => { const t = e.target; if (t.dataset && "shop" in t.dataset){ store.settings.shop = Object.assign({}, store.settings.shop || {}, { [t.dataset.shop]: t.checked }); saveSettings(); t.closest(".ck").classList.toggle("done", t.checked); const n = Object.values(store.settings.shop).filter(Boolean).length; if (!n || n === 1) renderShop(); } });
 
 /* ---------- SLEEP ---------- */

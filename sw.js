@@ -1,5 +1,5 @@
 /* Road to 10% offline cache. Bump VERSION whenever any app file changes. */
-const VERSION = "road-to-10-v9";
+const VERSION = "road-to-10-v10";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-512.png"];
 
 /* Ask the server for the newest copy (skipping the browser's own short-term cache) and save it. */
