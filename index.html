@@ -498,6 +498,23 @@ button.pill{cursor:pointer}
 .coach .steps em{font-style:normal;color:var(--muted);font-family:var(--body);font-size:13px;font-weight:500}
 .coach .steps .arrow{color:var(--muted)}
 /* more */
+.rcal{border:1px solid var(--line2);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.rcal-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rcal-sel{display:flex;gap:6px;min-width:0}
+.rcal-sel select{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:16px;min-height:40px;color:var(--ink)}
+.rcal-nav{width:40px;height:40px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:20px;line-height:1;cursor:pointer;color:var(--ink)}
+.rcal-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));row-gap:3px}
+.rcal-g .dh{font-size:11px;color:var(--muted);text-align:center;font-weight:600;padding:2px 0 4px}
+.rcal-g button{position:relative;height:42px;border:0;background:transparent;font-size:15px;cursor:pointer;color:var(--ink);font-variant-numeric:tabular-nums;padding:0}
+.rcal-g button.in{background:color-mix(in srgb, var(--blue) 16%, transparent)}
+.rcal-g button.s{background:var(--blue);color:var(--on-blue);border-radius:10px 0 0 10px}
+.rcal-g button.e{background:var(--blue);color:var(--on-blue);border-radius:0 10px 10px 0}
+.rcal-g button.s.e{border-radius:10px}
+.rcal-g button.t{font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.rcal-g button.dot::after{content:"";position:absolute;left:50%;bottom:5px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--green)}
+.rcal-g button.s::after,.rcal-g button.e::after{background:var(--on-blue)}
+.rsum{font-size:15px}
+.btn[disabled]{opacity:.45;pointer-events:none}
 .morelink{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;text-align:left;cursor:pointer;width:100%;font:inherit;color:inherit}
 .morelink b{display:block;font-family:var(--display);font-size:22px;font-weight:600}
 .morelink small{display:block;color:var(--muted);font-size:13.5px}
@@ -532,6 +549,7 @@ button.pill{cursor:pointer}
   <section class="view" id="v-history" hidden></section>
   <section class="view" id="v-cheat" hidden></section>
   <section class="view share" id="v-share" hidden></section>
+  <section class="view" id="v-report" hidden></section>
 </main>
 <div class="restbar" id="restBar" hidden><div class="in"><strong id="restTime">0:00</strong><span id="restLab">Rest</span><button type="button" data-rest="add">+15 s</button><button type="button" data-rest="skip">Skip</button></div></div>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -2748,7 +2766,7 @@ $("#v-overview").addEventListener("click", e => {
 
 function renderMore(){
   $("#v-more").innerHTML = `<h2 style="font-size:28px">More</h2>
-    ${[["overview","Overview","The whole plan on one page: the goal, phases, workouts, food, water and sleep targets"],["history","History","Weekly averages, strength floor and every day you've logged"],["cheat","Cheat sheet","Targets, your week and the rules for each phase"],["share","Send to Claude","Share a summary, back up or restore your log"]].map(([t, n, d]) => `<button type="button" class="card morelink" data-go="${t}"><span><b>${n}</b><small>${d}</small></span><span class="chev2" aria-hidden="true">›</span></button>`).join("")}`;
+    ${[["overview","Overview","The whole plan on one page: the goal, phases, workouts, food, water and sleep targets"],["history","History","Weekly averages, strength floor and every day you've logged"],["report","Your data by date","Pick categories and any dates: see it here, share it as text or download a spreadsheet"],["cheat","Cheat sheet","Targets, your week and the rules for each phase"],["share","Send to Claude","Share a summary, back up or restore your log"]].map(([t, n, d]) => `<button type="button" class="card morelink" data-go="${t}"><span><b>${n}</b><small>${d}</small></span><span class="chev2" aria-hidden="true">›</span></button>`).join("")}`;
 }
 $("#v-more").addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) goTab(b.dataset.go); });
 
@@ -2885,32 +2903,38 @@ const STRENGTH = [
 function topWeight(e, ids){ const ex = (e.train || {}).ex || {}; let best = null; ids.forEach(id => legacySets(ex[id]).filter(z => z.done).forEach(z => { const w = toNum(z.w); if (w !== null && (best === null || w > best)) best = w; })); return best; }
 function countBy(sp, fn, keys){ const c = {}; keys.forEach(k => c[k] = 0); spanDays(sp).forEach(d => fn(store.days[d]).forEach(v => { if (v in c) c[v]++; })); return c; }
 
+const CH_SEC = { measure:["Body","var(--steel)"], food:["Food","var(--green)"], workout:["Lifting","var(--red)"], cardio:["Cardio & steps","var(--yellow)"], sleep:["Sleep","var(--blue)"], feel:["How you felt","var(--day)"] };
+function chartSectionHTML(sec, P = ""){
+  const block = (id, title) => `<div class="chblock"><div class="chhead"><h3>${title}</h3><span class="chsub" id="${P}sub-${id}"></span></div><div class="ch" id="${P}ch-${id}"></div></div>`;
+  if (sec === "measure") return block("weight", "Morning weight") + block("waist", "Waist at the navel") + block("cal", "Caliper sum (3 sites)") + block("ratio", "Shoulders ÷ waist") + `<div class="chhead" style="margin-top:4px"><h3>Tape measurements</h3></div><div class="multi" id="${P}ch-tape"></div>`;
+  if (sec === "food") return block("kcal", "Calories") + block("prot", "Protein") + `<div class="two-d">${block("liked", "Did you like your meals?")}${block("full", "After meals you were…")}</div>` + block("hunger", "Hunger");
+  if (sec === "workout") return block("sessions", "Lifting sessions per week") + `<div class="chhead" style="margin-top:4px"><h3>Strength: heaviest set each session</h3></div><div class="multi" id="${P}ch-strength"></div><div class="two-d">${block("exfeel", "How exercises felt")}</div>` + block("wfeel", "After-workout feel and soreness");
+  if (sec === "cardio") return block("steps", "Steps") + `<div class="two-d">${block("cardio", "Conditioning sessions")}</div>`;
+  if (sec === "sleep") return block("sleep", "Hours in bed") + block("sleepq", "Sleep quality and how rested you felt");
+  if (sec === "feel") return block("mood", "Energy, mood and stress") + block("dayr", "Day overall");
+  return "";
+}
 function renderCharts(){
   const sp = chartSpan();
-  const block = (id, title) => `<div class="chblock"><div class="chhead"><h3>${title}</h3><span class="chsub" id="sub-${id}"></span></div><div class="ch" id="ch-${id}"></div></div>`;
-  const card = (title, plate, inner) => `<div class="card panel"><h2 style="display:flex;align-items:center;gap:10px"><span class="plate" style="--sec:${plate}"></span>${title}</h2>${inner}</div>`;
+  const card = sec => `<div class="card panel"><h2 style="display:flex;align-items:center;gap:10px"><span class="plate" style="--sec:${CH_SEC[sec][1]}"></span>${CH_SEC[sec][0]}</h2>${chartSectionHTML(sec)}</div>`;
   $("#v-charts").innerHTML = `
     <div class="row" style="justify-content:space-between"><h2 style="font-size:28px">Charts</h2>
       <div class="seg" role="group" aria-label="Time range">${CRANGES.map(([k, l]) => `<button data-crange="${k}" aria-pressed="${chartRange2 === k}">${l}</button>`).join("")}</div></div>
     <p class="small muted" style="margin:0">${fmtDate(sp.from)} – ${fmtDate(sp.to)}. Tap or drag across a chart to read the exact numbers.</p>
-    ${card("Body", "var(--steel)", block("weight", "Morning weight") + block("waist", "Waist at the navel") + block("cal", "Caliper sum (3 sites)") + block("ratio", "Shoulders ÷ waist") + `<div class="chhead" style="margin-top:4px"><h3>Tape measurements</h3></div><div class="multi" id="ch-tape"></div>`)}
-    ${card("Food", "var(--green)", block("kcal", "Calories") + block("prot", "Protein") + `<div class="two-d">${block("liked", "Did you like your meals?")}${block("full", "After meals you were…")}</div>` + block("hunger", "Hunger"))}
-    ${card("Lifting", "var(--red)", block("sessions", "Lifting sessions per week") + `<div class="chhead" style="margin-top:4px"><h3>Strength: heaviest set each session</h3></div><div class="multi" id="ch-strength"></div><div class="two-d">${block("exfeel", "How exercises felt")}</div>` + block("wfeel", "After-workout feel and soreness"))}
-    ${card("Cardio & steps", "var(--yellow)", block("steps", "Steps") + `<div class="two-d">${block("cardio", "Conditioning sessions")}</div>`)}
-    ${card("Sleep", "var(--blue)", block("sleep", "Hours in bed") + block("sleepq", "Sleep quality and how rested you felt"))}
-    ${card("How you felt", "var(--day)", block("mood", "Energy, mood and stress") + block("dayr", "Day overall"))}`;
+    ${["measure","food","workout","cardio","sleep","feel"].map(card).join("")}`;
   drawAllCharts(sp);
 }
-function drawAllCharts(sp){
-  const H = id => document.getElementById("ch-" + id);
-  const sub = (id, t) => { const el = document.getElementById("sub-" + id); if (el) el.textContent = t || ""; };
+function drawAllCharts(sp, opt = {}){
+  const P = opt.prefix || "", want = sec => !opt.only || opt.only.includes(sec);
+  const H = id => document.getElementById(P + "ch-" + id);
+  const sub = (id, t) => { const el = document.getElementById(P + "sub-" + id); if (el) el.textContent = t || ""; };
   const lastV = pts => pts.length ? pts[pts.length - 1].v : null;
   const delta = (pts, dp, unit) => { if (pts.length < 2) return ""; const dv = pts[pts.length - 1].v - pts[0].v; return `${dv > 0 ? "+" : dv < 0 ? "−" : "±"}${fmt(Math.abs(dv), dp).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "")}${unit} in this range`; };
   const base = { from: sp.from, to: sp.to };
   const in1 = v => fmt(v, 2).replace(/\.?0+$/, "") + "″";
   const r15 = Object.assign({}, base, { kind:"line", fixed:[1, 5], step:1, vFmt: v => fmt(v, 1) + "/5" });
 
-  /* body */
+  if (want("measure")){ /* body */
   const wp = pick(sp, e => toNum(e.weight)); const wa = rolling(wp, 7);
   const wDot = "color-mix(in srgb, var(--s1) 40%, var(--surface))";
   drawTime(H("weight"), Object.assign({}, base, { kind:"line", minSpan:4, series:[{ name:"Morning weight", pts: wp, dots:true, dotColor: wDot, line: wa, lineName:"7-day average", color:"var(--s1)" }], legend:[["dot", wDot, "Morning weight"], ["ln", "var(--s1)", "7-day average"]], vFmt: v => fmt(v, 1) + " lb", empty:"Weigh in on a few mornings to see your trend.", aria:"Morning weight and 7-day average" }));
@@ -2928,11 +2952,12 @@ function drawAllCharts(sp){
   const tapeHost = H("tape"); const tapeData = TAPE.map(([k, l]) => ({ k, l, pts: pick(sp, e => toNum((e.m || {})[k])) })).filter(z => z.pts.length);
   if (!tapeData.length) tapeHost.innerHTML = `<p class="empty">Full measurements every 4 weeks show up here.</p>`;
   else {
-    tapeHost.innerHTML = tapeData.map(z => `<div class="chblock"><div class="chhead"><h4>${z.l}</h4><span class="chsub">${in1(lastV(z.pts))}</span></div><div class="ch" id="mt-${z.k}"></div></div>`).join("");
-    tapeData.forEach(z => drawTime(document.getElementById("mt-" + z.k), Object.assign({}, base, { kind:"line", small:true, minSpan:1, series:[{ name:z.l, pts:z.pts }], vFmt: in1, yFmt: v => String(v), aria:z.l })));
+    tapeHost.innerHTML = tapeData.map(z => `<div class="chblock"><div class="chhead"><h4>${z.l}</h4><span class="chsub">${in1(lastV(z.pts))}</span></div><div class="ch" id="${P}mt-${z.k}"></div></div>`).join("");
+    tapeData.forEach(z => drawTime(document.getElementById(P + "mt-" + z.k), Object.assign({}, base, { kind:"line", small:true, minSpan:1, series:[{ name:z.l, pts:z.pts }], vFmt: in1, yFmt: v => String(v), aria:z.l })));
+  }
   }
 
-  /* food */
+  if (want("food")){ /* food */
   const kc = pick(sp, e => foodTotals(e).kcal);
   const kcT = pick(sp, e => { const ph = phaseOf(e); return targetKcal(ph, isReset(e, ph)); });
   drawTime(H("kcal"), Object.assign({}, base, { kind:"bar", series:[{ name:"Calories", pts: kc }], refPts: kcT, vFmt: v => fmt(v) + " kcal", tipExtra: d => { const t = kcT.find(q => q.d === d); return t ? `Target ${fmt(t.v)}` : ""; }, empty:"Log your meals to see calories per day.", aria:"Calories per day" }));
@@ -2949,53 +2974,58 @@ function drawAllCharts(sp){
   const hun = pick(sp, e => toNum((e.food || {}).hunger));
   drawTime(H("hunger"), Object.assign({}, r15, { series:[{ name:"Hunger", pts: hun, color:"var(--s2)" }], empty:"Rate your hunger each day.", aria:"Hunger" }));
   sub("hunger", hun.length ? `Average ${fmt(avgOf(hun), 1)}/5 · 5 = starving` : "5 = starving");
+  }
 
-  /* lifting */
+  if (want("workout")){ /* lifting */
   const wk = {}; spanDays(sp).forEach(d => { const e = store.days[d]; const ph = phaseOf(e); const st = workoutStats(e, ph, d); const lifted = ["done","partial"].includes((e.train || {}).status) || (st && st.done > 0); const k = weekKey(d); wk[k] = (wk[k] || 0) + (lifted ? 1 : 0); });
   const sess = Object.keys(wk).sort().map(k => ({ d: k, v: wk[k] }));
-  drawTime(H("sessions"), Object.assign({}, base, { kind:"bar", weekly:true, series:[{ name:"Sessions", pts: sess }], ref:5, refLabel:"Plan: 5", vFmt: v => `${v} of 5`, yFmt: v => String(v), empty:"Finish a workout to start this chart.", aria:"Lifting sessions per week" }));
+  drawTime(H("sessions"), Object.assign({}, base, { kind:"bar", weekly:true, series:[{ name:"Sessions", pts: sess }], ref:3, refLabel:"Plan: 3", vFmt: v => `${v} of 3`, yFmt: v => String(v), empty:"Finish a workout to start this chart.", aria:"Lifting sessions per week" }));
   sub("sessions", sess.length ? `${sess[sess.length - 1].v} this week` : "");
   const stHost = H("strength");
   const stData = STRENGTH.map(L => ({ L, pts: pick(sp, e => topWeight(e, L.ids)) })).filter(z => z.pts.length);
   if (!stData.length) stHost.innerHTML = `<p class="empty">Log sets in the Workout tab and your strength lifts appear here.</p>`;
   else {
-    stHost.innerHTML = stData.map((z, i) => `<div class="chblock"><div class="chhead"><h4>${esc(z.L.n)}</h4><span class="chsub">${fmt(lastV(z.pts), 1).replace(/\.0$/, "")} lb</span></div><div class="ch" id="ms-${i}"></div></div>`).join("");
-    stData.forEach((z, i) => drawTime(document.getElementById("ms-" + i), Object.assign({}, base, { kind:"line", small:true, minSpan:10, series:[{ name: z.L.n, pts: z.pts }], vFmt: v => fmt(v, 1).replace(/\.0$/, "") + " lb", aria: z.L.n })));
+    stHost.innerHTML = stData.map((z, i) => `<div class="chblock"><div class="chhead"><h4>${esc(z.L.n)}</h4><span class="chsub">${fmt(lastV(z.pts), 1).replace(/\.0$/, "")} lb</span></div><div class="ch" id="${P}ms-${i}"></div></div>`).join("");
+    stData.forEach((z, i) => drawTime(document.getElementById(P + "ms-" + i), Object.assign({}, base, { kind:"line", small:true, minSpan:10, series:[{ name: z.L.n, pts: z.pts }], vFmt: v => fmt(v, 1).replace(/\.0$/, "") + " lb", aria: z.L.n })));
   }
   const ef = countBy(sp, e => Object.values((e.train || {}).ex || {}).map(x => x && x.feel).filter(Boolean), ["easy","right","hard","heavy"]);
   drawDonut(H("exfeel"), [{ label:"Too easy", v: ef.easy }, { label:"Just right", v: ef.right }, { label:"Hard", v: ef.hard }, { label:"Too heavy", v: ef.heavy }], "exercises", "Rate each exercise in the Workout tab.");
   const fa = pick(sp, e => toNum((e.train || {}).feelAfter)), so = pick(sp, e => toNum((e.train || {}).soreness));
   drawTime(H("wfeel"), Object.assign({}, r15, { series:[{ name:"Felt after", pts: fa }, { name:"Soreness", pts: so }], empty:"Rate how you felt after workouts and your soreness.", aria:"After-workout feel and soreness" }));
+  }
 
-  /* cardio */
+  if (want("cardio")){ /* cardio */
   const stp = pick(sp, e => toNum((e.cardio || {}).steps));
   const stT = pick(sp, e => PH[phaseOf(e)].stepsN);
   drawTime(H("steps"), Object.assign({}, base, { kind:"bar", series:[{ name:"Steps", pts: stp, color:"var(--s4)" }], refPts: stT, vFmt: v => fmt(v) + " steps", empty:"Log your steps each day.", aria:"Steps per day" }));
   sub("steps", stp.length ? `Average ${fmt(avgOf(stp))} · ${stp.filter(p => p.v >= (PH[store.settings.phase].stepsN || 10000)).length} of ${stp.length} days at target` : "");
   const cd = countBy(sp, e => [(e.cardio || {}).status].filter(Boolean), ["done","partial","z2","skipped"]);
   drawDonut(H("cardio"), [{ label:"Done", v: cd.done }, { label:"Cut short", v: cd.partial }, { label:"Swapped for zone 2", v: cd.z2 }, { label:"Skipped", v: cd.skipped }], "sessions", "Mark your Tuesday, Thursday and weekend sessions on the Today tab.");
+  }
 
-  /* sleep */
+  if (want("sleep")){ /* sleep */
   const sl = pick(sp, e => sleepHours((e.sleep || {}).bed, (e.sleep || {}).wake));
   drawTime(H("sleep"), Object.assign({}, base, { kind:"bar", series:[{ name:"Hours in bed", pts: sl }], band:[7.5, 9, "Target 7.5–9 h"], vFmt: v => fmt(v, 1) + " h", empty:"Log bed and wake times to see your sleep.", aria:"Hours in bed per night" }));
   sub("sleep", sl.length ? `Average ${fmt(avgOf(sl), 1)} h · ${sl.filter(p => p.v >= 7.5).length} of ${sl.length} nights at 7.5 h or more` : "");
   const sq = pick(sp, e => toNum((e.sleep || {}).quality)), rs = pick(sp, e => toNum((e.sleep || {}).rested));
   drawTime(H("sleepq"), Object.assign({}, r15, { series:[{ name:"Quality", pts: sq }, { name:"Rested", pts: rs }], empty:"Rate your sleep each morning.", aria:"Sleep quality and how rested" }));
+  }
 
-  /* feelings */
+  if (want("feel")){ /* feelings */
   const en = pick(sp, e => { const f = e.feel || {}; const v = [f.eAm, f.ePm, f.eEve].map(toNum).filter(z => z !== null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; });
   const md = pick(sp, e => toNum((e.feel || {}).mood)), sr = pick(sp, e => toNum((e.feel || {}).stress));
   drawTime(H("mood"), Object.assign({}, r15, { series:[{ name:"Energy", pts: en }, { name:"Mood", pts: md }, { name:"Stress", pts: sr }], empty:"Rate your energy, mood and stress in How the day went.", aria:"Energy, mood and stress" }));
   const dr = pick(sp, e => toNum((e.feel || {}).overall));
   drawTime(H("dayr"), Object.assign({}, r15, { series:[{ name:"Day overall", pts: dr }], empty:"Rate each day overall.", aria:"Day overall" }));
   sub("dayr", dr.length ? `Average ${fmt(avgOf(dr), 1)}/5` : "");
+  }
 }
 $("#v-charts").addEventListener("click", e => { const b = e.target.closest("[data-crange]"); if (b){ chartRange2 = b.dataset.crange; renderCharts(); } });
 
 /* ---------- CHEAT SHEET ---------- */
 const EXIT = {
   lead:`<li><b>No set date.</b> The lead-in ends when the "Ready for Phase 1?" checklist on the Measure tab is all green. The plan pictures about 8–10 weeks of lifting at maintenance first: beginner muscle comes fastest now, and it's what makes 10% look full instead of flat.</li>
-        <li>Ready means at least 8 weeks of lifting, 4+ sessions in most weeks and food logged most days, plus 7+ hours of sleep most nights and your weight holding near maintenance if you weigh.</li>
+        <li>Ready means at least 8 weeks of lifting, 3 sessions in most weeks and food logged most days, plus 7+ hours of sleep most nights and your weight holding near maintenance if you weigh.</li>
         <li>In the few days before you switch, do a full check-in: waist, calipers, full tape, photos and weight. That's Phase 1's start line. Keep the same workouts and weights; only the food changes (2,300 kcal).</li>
         <li>Book a checkup before the cut starts: blood pressure, A1c, cholesterol, and vitamin D if they'll add it.</li>`,
   p1:`<li>Move on when <b>2 of these 3</b> are true: weekly average at or below <b>188 lb</b> for 2 weeks · waist about <b>39–40″</b> or less · photos show a clear change from your Phase 1 start.</li><li>Also: strength holding, 7+ hours of sleep most nights, not constantly drained. If not, take a reset week first. No scale: the waist and photo checks both have to be true and your caliper sum clearly lower.</li>`,
@@ -3091,40 +3121,40 @@ $("#v-cheat").addEventListener("change", e => { if (e.target.id === "maintIn"){ 
 
 /* ---------- SHARE ---------- */
 const RATE = { loved:"loved it", ok:"it was OK", no:"didn't like it", hungry:"still hungry", right:"satisfied", stuffed:"too full", easy:"too easy", hard:"ground out reps", light:"light", normal:"normal", heavy:"heavy", exams:"exams" };
-function dayText(d){
-  const e = store.days[d]; if (!e) return "";
+function dayText(d, cats){
+  const e = store.days[d]; if (!e) return ""; if (!Array.isArray(cats)) cats = null; const want = c => !cats || cats.includes(c);
   const phaseId = phaseOf(e); const plan = dayPlan(phaseId, d, e); const L = [];
   L.push(`== ${fmtLong(d)} · ${PH[phaseId].short}${plan.reset ? " (reset week)" : ""} · ${plan.work ? plan.work.name : "rest day"}`);
   const s = e.sleep || {}; const h = sleepHours(s.bed, s.wake);
   const sl = [s.bed && s.wake ? `${s.bed}→${s.wake} (${fmt(h,1)} h)` : null, has(s.latency) ? `fell asleep in ${s.latency} min` : null, has(s.wakeups) ? `woke ${s.wakeups}×` : null, s.quality ? `quality ${s.quality}/5` : null, s.rested ? `rested ${s.rested}/5` : null,
     s.light ? "morning light" : null, s.caffeine ? "caffeine cutoff kept" : null, s.winddown ? "wind-down" : null, s.snore ? "SNORING/GASPING/TIRED flag" : null].filter(Boolean);
-  if (sl.length || s.notes) L.push(`Sleep: ${sl.join(", ")}${s.notes ? ` — "${s.notes}"` : ""}`);
-  if (has(e.weight)) L.push(`Weight: ${e.weight} lb`);
+  if (want("sleep") && (sl.length || s.notes)) L.push(`Sleep: ${sl.join(", ")}${s.notes ? ` — "${s.notes}"` : ""}`);
+  if (want("measure") && has(e.weight)) L.push(`Weight: ${e.weight} lb`);
   const ft = foodTotals(e); const f = e.food || {};
   const fl = [ft.kcal !== null ? `${fmt(ft.kcal)} kcal (target ${fmt(targetKcal(phaseId, plan.reset))})` : null, ft.protein !== null ? `${fmt(ft.protein)} g protein` : null, ft.carbs !== null ? `${fmt(ft.carbs)} g carbs` : null, ft.fat !== null ? `${fmt(ft.fat)} g fat` : null, has(f.fiberTotal) ? `${f.fiberTotal} g fiber` : null, has(f.sodiumTotal) ? `${f.sodiumTotal} mg sodium` : null, f.source ? `totals from ${f.source}` : null, f.hunger ? `hunger ${f.hunger}/5` : null,
     f.creatine ? "creatine" : null, f.vitd ? "vit D" : null, has(f.alcohol) && toNum(f.alcohol) ? `${f.alcohol} drinks` : null, f.cravings ? `cravings: ${f.cravings}` : null].filter(Boolean);
-  if (fl.length) L.push(`Food: ${fl.join(", ")}`);
-  MEALS.forEach(([id, label]) => { const m = (e.meals || {})[id]; if (!m) return; const parts = [m.text, (has(m.kcal) || has(m.protein)) ? `(${has(m.kcal) ? m.kcal + " kcal" : ""}${has(m.kcal) && has(m.protein) ? ", " : ""}${has(m.protein) ? m.protein + " g P" : ""})` : null, m.liked ? RATE[m.liked] : null, m.full ? RATE[m.full] : null, m.felt ? `felt: ${m.felt}` : null].filter(Boolean); if (parts.length) L.push(`  ${label}: ${parts.join(" · ")}`); });
-  if (f.notes) L.push(`  Food notes: ${f.notes}`);
+  if (want("food") && fl.length) L.push(`Food: ${fl.join(", ")}`);
+  MEALS.forEach(([id, label]) => { const m = (e.meals || {})[id]; if (!m || !want("food")) return; const parts = [m.text, (has(m.kcal) || has(m.protein)) ? `(${has(m.kcal) ? m.kcal + " kcal" : ""}${has(m.kcal) && has(m.protein) ? ", " : ""}${has(m.protein) ? m.protein + " g P" : ""})` : null, m.liked ? RATE[m.liked] : null, m.full ? RATE[m.full] : null, m.felt ? `felt: ${m.felt}` : null].filter(Boolean); if (parts.length) L.push(`  ${label}: ${parts.join(" · ")}`); });
+  if (want("food") && f.notes) L.push(`  Food notes: ${f.notes}`);
   const t = e.train || {};
   const tl = [t.status ? `status ${t.status}` : null, has(t.length) ? `${t.length} min` : null, t.energyPre ? `energy before ${t.energyPre}/5` : null, t.feelAfter ? `felt after ${t.feelAfter}/5` : null, t.effort ? RATE[t.effort] : null, t.soreness ? `soreness ${t.soreness}/5` : null, t.power ? "power work done" : null, t.vacuums ? "vacuums" : null, t.apt ? "APT" : null, has(t.hangs) ? `hangs ${t.hangs} s` : null].filter(Boolean);
-  if (tl.length) L.push(`Lifting: ${tl.join(", ")}`);
-  if (plan.work) plan.work.ex.forEach(x => { const line = exLine(x, (t.ex || {})[x.id]); if (line) L.push("  " + line); });
-  ["feltNotes","pain","swaps","extra"].forEach(k => { if (t[k]) L.push(`  ${ {feltNotes:"After", pain:"Pain", swaps:"Swaps/notes", extra:"Other activity"}[k] }: ${t[k]}`); });
+  if (want("workout") && tl.length) L.push(`Lifting: ${tl.join(", ")}`);
+  if (want("workout") && plan.work) plan.work.ex.forEach(x => { const line = exLine(x, (t.ex || {})[x.id]); if (line) L.push("  " + line); });
+  ["feltNotes","pain","swaps","extra"].forEach(k => { if (t[k] && want("workout")) L.push(`  ${ {feltNotes:"After", pain:"Pain", swaps:"Swaps/notes", extra:"Other activity"}[k] }: ${t[k]}`); });
   const c = e.cardio || {};
   const cl = [has(c.steps) ? `${c.steps} steps` : null, c.ab ? `Thursday option: ${c.ab === "A" ? "bike intervals" : "circuit or sprints"}` : null, c.status ? `session ${c.status}` : null, has(c.minutes) ? `${c.minutes} min` : null, has(c.rounds) ? `${c.rounds} rounds` : null, has(c.hr) ? `avg HR ${c.hr}` : null, c.rpe ? `RPE ${c.rpe}/10` : null, has(c.walkMin) ? `walk ${c.walkMin} min${c.walkWhere ? " (" + c.walkWhere + ")" : ""}` : null].filter(Boolean);
-  if (cl.length) L.push(`Cardio: ${cl.join(", ")}`);
-  if (c.felt) L.push(`  Felt: ${c.felt}`); if (c.notes) L.push(`  Notes: ${c.notes}`);
+  if (want("cardio")){ if (cl.length) L.push(`Cardio: ${cl.join(", ")}`);
+  if (c.felt) L.push(`  Felt: ${c.felt}`); if (c.notes) L.push(`  Notes: ${c.notes}`); }
   const m = e.m || {}; const S = ["cChest","cAbs","cThigh"].map(k => toNum(m[k]));
   const ml = [has(m.waist) ? `waist ${m.waist}″` : null, S.every(v => v !== null) ? `calipers ${S.join("/")} = ${fmt(S[0]+S[1]+S[2],1)} mm (~${fmt(jp3(S[0]+S[1]+S[2]),1)}%)` : null,
     ...[["neck","neck"],["shoulders","shoulders"],["chest","chest"],["hips","hips"],["armR","arm"],["armF","arm flexed"],["forearm","forearm"],["thighR","thigh R"],["thighL","thigh L"],["calfR","calf R"],["calfL","calf L"]].map(([k,l]) => has(m[k]) ? `${l} ${m[k]}″` : null), m.photos ? "photos taken" : null, m.photoCmp ? `photos vs phase start: ${PHOTO_CMP[m.photoCmp].toLowerCase()}` : null, m.absLook ? ABS_LOOK[m.absLook].toLowerCase() : null].filter(Boolean);
-  if (ml.length) L.push(`Measurements: ${ml.join(", ")}`); if (m.notes) L.push(`  Notes: ${m.notes}`);
+  if (want("measure")){ if (ml.length) L.push(`Measurements: ${ml.join(", ")}`); if (m.notes) L.push(`  Notes: ${m.notes}`); }
   const fe = e.feel || {};
   const el = [fe.eAm || fe.ePm || fe.eEve ? `energy am/pm/eve ${fe.eAm||"–"}/${fe.ePm||"–"}/${fe.eEve||"–"}` : null, fe.mood ? `mood ${fe.mood}/5` : null, fe.stress ? `stress ${fe.stress}/5` : null, fe.load ? `load ${RATE[fe.load]}` : null, fe.overall ? `day ${fe.overall}/5` : null].filter(Boolean);
-  if (el.length) L.push(`Day: ${el.join(", ")}`);
+  if (!cats){ if (el.length) L.push(`Day: ${el.join(", ")}`);
   if (fe.notes) L.push(`  How I felt: ${fe.notes}`);
-  if (fe.forClaude) L.push(`  FOR CLAUDE: ${fe.forClaude}`);
-  return L.join("\n");
+  if (fe.forClaude) L.push(`  FOR CLAUDE: ${fe.forClaude}`); }
+  return cats && L.length < 2 ? "" : L.join("\n");
 }
 function shareText(){
   const ds = sortedDates(); const today = iso(new Date());
@@ -3134,9 +3164,20 @@ function shareText(){
   const rtxt = R ? `PHASE CHECK (${R.title}) ${R.main.concat(R.also).map(c => `${c.l}: ${c.s === "yes" ? "yes" : c.s === "no" ? "NO" : "no data"} (${c.t})`).join("; ")}\n→ ${R.headline}\n` : "";
   const head = `ROAD TO 10% LOG — ${PH[store.settings.phase].name} (since ${fmtDate(store.settings.phaseStart)}${weekTag(store.settings.phase, today) ? ", " + weekTag(store.settings.phase, today) : ""}) — ${pick.length} day${pick.length===1?"":"s"}\nTargets: ${store.settings.phase === "after" ? "maintenance" : fmt(PH[store.settings.phase].kcal) + " kcal"}, ${PH[store.settings.phase].p} g protein, ${PH[store.settings.phase].steps} steps\n` + rtxt;
   const wk = weeklyRows().slice(0, 4).map(r => `Week of ${fmtDate(r.k)}: avg ${r.w !== null ? fmt(r.w,1) + " lb" : "–"}, ${fmt(r.kcal)} kcal, ${r.prot !== null ? fmt(r.prot) + " g" : "–"} protein, ${fmt(r.steps)} steps, ${r.sleep !== null ? fmt(r.sleep,1) + " h" : "–"} sleep, ${r.lifts}/3 lifts`).join("\n");
-  return head + (wk ? `\nWEEKLY AVERAGES\n${wk}\n` : "") + "\n" + (pick.map(dayText).join("\n\n") || "No days logged in this range yet.");
+  return head + (wk ? `\nWEEKLY AVERAGES\n${wk}\n` : "") + "\n" + (pick.map(d => dayText(d)).join("\n\n") || "No days logged in this range yet.");
 }
-function csvAll(){
+/* which category a spreadsheet column belongs to */
+function csvGroupOf(col){
+  if (["date","phase","reset"].includes(col)) return "base";
+  if (col === "weight") return "measure";
+  if (col.startsWith("sleep_")) return "sleep";
+  if (MEALS.some(([id]) => col.startsWith(id + "_")) || ["kcal_total","protein_total","carbs_total","fat_total","fiber_total","sodium_total","hunger","cravings","creatine","vitamin_d","alcohol","food_notes"].includes(col)) return "food";
+  if (col.startsWith("workout") || ["energy_before","felt_after","effort","soreness","pain","exercise_log"].includes(col)) return "workout";
+  if (col === "steps" || col === "walk_min" || col.startsWith("cardio_")) return "cardio";
+  if (["energy_am","energy_pm","energy_eve","mood","stress","load","day_overall","how_i_felt","for_claude"].includes(col)) return "feel";
+  return "measure";
+}
+function csvAll(dates, cats){
   const cols = ["date","phase","reset","weight","sleep_bed","sleep_wake","sleep_hours","sleep_latency_min","sleep_wakeups","sleep_quality","sleep_rested","sleep_notes",
     ...MEALS.flatMap(([id]) => [`${id}_what`,`${id}_kcal`,`${id}_protein`,`${id}_liked`,`${id}_fullness`,`${id}_felt`]),
     "kcal_total","protein_total","carbs_total","fat_total","fiber_total","sodium_total","hunger","cravings","creatine","vitamin_d","alcohol","food_notes",
@@ -3145,7 +3186,7 @@ function csvAll(){
     "waist","cal_chest","cal_abs","cal_thigh","cal_sum","bf_est","neck","shoulders","chest","hips","arm","arm_flexed","forearm","thigh_r","thigh_l","calf_r","calf_l","photos","photo_compare","abs_look",
     "energy_am","energy_pm","energy_eve","mood","stress","load","day_overall","how_i_felt","for_claude"];
   const q = v => { const s = v === undefined || v === null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; };
-  const rows = sortedDates().map(d => {
+  const rows = (dates || sortedDates()).map(d => {
     const e = store.days[d], s = e.sleep||{}, f = e.food||{}, t = e.train||{}, c = e.cardio||{}, m = e.m||{}, fe = e.feel||{}; const ph = phaseOf(e); const plan = dayPlan(ph, d, e); const ft = foodTotals(e);
     const S = ["cChest","cAbs","cThigh"].map(k => toNum(m[k])); const sum = S.every(v => v !== null) ? S[0]+S[1]+S[2] : null;
     const exlog = plan.work ? plan.work.ex.map(x => exLine(x, (t.ex||{})[x.id])).filter(Boolean).join("; ") : "";
@@ -3156,9 +3197,10 @@ function csvAll(){
       plan.work ? plan.work.name : "rest", t.status, t.length, t.energyPre, t.feelAfter, t.effort ? RATE[t.effort] : "", t.soreness, t.pain, exlog, [t.feltNotes, t.swaps, t.extra].filter(Boolean).join(" | "),
       c.steps, c.ab, c.status, c.minutes, c.rounds, c.rpe, c.walkMin, [c.felt, c.notes].filter(Boolean).join(" | "),
       m.waist, m.cChest, m.cAbs, m.cThigh, sum !== null ? sum.toFixed(1) : "", sum !== null ? jp3(sum).toFixed(1) : "", m.neck, m.shoulders, m.chest, m.hips, m.armR, m.armF, m.forearm, m.thighR, m.thighL, m.calfR, m.calfL, m.photos ? "yes" : "", m.photoCmp ? PHOTO_CMP[m.photoCmp] : "", m.absLook ? ABS_LOOK[m.absLook] : "",
-      fe.eAm, fe.ePm, fe.eEve, fe.mood, fe.stress, fe.load, fe.overall, fe.notes, fe.forClaude].map(q).join(",");
+      fe.eAm, fe.ePm, fe.eEve, fe.mood, fe.stress, fe.load, fe.overall, fe.notes, fe.forClaude].map(q);
   });
-  return cols.join(",") + "\n" + rows.join("\n");
+  const keep = cols.map((c, i) => { const g = csvGroupOf(c); return !cats || g === "base" || cats.includes(g) ? i : -1; }).filter(i => i >= 0);
+  return keep.map(i => cols[i]).join(",") + "\n" + rows.map(r => keep.map(i => r[i]).join(",")).join("\n");
 }
 function backupJson(){ return JSON.stringify({ app:"road-to-10", version:1, exportedAt: new Date().toISOString(), settings: store.settings, days: sortedDates().map(d => store.days[d]) }, null, 2); }
 function syncDraftIntoStore(){ if (dirty) store.days[draft.date] = clone(draft); }
@@ -3441,11 +3483,176 @@ $("#v-share").addEventListener("click", e => {
 });
 $("#v-share").addEventListener("change", e => { if (e.target.id === "restoreIn" && e.target.files && e.target.files[0]){ restoreFrom(e.target.files[0]); e.target.value = ""; } });
 
+/* ---------- YOUR DATA BY DATE: pick categories and any date range, then view, share as text or download a spreadsheet ---------- */
+const REP_CATS = [["workout","Workout"],["food","Food"],["cardio","Cardio"],["sleep","Sleep"],["measure","Measure"],["charts","Charts"]];
+const REP_QUICK = [["d7","Last 7 days"],["d30","Last 30 days"],["month","This month"],["last","Last month"],["year","This year"],["phase","This phase"],["all","Everything"]];
+let rep = (() => { const st = ls.get("rt10-report") || {}; return { cats: Array.isArray(st.cats) ? st.cats : REP_CATS.map(c => c[0]), from: st.from || null, to: st.to || null, month: st.month || null, anchor: null, shown: false }; })();
+function repSave(){ ls.set("rt10-report", { cats: rep.cats, from: rep.from, to: rep.to, month: rep.month }); }
+function repInit(){ const today = iso(new Date()); if (!rep.from || !rep.to){ rep.to = today; rep.from = addDays(today, -6); } if (!rep.month) rep.month = rep.to.slice(0, 7); }
+const monthStart = ym => ym + "-01";
+const monthEnd = ym => { const [y, m] = ym.split("-").map(Number); return iso(new Date(y, m, 0)); };
+const shiftMonth = (ym, n) => { const [y, m] = ym.split("-").map(Number); return iso(new Date(y, m - 1 + n, 1)).slice(0, 7); };
+function repDateLabel(d, withYear){ const x = parseISO(d); return `${MON[x.getMonth()]} ${x.getDate()}${withYear ? ", " + x.getFullYear() : ""}`; }
+function repRangeLabel(){ if (rep.from === rep.to) return fmtLong(rep.from); const same = rep.from.slice(0, 4) === rep.to.slice(0, 4); return `${repDateLabel(rep.from, !same)} – ${repDateLabel(rep.to, true)}`; }
+function repDays(){ syncDraftIntoStore(); return sortedDates().filter(d => d >= rep.from && d <= rep.to); }
+function repCatsNoCharts(){ return REP_CATS.map(c => c[0]).filter(c => c !== "charts" && rep.cats.includes(c)); }
+function repMsg(t){ const m = document.getElementById("repMsg"); if (m) m.textContent = t; }
+function repQuick(k){
+  const today = iso(new Date()), ym = today.slice(0, 7), y = today.slice(0, 4), ds = sortedDates();
+  const R = { d7:[addDays(today, -6), today], d30:[addDays(today, -29), today], month:[monthStart(ym), monthEnd(ym)], last:[monthStart(shiftMonth(ym, -1)), monthEnd(shiftMonth(ym, -1))],
+    year:[`${y}-01-01`, `${y}-12-31`], phase:[phaseStartFor(store.settings.phase), today], all:[ds[0] || today, ds.length && ds[ds.length - 1] > today ? ds[ds.length - 1] : today] }[k];
+  if (!R) return;
+  rep.from = R[0] <= R[1] ? R[0] : R[1]; rep.to = R[0] <= R[1] ? R[1] : R[0]; rep.anchor = null; rep.month = rep.from.slice(0, 7); repSave();
+}
+function repCalHTML(){
+  const ym = rep.month, [Y, M] = ym.split("-").map(Number), first = monthStart(ym), last = monthEnd(ym), today = iso(new Date());
+  const lead = (parseISO(first).getDay() + 6) % 7, cells = [];
+  for (let i = 0; i < lead; i++) cells.push("<span></span>");
+  for (let d = first; d <= last; d = addDays(d, 1)){
+    const inR = d >= rep.from && d <= rep.to, st = d === rep.from, en = d === rep.to, logged = !!store.days[d];
+    const cls = [inR && !st && !en ? "in" : "", st ? "s" : "", en ? "e" : "", d === today ? "t" : "", logged ? "dot" : ""].filter(Boolean).join(" ");
+    cells.push(`<button type="button" data-rday="${d}" class="${cls}" aria-pressed="${inR}" aria-label="${fmtLong(d)}${logged ? ", has entries" : ""}">${parseISO(d).getDate()}</button>`);
+  }
+  const ty = Number(today.slice(0, 4)), ds = sortedDates();
+  const y0 = Math.min(2000, ds.length ? Number(ds[0].slice(0, 4)) : ty, Y), y1 = Math.max(ty + 20, Y), years = [];
+  for (let y = y0; y <= y1; y++) years.push(y);
+  return `<div class="rcal">
+    <div class="rcal-h"><button type="button" class="rcal-nav" data-rcal="-1" aria-label="Previous month">‹</button>
+      <div class="rcal-sel"><select data-rmon aria-label="Month">${MON.map((m, i) => `<option value="${i + 1}"${i + 1 === M ? " selected" : ""}>${m}</option>`).join("")}</select><select data-ryear aria-label="Year">${years.map(y => `<option${y === Y ? " selected" : ""}>${y}</option>`).join("")}</select></div>
+      <button type="button" class="rcal-nav" data-rcal="1" aria-label="Next month">›</button></div>
+    <div class="rcal-g">${["M","T","W","T","F","S","S"].map(h => `<span class="dh">${h}</span>`).join("")}${cells.join("")}</div>
+    <div class="small muted">${rep.anchor ? `Start: ${esc(fmtLong(rep.anchor))}. Now tap the last day, or the same day again for just that day.` : "Tap the first day, then the last day. Use the arrows or the month and year to go anywhere. Days with a dot have entries."}</div>
+  </div>`;
+}
+/* the numbers for one category over the chosen days: summary lines and a day-by-day table (used by the view and the text) */
+function repSection(cat, ds, yr){
+  const D = d => store.days[d] || {}, dl = d => yr ? repDateLabel(d, true) : fmtDate(d), today = iso(new Date());
+  const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+  const nice = (v, dp) => fmt(v, dp).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+  const planDays = fn => { const out = [], a = rep.from < LEAD_START ? LEAD_START : rep.from, b = rep.to < today ? rep.to : today; if (a > b || daysBetween(a, b) > 4000) return out;
+    for (let d = a; d <= b; d = addDays(d, 1)){ const e = store.days[d] || { date: d }; if (fn(dayPlan(phaseOf(e), d, store.days[d]))) out.push(d); } return out; };
+  const lines = [];
+  if (cat === "workout"){
+    const rowsD = ds.filter(d => { const t = D(d).train || {}; return liftedOn(D(d)) || t.status || has(t.feelAfter) || has(t.soreness); });
+    const lifted = ds.filter(d => liftedOn(D(d))).length, planned = planDays(p => !!p.work).length;
+    lines.push(`Lifted on ${lifted} day${lifted === 1 ? "" : "s"}${planned && planned >= lifted ? ` out of ${planned} planned (${Math.round(lifted / planned * 100)}%)` : ""}.`);
+    const span = daysBetween(rep.from, rep.to < today ? rep.to : today) + 1; if (span >= 14 && lifted) lines.push(`About ${nice(lifted / span * 7, 1)} sessions a week.`);
+    STRENGTH.forEach(L => { const pts = ds.map(d => ({ d, v: topWeight(D(d), L.ids) })).filter(p => p.v !== null); if (!pts.length) return;
+      lines.push(`${L.n}: heaviest ${fmtW(Math.max(...pts.map(p => p.v)))} lb${pts.length > 1 ? ` (first ${fmtW(pts[0].v)}, last ${fmtW(pts[pts.length - 1].v)})` : ""}.`); });
+    const fa = avg(rowsD.map(d => toNum((D(d).train || {}).feelAfter)).filter(v => v !== null)); if (fa !== null) lines.push(`Felt ${nice(fa, 1)}/5 after workouts on average.`);
+    const ST = { done:"Done", partial:"Part of it", skipped:"Skipped" };
+    return { key:cat, title:"Workout", plate:"var(--red)", lines, cols:[["Date"],["Workout"],["Status"],["Sets",1],["Felt after",1],["Soreness",1],["Pain"]],
+      rows: rowsD.map(d => { const e = D(d), t = e.train || {}, ph = phaseOf(e), plan = dayPlan(ph, d, e), st = workoutStats(e, ph, d);
+        return [dl(d), plan.work ? plan.work.name.split(" · ")[0] : "Rest day", ST[t.status] || (liftedOn(e) ? "Logged" : ""), st ? `${st.done}/${st.total}` : "", t.feelAfter ? t.feelAfter + "/5" : "", t.soreness ? t.soreness + "/5" : "", t.pain || ""]; }) };
+  }
+  if (cat === "food"){
+    const rowsD = ds.filter(d => { const ft = foodTotals(D(d)), f = D(d).food || {}; return ft.kcal !== null || ft.protein !== null || has(f.water) || has(f.hunger); });
+    const K = rowsD.map(d => { const e = D(d), ph = phaseOf(e); return { k: foodTotals(e).kcal, t: targetKcal(ph, isReset(e, ph)) }; }).filter(x => x.k !== null);
+    const Pp = rowsD.map(d => ({ p: foodTotals(D(d)).protein, min: PH[phaseOf(D(d))].pMin || 150 })).filter(x => x.p !== null);
+    if (K.length) lines.push(`Calories logged on ${K.length} day${K.length === 1 ? "" : "s"}: ${fmt(avg(K.map(x => x.k)))} kcal on average, within 100 kcal of the target on ${K.filter(x => Math.abs(x.k - x.t) <= 100).length}.`);
+    if (Pp.length) lines.push(`Protein: ${fmt(avg(Pp.map(x => x.p)))} g on average, at your minimum or more on ${Pp.filter(x => x.p >= x.min).length} of ${Pp.length} days.`);
+    const cb = rowsD.map(d => foodTotals(D(d)).carbs).filter(v => v !== null), fa = rowsD.map(d => foodTotals(D(d)).fat).filter(v => v !== null);
+    if (cb.length || fa.length) lines.push(`Carbs ${cb.length ? fmt(avg(cb)) + " g" : "–"} and fat ${fa.length ? fmt(avg(fa)) + " g" : "–"} on average.`);
+    const w = rowsD.map(d => toNum((D(d).food || {}).water)).filter(v => v !== null); if (w.length) lines.push(`Water: ${nice(avg(w), 1)} cups a day on average (${w.length} day${w.length === 1 ? "" : "s"} logged).`);
+    const h = rowsD.map(d => toNum((D(d).food || {}).hunger)).filter(v => v !== null); if (h.length) lines.push(`Hunger: ${nice(avg(h), 1)}/5 on average.`);
+    return { key:cat, title:"Food", plate:"var(--green)", lines, cols:[["Date"],["Calories",1],["Target",1],["Protein",1],["Carbs",1],["Fat",1],["Water",1],["Hunger",1]],
+      rows: rowsD.map(d => { const e = D(d), ft = foodTotals(e), ph = phaseOf(e), f = e.food || {};
+        return [dl(d), ft.kcal !== null ? fmt(ft.kcal) : "", fmt(targetKcal(ph, isReset(e, ph))), ft.protein !== null ? fmt(ft.protein) + " g" : "", ft.carbs !== null ? fmt(ft.carbs) + " g" : "", ft.fat !== null ? fmt(ft.fat) + " g" : "", has(f.water) ? f.water + " cups" : "", f.hunger ? f.hunger + "/5" : ""]; }) };
+  }
+  if (cat === "cardio"){
+    const rowsD = ds.filter(d => { const c = D(d).cardio || {}; return has(c.steps) || c.status || has(c.minutes) || has(c.walkMin); });
+    const st = rowsD.map(d => ({ v: toNum((D(d).cardio || {}).steps), t: PH[phaseOf(D(d))].stepsN || 10000 })).filter(x => x.v !== null);
+    const planned = planDays(p => !!p.cond).length, done = ds.filter(d => ["done","partial","z2"].includes((D(d).cardio || {}).status)).length;
+    if (st.length) lines.push(`Steps: ${fmt(avg(st.map(x => x.v)))} a day on average, at the target on ${st.filter(x => x.v >= x.t).length} of ${st.length} days.`);
+    if (planned || done) lines.push(`Cardio sessions done: ${done}${planned && planned >= done ? ` of ${planned} planned` : ""}.`);
+    const wm = rowsD.map(d => toNum((D(d).cardio || {}).walkMin)).filter(v => v !== null); if (wm.length) lines.push(`Walks: ${wm.length}, ${fmt(avg(wm))} min on average.`);
+    const CS = { done:"Done", partial:"Cut short", z2:"Zone 2 instead", skipped:"Skipped" };
+    return { key:cat, title:"Cardio", plate:"var(--yellow)", lines, cols:[["Date"],["Steps",1],["Session"],["Minutes",1],["Effort",1],["Walk",1]],
+      rows: rowsD.map(d => { const c = D(d).cardio || {}; return [dl(d), has(c.steps) ? fmt(toNum(c.steps)) : "", CS[c.status] || "", has(c.minutes) ? c.minutes + " min" : "", c.rpe ? c.rpe + "/10" : "", has(c.walkMin) ? c.walkMin + " min" : ""]; }) };
+  }
+  if (cat === "sleep"){
+    const rowsD = ds.filter(d => { const z = D(d).sleep || {}; return (z.bed && z.wake) || z.quality || z.rested; });
+    const hrs = rowsD.map(d => sleepHours((D(d).sleep || {}).bed, (D(d).sleep || {}).wake)).filter(v => v !== null);
+    const q = rowsD.map(d => toNum((D(d).sleep || {}).quality)).filter(v => v !== null), r = rowsD.map(d => toNum((D(d).sleep || {}).rested)).filter(v => v !== null);
+    if (hrs.length) lines.push(`${nice(avg(hrs), 1)} h in bed on average, 7.5 h or more on ${hrs.filter(x => x >= 7.5).length} of ${hrs.length} nights.`);
+    if (q.length || r.length) lines.push(`Sleep quality ${q.length ? nice(avg(q), 1) + "/5" : "–"}, rested ${r.length ? nice(avg(r), 1) + "/5" : "–"} on average.`);
+    return { key:cat, title:"Sleep", plate:"var(--blue)", lines, cols:[["Date"],["Bed",1],["Wake",1],["Hours",1],["Quality",1],["Rested",1]],
+      rows: rowsD.map(d => { const z = D(d).sleep || {}, hh = sleepHours(z.bed, z.wake); return [dl(d), z.bed ? clock(hm(z.bed)) : "", z.wake ? clock(hm(z.wake)) : "", hh !== null ? nice(hh, 1) + " h" : "", z.quality ? z.quality + "/5" : "", z.rested ? z.rested + "/5" : ""]; }) };
+  }
+  /* measure */
+  const MK = ["waist","cChest","cAbs","cThigh","shoulders","chest","armF","armR","thighR","neck","hips","calfR"];
+  const rowsD = ds.filter(d => has(D(d).weight) || MK.some(k => has((D(d).m || {})[k])));
+  const sumC = e => { const m = e.m || {}; const v = ["cChest","cAbs","cThigh"].map(k => toNum(m[k])); return v.every(z => z !== null) ? v[0] + v[1] + v[2] : null; };
+  const series = fn => rowsD.map(d => ({ d, v: fn(D(d)) })).filter(p => p.v !== null);
+  const chg = (pts, u, dp) => { const a = pts[0].v, b = pts[pts.length - 1].v; return pts.length > 1 ? `${nice(a, dp)}${u} → ${nice(b, dp)}${u} (${b - a >= 0 ? "+" : "−"}${nice(Math.abs(b - a), dp)}${u})` : `${nice(a, dp)}${u}`; };
+  const W = series(e => toNum(e.weight)); if (W.length) lines.push(`Weight: ${chg(W, " lb", 1)}${W.length > 1 ? `, ${W.length} weigh-ins` : ""}.`);
+  const WA = series(e => toNum((e.m || {}).waist)); if (WA.length) lines.push(`Waist: ${chg(WA, "″", 2)}.`);
+  const C = series(sumC); if (C.length) lines.push(`Caliper sum: ${chg(C, " mm", 1)}, about ${nice(jp3(C[C.length - 1].v), 1)}% body fat at the latest.`);
+  const SH = series(e => toNum((e.m || {}).shoulders)); if (SH.length) lines.push(`Shoulders: ${chg(SH, "″", 2)}.`);
+  const AF = series(e => toNum((e.m || {}).armF)); if (AF.length) lines.push(`Arm flexed: ${chg(AF, "″", 2)}.`);
+  return { key:"measure", title:"Measure", plate:"var(--steel)", lines, cols:[["Date"],["Weight",1],["Waist",1],["Calipers",1],["Body fat",1],["Shoulders",1],["Arm flexed",1]],
+    rows: rowsD.map(d => { const e = D(d), m = e.m || {}, sm = sumC(e); return [dl(d), has(e.weight) ? nice(toNum(e.weight), 1) + " lb" : "", has(m.waist) ? m.waist + "″" : "", sm !== null ? nice(sm, 1) + " mm" : "", sm !== null ? "≈" + nice(jp3(sm), 1) + "%" : "", has(m.shoulders) ? m.shoulders + "″" : "", has(m.armF) ? m.armF + "″" : ""]; }) };
+}
+function renderReport(){
+  repInit();
+  const ds = sortedDates().filter(d => d >= rep.from && d <= rep.to), nDays = daysBetween(rep.from, rep.to) + 1, none = !repCatsNoCharts().length;
+  $("#v-report").innerHTML = `<h2 style="font-size:28px">Your data by date</h2>
+    <div class="card panel">
+      <p class="small muted" style="margin:0">Pick what you want and the dates. Then read it here, share it as text, or download a spreadsheet.</p>
+      <div class="sub">What to include</div>
+      <div class="chips" role="group" aria-label="Categories">${REP_CATS.map(([k, l]) => `<button type="button" class="chip" data-rcat="${k}" aria-pressed="${rep.cats.includes(k)}">${l}</button>`).join("")}</div>
+      <div class="sub">Dates</div>
+      <div class="chips" role="group" aria-label="Quick dates">${REP_QUICK.map(([k, l]) => `<button type="button" class="chip" data-rquick="${k}">${l}</button>`).join("")}</div>
+      ${repCalHTML()}
+      <div class="rsum"><b>${esc(repRangeLabel())}</b><span class="muted"> · ${fmt(nDays)} day${nDays === 1 ? "" : "s"} · ${ds.length} with entries</span></div>
+      ${none ? `<div class="notice warn">Pick at least one of Workout, Food, Cardio, Sleep or Measure.</div>` : ""}
+      <div class="row"><button type="button" class="btn" data-rgo="view"${none ? " disabled" : ""}>Show it</button><button type="button" class="btn ghost" data-rgo="share"${none ? " disabled" : ""}>Share as text</button><button type="button" class="btn ghost" data-rgo="copy"${none ? " disabled" : ""}>Copy text</button><button type="button" class="btn ghost" data-rgo="csv"${none ? " disabled" : ""}>Download spreadsheet</button></div>
+      <span class="small muted" id="repMsg" role="status"></span>
+      ${rep.cats.includes("charts") ? `<p class="small muted" style="margin:0">Charts show here in the app. The text and the spreadsheet have the numbers.</p>` : ""}
+    </div>
+    <div id="repOut"></div>`;
+  if (rep.shown && !none && !rep.anchor) repShow();
+}
+function repShow(){
+  const out = document.getElementById("repOut"); if (!out) return;
+  const ds = repDays(), cats = repCatsNoCharts(), charts = rep.cats.includes("charts"), yr = rep.from.slice(0, 4) !== rep.to.slice(0, 4);
+  const secs = cats.map(c => repSection(c, ds, yr));
+  out.innerHTML = secs.map(S => `<div class="card panel"><h2 style="display:flex;align-items:center;gap:10px"><span class="plate" style="--sec:${S.plate}"></span>${S.title}</h2>
+      ${S.lines.length ? `<ul class="rules">${S.lines.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : ""}
+      ${charts ? chartSectionHTML(S.key, "r-") : ""}
+      ${S.rows.length ? `<div class="sub">Day by day · ${S.rows.length} day${S.rows.length === 1 ? "" : "s"}</div><div class="scroll-x"><table><thead><tr>${S.cols.map(([c, n]) => `<th${n ? ' class="num"' : ""}>${esc(c)}</th>`).join("")}</tr></thead><tbody>${S.rows.map(r => `<tr>${r.map((v, i) => `<td${S.cols[i][1] ? ' class="num"' : ""}>${esc(v === null || v === undefined || v === "" ? "–" : String(v))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`
+        : `<p class="empty">Nothing logged for ${S.title.toLowerCase()} in these dates.</p>`}
+    </div>`).join("");
+  if (charts) drawAllCharts({ from: rep.from, to: rep.to }, { prefix:"r-", only: cats });
+}
+function repText(){
+  const ds = repDays(), cats = repCatsNoCharts(), yr = rep.from.slice(0, 4) !== rep.to.slice(0, 4), nDays = daysBetween(rep.from, rep.to) + 1;
+  const names = cats.map(c => REP_CATS.find(x => x[0] === c)[1]);
+  const secs = cats.map(c => repSection(c, ds, yr));
+  const days = ds.map(d => dayText(d, cats)).filter(Boolean);
+  return `ROAD TO 10% — ${repRangeLabel()} (${nDays} day${nDays === 1 ? "" : "s"}, ${days.length} with entries)\nIncluded: ${names.join(", ")}\n\n`
+    + secs.map(S => `${S.title.toUpperCase()}\n${S.lines.length ? S.lines.map(l => "- " + l).join("\n") : "- Nothing logged"}`).join("\n\n")
+    + `\n\nDAY BY DAY\n${days.join("\n\n") || "Nothing logged in these dates."}`;
+}
+$("#v-report").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  if (b.dataset.rcat){ const k = b.dataset.rcat; rep.cats = rep.cats.includes(k) ? rep.cats.filter(x => x !== k) : rep.cats.concat([k]); repSave(); renderReport(); return; }
+  if (b.dataset.rquick){ repQuick(b.dataset.rquick); renderReport(); return; }
+  if (b.dataset.rcal){ rep.month = shiftMonth(rep.month, Number(b.dataset.rcal)); repSave(); renderReport(); return; }
+  if (b.dataset.rday){ const d = b.dataset.rday; if (rep.anchor){ const a = rep.anchor; rep.from = a < d ? a : d; rep.to = a < d ? d : a; rep.anchor = null; } else { rep.anchor = d; rep.from = d; rep.to = d; } repSave(); renderReport(); return; }
+  const go = b.dataset.rgo; if (!go) return;
+  if (go === "view"){ rep.shown = true; repShow(); const o = document.getElementById("repOut"); if (o && o.firstChild) o.scrollIntoView({ behavior:"smooth", block:"start" }); return; }
+  if (go === "share"){ const text = repText(); if (navigator.share) navigator.share({ text }).catch(err => { if (!(err && err.name === "AbortError")) repMsg("Couldn't open the share sheet. Use Copy text instead."); }); else repMsg("Sharing isn't available here. Use Copy text instead."); return; }
+  if (go === "copy"){ const text = repText(); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => repMsg("Copied. Paste it wherever you like.")).catch(() => repMsg("Copy was blocked here. Use Share as text instead.")); else repMsg("Copy isn't available here. Use Share as text instead."); return; }
+  if (go === "csv"){ const ds = repDays(); shareFile(`road-to-10-${rep.from}-to-${rep.to}.csv`, csvAll(ds, repCatsNoCharts()), "text/csv").then(r => repMsg(r === "downloaded" ? `Downloaded the spreadsheet (${ds.length} day${ds.length === 1 ? "" : "s"}).` : "")).catch(err => { if (!(err && err.name === "AbortError")) repMsg("Couldn't open the share sheet."); }); return; }
+});
+$("#v-report").addEventListener("change", e => { const t = e.target; if (t.dataset && ("rmon" in t.dataset || "ryear" in t.dataset)){ const mon = $("#v-report [data-rmon]").value, yr = $("#v-report [data-ryear]").value; rep.month = `${yr}-${pad(Number(mon))}`; repSave(); renderReport(); } });
+
 /* ---------- tabs, phase picker, mode ---------- */
-const TABS = ["today","workout","food","sleep","measure","charts","more","history","cheat","share","overview"];
+const TABS = ["today","workout","food","sleep","measure","charts","more","history","cheat","share","overview","report"];
 const NAVTABS = ["today","workout","food","sleep","measure","charts","more"];
 function showTab(t){
-  const prev = tab; tab = t; const navKey = ["history","cheat","share","overview"].includes(t) ? "more" : t;
+  const prev = tab; tab = t; const navKey = ["history","cheat","share","overview","report"].includes(t) ? "more" : t;
   TABS.forEach(x => { $("#v-" + x).hidden = x !== t; });
   NAVTABS.forEach(x => $("#t-" + x).setAttribute("aria-selected", String(x === navKey)));
   if (prev !== t && ["today","workout","food","sleep","measure"].includes(prev)) $("#v-" + prev).innerHTML = "";
@@ -3460,6 +3667,7 @@ function showTab(t){
   if (t === "history") renderHistory();
   if (t === "cheat") renderCheat();
   if (t === "share") renderShare();
+  if (t === "report") renderReport();
   wakeLock(t === "workout");
   try { history.replaceState(null, "", "#" + t); } catch(e){}
 }
